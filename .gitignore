@@ -1,0 +1,32 @@
+# 수집 데이터는 저장소에 올리지 않는다.
+# 자막/오디오는 용량 문제도 있지만, 무엇보다 원저작물이라 배포 대상이 아니다.
+data/
+*.vtt
+*.srt
+*.wav
+*.m4a
+*.mp3
+
+# 벡터 인덱스 / 임베딩 캐시
+index/
+*.faiss
+*.sqlite3
+*.duckdb
+
+# 파이썬
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# 환경 변수 (API 키)
+.env
+.env.*
+!.env.example
+
+# 에디터 / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
