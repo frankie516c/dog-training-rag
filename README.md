@@ -6,7 +6,7 @@
 
 ## 현재 상태
 
-수집 대상 실측까지 완료. 파이프라인 미구현.
+수집 대상 실측과 데이터 조사 계약, 최소 FastAPI 실행 기반까지 구현. 검색 파이프라인은 미구현.
 
 | 항목 | 실측값 |
 |---|---|
@@ -67,10 +67,13 @@ scripts/
 docs/
   SOURCES.md         소스 지도와 라이선스 메모
   GROUNDRULES.md     팀 규칙과 이 저장소의 선택 근거
+  backend.md         최소 백엔드 설정·실행·검증 방법
+backend/app/         FastAPI 앱과 설정 로딩
+tests/               백엔드 테스트
 data/                수집물 (gitignored — 저장소에 올리지 않음)
 ```
 
-백엔드(`backend/`)와 프론트(`frontend/`)는 아직 없습니다. 수집·청킹이 한 바퀴 돈 뒤에 올립니다.
+백엔드 실행 방법은 [`docs/backend.md`](docs/backend.md)를 참고하세요. 프론트엔드(`frontend/`)와 검색 파이프라인은 아직 없습니다.
 
 ## 실행
 
