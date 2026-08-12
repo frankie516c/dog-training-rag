@@ -41,6 +41,22 @@ RAG에서 깨진 청크는 없느니만 못합니다. 출처 링크를 붙여도
 
 상세는 [`docs/SOURCES.md`](docs/SOURCES.md).
 
+## 스택
+
+팀 그라운드룰로 고정된 것과, 이 PC 환경에 맞춰 고른 것이 섞여 있습니다. 판단 근거는 [`docs/GROUNDRULES.md`](docs/GROUNDRULES.md).
+
+| | | |
+|---|---|---|
+| 백엔드 | FastAPI | 규칙 |
+| 프론트 | Next.js | 규칙 |
+| 패키지 | uv | 규칙 |
+| 벡터 DB | Qdrant 임베디드 (`path=`) | 선택 — Docker 없이 로컬 파일로 |
+| 임베딩 | 로컬 (`bge-m3` / `KURE-v1`) | 선택 — 청킹 재실험 비용을 낮추려고 |
+| 생성 | API | 선택 — VRAM 6GB로는 한국어 생성 품질이 안 나옴 |
+| 전사 | faster-whisper `int8_float16` | 선택 — 6GB에 맞춤 |
+
+ERD와 관계형 스키마 설계는 규칙에 따라 배제합니다. 메타데이터는 벡터 DB payload에 넣습니다.
+
 ## 구조
 
 ```
@@ -50,8 +66,11 @@ scripts/
   vtt_stats.py       VTT 롤업 중복 제거 후 실제 본문 분량 측정
 docs/
   SOURCES.md         소스 지도와 라이선스 메모
+  GROUNDRULES.md     팀 규칙과 이 저장소의 선택 근거
 data/                수집물 (gitignored — 저장소에 올리지 않음)
 ```
+
+백엔드(`backend/`)와 프론트(`frontend/`)는 아직 없습니다. 수집·청킹이 한 바퀴 돈 뒤에 올립니다.
 
 ## 실행
 
