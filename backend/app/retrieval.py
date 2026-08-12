@@ -20,7 +20,7 @@ from backend.app.data_validation import (
     ValidationSummary,
     load_and_validate,
 )
-from backend.app.domain import EvidenceCard
+from backend.app.domain import EvidenceCard, SourceRegistryEntry
 from backend.app.embeddings import BgeM3EmbeddingProvider, EmbeddingProvider
 
 DEFAULT_TOP_K = 5
@@ -162,6 +162,12 @@ class EvidenceRetrieval:
                 raise RetrievalError(f"Qdrant point content_hash is stale for card {card_id}")
             results.append(SearchResult(card_id=card_id, score=point.score, card=card))
         return results
+
+    def sources_by_id(self) -> dict[str, SourceRegistryEntry]:
+        """Return the validated registry used to resolve server-owned citations."""
+
+        data = _load_retrieval_data(self.paths)
+        return {source.source_id: source for source in data.sources}
 
 
 def _load_retrieval_data(paths: DataPaths) -> DataLoadResult:
