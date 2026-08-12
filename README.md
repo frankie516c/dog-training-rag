@@ -55,21 +55,25 @@ data/                수집물 (gitignored — 저장소에 올리지 않음)
 
 ## 실행
 
+패키지 관리는 **uv**를 씁니다 (팀 그라운드룰). `pip`을 직접 쓰지 마세요.
+
 ```powershell
-# 의존성
-pip install yt-dlp
+# 의존성 설치 — .venv 생성부터 lock 반영까지 한 번에
+uv sync
 
 # 1. 채널 인덱스 수집
-python scripts/collect_index.py "https://www.youtube.com/channel/UCee1MvXr6E8qC_d2WEYTU5g/videos" data/bodeum_index.tsv
+uv run python scripts/collect_index.py "https://www.youtube.com/channel/UCee1MvXr6E8qC_d2WEYTU5g/videos" data/bodeum_index.tsv
 
 # 2. 자막 커버리지 실측 (20개 샘플)
-python scripts/check_subs.py data/bodeum_index.tsv 20
+uv run python scripts/check_subs.py data/bodeum_index.tsv 20
 
 # 3. 받은 자막의 실제 본문 분량 확인
-python scripts/vtt_stats.py "data/subs/*.vtt"
+uv run python scripts/vtt_stats.py "data/subs/*.vtt"
 ```
 
-재전사 단계는 `ffmpeg`와 별도 Python 3.12 환경이 필요합니다. 워크스페이스 공용 venv는 3.14라 `ctranslate2` 휠이 없습니다.
+의존성을 추가할 때도 `uv add <패키지>`로 넣습니다. `uv.lock`은 커밋합니다.
+
+재전사 단계에서는 `ffmpeg`가 추가로 필요합니다 (`winget install Gyan.FFmpeg`). Python 버전은 3.14로 충분합니다 — `ctranslate2` 4.8.1에 cp314 Windows 휠이 있는 것을 확인했습니다.
 
 ## 데이터 취급
 
