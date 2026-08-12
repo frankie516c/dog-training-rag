@@ -20,9 +20,10 @@
 
 ```
 GPU      : RTX 3050 / VRAM 6 GB
-Node     : v24.18.0  (준비됨)
-Docker   : 없음
-ffmpeg   : 없음  (재전사 단계에서 필요)
+Node     : v24.18.0
+Python   : 3.14.6 (uv 관리)
+Docker   : Docker Desktop 4.86.0 설치
+ffmpeg   : 없음 — 이 파이프라인에는 필요 없음 (아래 참고)
 ```
 
 ### DB — Qdrant 임베디드 모드
@@ -48,10 +49,42 @@ ffmpeg   : 없음  (재전사 단계에서 필요)
 
 ### 전사 — faster-whisper, int8_float16
 
-`large-v3`를 fp16으로 올리면 약 4.7GB로 6GB에 빠듯합니다. `int8_float16`으로 낮춰 여유를 둡니다. 이 단계 전에 `winget install Gyan.FFmpeg` 필요.
+`large-v3`를 fp16으로 올리면 약 4.7GB로 6GB에 빠듯합니다. `int8_float16`으로 낮춰 여유를 둡니다.
+
+**시스템 `ffmpeg`는 설치하지 않습니다.** 처음에 필요하다고 적었으나 실측 결과 아니었습니다.
+
+- 오디오는 `-f bestaudio`로 원본 스트림(opus/webm)을 그대로 받습니다 — 후처리가 없으니 yt-dlp에 ffmpeg가 필요 없습니다
+- faster-whisper 1.x는 **PyAV로 디코딩**하고, PyAV는 ffmpeg 라이브러리를 휠에 내장합니다
+- 실제로 시스템 ffmpeg 없이 48kHz opus → 16kHz mono 디코딩이 되는 것을 확인했습니다
+
+ffmpeg가 필요해지는 경우는 `--extract-audio --audio-format wav`처럼 **포맷 변환을 시킬 때**입니다. 그럴 이유가 없습니다 — Whisper는 어차피 16kHz로 리샘플하므로 중간에 wav를 만드는 건 디스크만 낭비합니다.
 
 ## 배제한 것
 
 - **ERD·관계형 스키마 설계** — 규칙대로 배제. 메타데이터는 벡터 DB의 payload에 넣습니다
 - **공용 DB 서버** — 규칙대로 배제
-- **Docker** — 현재 불필요. 도입한다면 그때 판단
+- **시스템 ffmpeg** — 불필요함을 확인
+- **로컬 생성 LLM** — VRAM 6GB 제약
+
+## Docker
+
+Docker Desktop 4.86.0 + CLI 29.7.2 설치됨. 이 저장소의 벡터 DB는 **임베디드 모드라 Docker를 쓰지 않습니다.** 나중에 Qdrant를 서버로 띄우거나 팀 공통 실행 환경이 필요해지면 그때 씁니다.
+
+### 이 PC에서 Docker를 처음 띄울 때 걸린 것
+
+Docker Desktop이 `virtualisation support wasn't detected`로 실행에 실패했습니다. **BIOS 문제가 아닙니다.**
+
+```
+VirtualizationFirmwareEnabled : True    ← BIOS의 VT-x는 켜져 있음
+SecondLevelAddressTranslation : True
+VMMonitorModeExtensions       : True
+HyperVisorPresent             : False   ← Windows 가상화 기능이 꺼져 있음
+```
+
+메시지가 BIOS를 가리키는 것처럼 읽히지만 실제 원인은 Windows 선택적 기능입니다. 관리자 권한으로:
+
+```powershell
+wsl --install --no-distribution
+```
+
+`--no-distribution`을 붙이는 건 Docker Desktop이 자체 WSL 배포판(`docker-desktop`)을 만들기 때문입니다. Ubuntu 같은 걸 따로 깔 필요가 없습니다. 실행 후 **재부팅**해야 적용됩니다.

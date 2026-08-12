@@ -92,7 +92,12 @@ uv run python scripts/vtt_stats.py "data/subs/*.vtt"
 
 의존성을 추가할 때도 `uv add <패키지>`로 넣습니다. `uv.lock`은 커밋합니다.
 
-재전사 단계에서는 `ffmpeg`가 추가로 필요합니다 (`winget install Gyan.FFmpeg`). Python 버전은 3.14로 충분합니다 — `ctranslate2` 4.8.1에 cp314 Windows 휠이 있는 것을 확인했습니다.
+### 외부 도구는 필요 없습니다
+
+`ffmpeg`도 별도 Python 환경도 필요 없습니다. 둘 다 실측으로 확인했습니다.
+
+- **ffmpeg 불필요** — 오디오를 `-f bestaudio`로 원본 스트림(opus/webm) 그대로 받고, faster-whisper가 쓰는 **PyAV가 ffmpeg 라이브러리를 내장**해 그걸 직접 디코딩합니다. 시스템 ffmpeg 없이 48kHz opus → 16kHz mono 변환이 되는 것을 확인했습니다. ffmpeg가 필요해지는 건 yt-dlp에 `--extract-audio --audio-format wav` 같은 후처리를 시킬 때인데, 이 파이프라인은 그걸 하지 않습니다.
+- **Python 3.14로 충분** — `ctranslate2` 4.8.1에 `cp314-win_amd64` 휠이 있습니다.
 
 ## 데이터 취급
 
