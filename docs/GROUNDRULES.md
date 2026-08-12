@@ -21,7 +21,7 @@
 ```
 GPU      : RTX 3050 / VRAM 6 GB
 Node     : v24.18.0
-Python   : 3.14.6 (uv 관리)
+Python   : 3.12.13 (uv 관리)
 Docker   : Docker Desktop 4.86.0 설치
 ffmpeg   : 없음 — 이 파이프라인에는 필요 없음 (아래 참고)
 ```

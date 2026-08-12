@@ -97,7 +97,7 @@ uv run python scripts/vtt_stats.py "data/subs/*.vtt"
 `ffmpeg`도 별도 Python 환경도 필요 없습니다. 둘 다 실측으로 확인했습니다.
 
 - **ffmpeg 불필요** — 오디오를 `-f bestaudio`로 원본 스트림(opus/webm) 그대로 받고, faster-whisper가 쓰는 **PyAV가 ffmpeg 라이브러리를 내장**해 그걸 직접 디코딩합니다. 시스템 ffmpeg 없이 48kHz opus → 16kHz mono 변환이 되는 것을 확인했습니다. ffmpeg가 필요해지는 건 yt-dlp에 `--extract-audio --audio-format wav` 같은 후처리를 시킬 때인데, 이 파이프라인은 그걸 하지 않습니다.
-- **Python 3.14로 충분** — `ctranslate2` 4.8.1에 `cp314-win_amd64` 휠이 있습니다.
+- **Python 3.12 사용** — 프로젝트 가상환경과 의존성은 Python 3.12 기준으로 관리합니다.
 
 ## 데이터 취급
 
