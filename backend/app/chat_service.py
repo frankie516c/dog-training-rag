@@ -1,21 +1,22 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Protocol
 from uuid import UUID, uuid4
 
+from backend.app.composition import EvidenceCompositionError, compose_evidence_answer
 from backend.app.domain import (
     ChatCitation,
     ChatRequest,
     ChatResponse,
     ChatStatus,
     ContentLanguage,
+    EvidenceCard,
     EvidenceLevel,
     SafetyNotice,
     SourceRegistryEntry,
 )
-from backend.app.generation import GenerationEvidence, GenerationProvider
 from backend.app.retrieval import DEFAULT_TOP_K, SearchResult
 from backend.app.safety import detect_safety_risk
 from backend.app.scope import card_scope, route_query_scope
@@ -39,19 +40,26 @@ class ChatRetriever(Protocol):
 
 
 class ChatService:
+    """Answer from reviewed evidence only. No generation provider is involved.
+
+    The production path composes the approved claim text of the selected cards. See
+    backend.app.composition and docs/answer-composition.md for why free generation was
+    removed from this path.
+    """
+
     def __init__(
         self,
         *,
         retriever: ChatRetriever,
-        generator: GenerationProvider,
         scope_matched_minimum: float = PROVISIONAL_SCOPE_MATCHED_MINIMUM,
         candidate_top_k: int = CANDIDATE_TOP_K,
+        composer: Callable[[Sequence[EvidenceCard]], str] = compose_evidence_answer,
         request_id_factory: Callable[[], UUID] = uuid4,
     ) -> None:
         self._retriever = retriever
-        self._generator = generator
         self._scope_matched_minimum = scope_matched_minimum
         self._candidate_top_k = candidate_top_k
+        self._composer = composer
         self._request_id_factory = request_id_factory
 
     async def answer(self, request: ChatRequest) -> ChatResponse:
@@ -78,38 +86,30 @@ class ChatService:
         except Exception as exc:
             raise ChatServiceUnavailable("evidence retrieval failed") from exc
 
+        # A card is only usable when its scope matches, its dense score clears the
+        # provisional minimum, and its reviewed claim is already written in the requested
+        # language. Nothing is translated, so a language mismatch removes the card from the
+        # answer, the citations and the limitations alike.
         selected = [
             result
             for result in search_results
-            if card_scope(result.card) is scope and result.score >= self._scope_matched_minimum
+            if card_scope(result.card) is scope
+            and result.card.claim_language is request.response_language
+            and result.score >= self._scope_matched_minimum
         ]
         if not selected:
             return self._insufficient(request, _insufficient_answer(request.response_language))
 
-        evidence = tuple(
-            GenerationEvidence(
-                claim=result.card.claim,
-                topic=result.card.topic,
-                limitations=tuple(result.card.limitations),
-            )
-            for result in selected
-        )
+        try:
+            answer = self._composer([result.card for result in selected])
+        except EvidenceCompositionError:
+            return self._insufficient(request, _insufficient_answer(request.response_language))
+
         try:
             sources_by_id = self._retriever.sources_by_id()
             citations = _build_citations(selected, sources_by_id)
         except Exception as exc:
             raise ChatServiceUnavailable("citation construction failed") from exc
-
-        try:
-            answer = await self._generator.generate(
-                message=request.message,
-                response_language=request.response_language,
-                evidence=evidence,
-            )
-        except Exception as exc:
-            raise ChatServiceUnavailable("generation provider failed") from exc
-        if not answer.strip():
-            raise ChatServiceUnavailable("generation provider returned an empty answer")
 
         return ChatResponse(
             request_id=self._request_id_factory(),

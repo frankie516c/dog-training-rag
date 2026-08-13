@@ -18,7 +18,7 @@ BGE-M3 dense 검색에 global cosine threshold `0.45` 하나만 적용한 smoke 
 ## rule-based scope gate를 둔 이유
 
 - **결정적이다.** 같은 질문은 항상 같은 범주로 간다. 재현·디버깅·회귀 테스트가 가능하다.
-- **모델을 부르지 않는다.** 미지원·안전 질문은 임베딩과 생성 provider를 모두 건너뛴다. 응답이 빠르고, provider가 설정되지 않은 상태에서도 정상적인 200 응답을 준다.
+- **모델을 부르지 않는다.** 미지원·안전 질문은 임베딩 검색과 answer 조립을 모두 건너뛴다. 응답이 빠르고, 검색 인덱스가 비어 있어도 정상적인 200 응답을 준다. (5H 이후 기본 경로에는 생성 provider 자체가 없다 — [`answer-composition.md`](answer-composition.md))
 - **fail closed가 자연스럽다.** 규칙에 없으면 답하지 않는다. LLM classifier는 모르는 질문도 그럴듯하게 분류해 근거 없는 답변으로 이어진다.
 
 이 게이트는 검색 품질 향상 장치가 아니라 **범위 밖 답변을 막는 장치**다. reranker, hybrid retrieval, LLM classifier는 이번 범위가 아니다.
