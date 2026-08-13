@@ -23,11 +23,16 @@
 수집은 `yt-dlp`. 자막만 받을 때는 `ffmpeg`가 필요 없습니다.
 
 ```powershell
-yt-dlp --skip-download --write-subs --sub-langs "ko" --sub-format "vtt/best" `
+yt-dlp --skip-download --write-subs --sub-langs "ko.*" --sub-format "vtt/best" `
        --write-info-json -o "data/subs/%(id)s.%(ext)s" <URL>
 ```
 
-`--write-auto-subs`는 **의도적으로 빼두었습니다.** 자동자막을 받아두면 나중에 섞여 들어갑니다. 사유는 README의 "핵심 제약" 절 참고.
+- `--sub-langs "ko.*"` 는 yt-dlp의 language regex를 써서 `ko` 트랙과 `ko-` 접미사 트랙을 함께 탐색하기 위한 **조사 명령**입니다. 이전 표기였던 `"ko"` 는 정확히 일치하는 트랙만 잡습니다. 2026-08-13 표본 84편에서 수동 `ko` 계열 트랙 25편 중 18편이 `ko-` 접미사 형태였고, `"ko"` 로는 그 18편이 경고 없이 누락됐습니다.
+- `--write-auto-subs`가 없으므로 **자동생성 자막은 포함되지 않습니다.** 자동자막을 받아두면 나중에 섞여 들어갑니다. 사유는 README의 "핵심 제약" 절 참고.
+- 이 명령은 **기술적 feasibility 확인용**이며, 전체 채널 수집이나 수집물의 RAG 재사용을 승인하지 않습니다.
+- 실제 대량 수집·저장·가공은 **YouTube 약관과 콘텐츠 권리자의 별도 허락을 확인하기 전까지 금지**합니다.
+
+보듬TV 채널의 조사 기록과 이용조건 판정은 [`data-research/source-audits/bodeumtv-youtube-channel.md`](data-research/source-audits/bodeumtv-youtube-channel.md) 참고. 현재 `recommendation: hold`입니다.
 
 ## 2층 — 정답 기준 (라이선스 명확)
 
