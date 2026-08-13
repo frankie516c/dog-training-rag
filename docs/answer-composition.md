@@ -64,14 +64,16 @@
 
 ## 런타임 구성
 
-기본 경로는 generation provider를 **생성하지도 호출하지도 않는다.** 따라서 다음 상태에서도 `/chat`이 정상 동작한다.
+이 문서가 설명하는 결정적 조립은 5I-A 이후 **안전 fallback**이다. provider가 설정돼 있으면 grounded generation을 먼저 시도하고, 검증에 실패하거나 provider가 없으면 여기로 내려온다. 전체 흐름은 [`grounded-rag.md`](grounded-rag.md)에 있다.
+
+fallback 경로만으로도 서비스가 완결되므로 다음 상태에서 `/chat`이 정상 동작한다.
 
 - Ollama 미실행
 - `GENERATION_BASE_URL`, `GENERATION_API_KEY`, `GENERATION_MODEL` 미설정
 
-`backend/app/generation.py`와 그 단위 테스트는 **5G 실험 기록과 향후 모델 비교를 위해 보존**하지만 production `/chat` 실행 경로에서는 사용하지 않는다. `chat_service.py`와 `main.py`는 이 모듈을 import하지 않으며, 그 사실을 테스트로 고정했다.
+`ChatService`는 HTTP provider를 직접 알지 못하고 `GroundedAnswerer`만 선택적으로 받는다. provider 부재는 오류가 아니며 503을 만들지 않는다.
 
-dual mode, provider 선택 UI, 새로운 public API field는 추가하지 않는다. production 경로는 결정적 조립 하나뿐이다.
+새로운 public API field, dual mode 스위치, provider 선택 UI는 없다. 두 경로는 같은 `ChatResponse`를 만들고, 어느 경로로 답했는지는 응답에 드러나지 않는다.
 
 ## 앞으로 더 강한 모델을 쓰려면
 

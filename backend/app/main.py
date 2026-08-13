@@ -10,6 +10,8 @@ from backend.app.config import Settings, get_settings
 from backend.app.data_validation import DataPaths
 from backend.app.domain import ChatErrorResponse, ChatRequest, ChatResponse
 from backend.app.embeddings import BgeM3EmbeddingProvider
+from backend.app.generation import OpenAICompatibleGenerationProvider
+from backend.app.grounded import GroundedAnswerer
 from backend.app.retrieval import EvidenceRetrieval
 
 CHAT_NOT_READY_MESSAGE = "검증된 근거를 검색하는 기능을 준비 중입니다."
@@ -76,11 +78,10 @@ def create_app(
 
 
 def _create_chat_service(settings: Settings) -> ChatService | None:
-    """Build the evidence-only chat service.
+    """Build the chat service, with grounded generation only if a provider is configured.
 
-    No generation provider is constructed or called here. `/chat` answers by composing
-    reviewed EvidenceCard claims, so the service is ready without Ollama and without any
-    GENERATION_* variable being set.
+    A missing or unusable provider is not an error: the service still starts and answers
+    by composing reviewed claims. Only retrieval initialization failure disables `/chat`.
     """
 
     try:
@@ -105,8 +106,40 @@ def _create_chat_service(settings: Settings) -> ChatService | None:
 
     return ChatService(
         retriever=retriever,
+        grounded=_create_grounded_answerer(settings),
         scope_matched_minimum=settings.scope_matched_minimum_score,
     )
+
+
+def _create_grounded_answerer(settings: Settings) -> GroundedAnswerer | None:
+    """Return an answerer when a provider is configured, otherwise None.
+
+    Model name and endpoint come from settings only; nothing is hardcoded. Returning None
+    leaves the deterministic path in place rather than failing the service.
+    """
+
+    base_url = settings.generation_base_url
+    model = settings.generation_model
+    if not base_url or not base_url.strip() or not model or not model.strip():
+        logger.info("grounded generation disabled: no provider configured")
+        return None
+
+    api_key = settings.generation_api_key
+    try:
+        provider = OpenAICompatibleGenerationProvider(
+            base_url=base_url,
+            model=model,
+            api_key=api_key.get_secret_value() if api_key is not None else None,
+        )
+    except (OSError, RuntimeError, ValueError) as exc:
+        # Never log the settings values themselves; the API key lives in there.
+        logger.error(
+            "grounded generation disabled: provider initialization failed (%s)",
+            type(exc).__name__,
+            exc_info=True,
+        )
+        return None
+    return GroundedAnswerer(provider=provider)
 
 
 def _chat_not_ready_response() -> JSONResponse:

@@ -166,17 +166,22 @@ def test_retrieval_initialization_failure_logs_the_cause_and_stays_not_ready(
         assert forbidden not in response.text
 
 
-def test_generation_module_is_not_used_by_the_production_chat_path() -> None:
-    """The adapter is kept for future model comparisons, not for serving /chat."""
+def test_chat_service_does_not_depend_on_the_generation_adapter() -> None:
+    """ChatService talks to a GroundedAnswerer, never to an HTTP provider directly.
+
+    main.py may construct the adapter when one is configured; the service itself must
+    stay usable with no provider at all.
+    """
+
+    import inspect
 
     import backend.app.chat_service as chat_service
-    import backend.app.main as main_module
 
-    for module in (chat_service, main_module):
-        source = Path(module.__file__).read_text(encoding="utf-8")
-        assert "from backend.app.generation import" not in source
-        assert "import backend.app.generation" not in source
-
-    assert not hasattr(main_module, "OpenAICompatibleGenerationProvider")
+    source = Path(chat_service.__file__).read_text(encoding="utf-8")
+    assert "from backend.app.generation import" not in source
+    assert "import backend.app.generation" not in source
     assert not hasattr(chat_service, "GenerationProvider")
     assert not hasattr(chat_service, "GenerationEvidence")
+
+    parameters = inspect.signature(chat_service.ChatService.__init__).parameters
+    assert parameters["grounded"].default is None

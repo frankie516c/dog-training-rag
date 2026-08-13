@@ -5,6 +5,11 @@ from collections.abc import Callable, Sequence
 from typing import Protocol
 from uuid import UUID, uuid4
 
+from backend.app.answerability import (
+    QuestionIntent,
+    card_supports_intent,
+    classify_question_intent,
+)
 from backend.app.composition import EvidenceCompositionError, compose_evidence_answer
 from backend.app.domain import (
     ChatCitation,
@@ -17,6 +22,7 @@ from backend.app.domain import (
     SafetyNotice,
     SourceRegistryEntry,
 )
+from backend.app.grounded import DraftVerdict, GroundedAnswerer
 from backend.app.retrieval import DEFAULT_TOP_K, SearchResult
 from backend.app.safety import detect_safety_risk
 from backend.app.scope import card_scope, route_query_scope
@@ -27,6 +33,16 @@ PROVISIONAL_SCOPE_MATCHED_MINIMUM = 0.40
 # than the CLI default so an on-topic card is not lost behind off-topic neighbours, and
 # it is not derived from the current corpus size.
 CANDIDATE_TOP_K = 20
+
+# Intents allowed to reach the generation provider.
+#
+# COMPARISON is excluded on purpose. The draft validator checks vocabulary, not meaning, so
+# it cannot see a dropped negation ("나타나지 않았다" -> "나타났다") or a swapped comparison
+# subject — both reuse the evidence's own words and numbers. That is exactly the failure two
+# local 4B models produced in checkpoints 5G and 5G-1, and it is the failure with the worst
+# consequence here: a reversed welfare conclusion carries a correct-looking citation.
+# Until a semantic guard exists, a comparison answer is the reviewed claim itself.
+GENERATED_INTENTS = frozenset({QuestionIntent.HOW_TO, QuestionIntent.EXPLANATION})
 
 
 class ChatServiceUnavailable(RuntimeError):
@@ -40,23 +56,30 @@ class ChatRetriever(Protocol):
 
 
 class ChatService:
-    """Answer from reviewed evidence only. No generation provider is involved.
+    """Answer from retrieved evidence, generating only when the draft validates.
 
-    The production path composes the approved claim text of the selected cards. See
-    backend.app.composition and docs/answer-composition.md for why free generation was
-    removed from this path.
+    Two paths share one selection pipeline. When a grounded answerer is configured and the
+    intent is allowed to use it, the model may phrase an answer over the selected cards, but
+    the draft must survive validation against those exact cards. When there is no answerer,
+    when the intent is excluded, or when the draft fails any check, the reviewed claims are
+    composed deterministically (checkpoint 5H). See GENERATED_INTENTS for the exclusion.
+
+    Neither path runs when the evidence cannot answer the kind of question that was
+    asked. See docs/grounded-rag.md.
     """
 
     def __init__(
         self,
         *,
         retriever: ChatRetriever,
+        grounded: GroundedAnswerer | None = None,
         scope_matched_minimum: float = PROVISIONAL_SCOPE_MATCHED_MINIMUM,
         candidate_top_k: int = CANDIDATE_TOP_K,
         composer: Callable[[Sequence[EvidenceCard]], str] = compose_evidence_answer,
         request_id_factory: Callable[[], UUID] = uuid4,
     ) -> None:
         self._retriever = retriever
+        self._grounded = grounded
         self._scope_matched_minimum = scope_matched_minimum
         self._candidate_top_k = candidate_top_k
         self._composer = composer
@@ -100,14 +123,45 @@ class ChatService:
         if not selected:
             return self._insufficient(request, _insufficient_answer(request.response_language))
 
-        try:
-            answer = self._composer([result.card for result in selected])
-        except EvidenceCompositionError:
+        # Sharing a topic is not answering the question. A feasibility study cannot serve a
+        # how_to request, so it is removed here — before generation and before the
+        # deterministic fallback, so the fallback never shows a research summary as if it
+        # were the requested procedure.
+        intent = classify_question_intent(request.message)
+        usable = [result for result in selected if card_supports_intent(result.card, intent)]
+        if not usable:
             return self._insufficient(request, _insufficient_answer(request.response_language))
 
+        if self._grounded is not None and intent in GENERATED_INTENTS:
+            result = await self._grounded.draft(
+                message=request.message,
+                response_language=request.response_language,
+                cards=[result.card for result in usable],
+            )
+            if result.verdict is DraftVerdict.NOT_ANSWERABLE:
+                # The model looked at this evidence and said it cannot answer. Take that
+                # at face value rather than showing a claim it just rejected.
+                return self._insufficient(request, _insufficient_answer(request.response_language))
+            if result.draft is not None:
+                cited = [item for item in usable if item.card_id in result.draft.used_card_ids]
+                if cited:
+                    return self._answered(request, result.draft.answer, cited)
+
+        try:
+            answer = self._composer([result.card for result in usable])
+        except EvidenceCompositionError:
+            return self._insufficient(request, _insufficient_answer(request.response_language))
+        return self._answered(request, answer, usable)
+
+    def _answered(
+        self,
+        request: ChatRequest,
+        answer: str,
+        results: list[SearchResult],
+    ) -> ChatResponse:
         try:
             sources_by_id = self._retriever.sources_by_id()
-            citations = _build_citations(selected, sources_by_id)
+            citations = _build_citations(results, sources_by_id)
         except Exception as exc:
             raise ChatServiceUnavailable("citation construction failed") from exc
 
@@ -117,7 +171,7 @@ class ChatService:
             answer=answer,
             answer_language=request.response_language,
             citations=citations,
-            limitations=_collect_limitations(selected),
+            limitations=_collect_limitations(results),
         )
 
     def _insufficient(self, request: ChatRequest, answer: str) -> ChatResponse:
