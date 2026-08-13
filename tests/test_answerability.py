@@ -62,6 +62,40 @@ def test_comparison_wins_over_the_training_word() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    "message",
+    [
+        # The 더-less phrasings that leaked to generation before this rule existed.
+        "전자 목줄이 보상 훈련보다 효과적인가요?",
+        "전자 목줄이 보상 훈련보다 효율적인가요?",
+        "전자 목줄이 보상 훈련보다 더 효과적인가요?",
+        "전자 목줄이 보상 훈련보다 나은가요?",
+        "전자 목줄이 보상 훈련보다 효과가 좋나요?",
+        "전자 목줄이 보상 훈련에 비해 효과적인가요?",
+    ],
+)
+def test_comparative_training_questions_are_comparison(message: str) -> None:
+    assert classify_question_intent(message) is QuestionIntent.COMPARISON
+
+
+@pytest.mark.parametrize(
+    ("message", "expected"),
+    [
+        # A metric with nothing to compare against.
+        ("효과적인 배변 훈련 방법을 알려주세요.", QuestionIntent.HOW_TO),
+        ("보상 훈련은 어떻게 하나요?", QuestionIntent.HOW_TO),
+        ("전자 목줄 연구 결과가 왜 그런가요?", QuestionIntent.EXPLANATION),
+        ("산책할 때 리드줄을 계속 당겨요.", QuestionIntent.HOW_TO),
+        ("강아지가 왜 계속 짖나요?", QuestionIntent.EXPLANATION),
+        # 보다 as the verb "to see", with no metric.
+        ("사람을 보다가 자꾸 뛰어올라요.", QuestionIntent.HOW_TO),
+        ("강아지를 보다 보면 왜 그런지 궁금해요.", QuestionIntent.EXPLANATION),
+    ],
+)
+def test_half_a_comparison_is_not_a_comparison(message: str, expected: QuestionIntent) -> None:
+    assert classify_question_intent(message) is expected
+
+
 def test_research_findings_cannot_authorize_a_procedure() -> None:
     assert QuestionIntent.HOW_TO not in CAPABILITIES[EvidenceKind.RESEARCH_FINDING]
     assert QuestionIntent.COMPARISON in CAPABILITIES[EvidenceKind.RESEARCH_FINDING]

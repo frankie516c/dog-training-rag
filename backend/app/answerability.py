@@ -69,23 +69,29 @@ CAPABILITIES: dict[EvidenceKind, frozenset[QuestionIntent]] = {
 # explanation, so the honest "this evidence does not show that" answer stays reachable for
 # anyone who actually asks for the finding.
 
-_COMPARISON = compile_terms(
+# Comparison is recognised two ways.
+#
+# Explicit markers stand alone. The combination rule exists because listing surface forms
+# missed the ones users actually type: "…보다 효과적인가요?" has no 더, so a 더-anchored marker
+# let a real comparison through to generation, where a reversed conclusion cannot be caught.
+# A basis of comparison plus a metric is the shape those questions share.
+_COMPARISON_EXPLICIT = compile_terms(
     (
-        "더 효과",
-        "더 효율",
-        "보다 나",
-        "보다 낫",
         "낫나요",
         "비교",
         "차이가",
         "어느 쪽",
         "어느게",
         "어느 게",
-        "vs",
         "more effective",
         "better than",
-        "compared",
     )
+)
+_COMPARISON_BASIS = compile_terms(
+    ("보다", "에 비해", "에 비하면", "대비", "vs", "versus", "compared")
+)
+_COMPARISON_METRIC = compile_terms(
+    ("효과", "효율", "나은", "낫", "우수", "유리", "좋", "better", "effective")
 )
 
 _HOW_TO = compile_terms(
@@ -137,15 +143,28 @@ _PROBLEM_STATEMENT = compile_terms(
 )
 
 
+def _is_comparison(text: str) -> bool:
+    """Explicit marker, or a basis of comparison paired with a metric.
+
+    Neither half decides alone: "효과적인 배변 훈련 방법" has a metric but nothing to compare
+    against, and "사람을 보다가 뛰어올라요" has 보다 with no metric.
+    """
+
+    if _COMPARISON_EXPLICIT.search(text):
+        return True
+    return bool(_COMPARISON_BASIS.search(text) and _COMPARISON_METRIC.search(text))
+
+
 def classify_question_intent(message: str) -> QuestionIntent:
     """Classify a question deterministically. No model, no network.
 
-    Order matters. Explicit markers win over the implicit reading, so a 왜/원인 question
-    about a recurring behaviour stays an explanation.
+    Order matters. Comparison is decided first so a comparison never reaches generation;
+    explicit markers then win over the implicit how_to reading, so a 왜/원인 question about a
+    recurring behaviour stays an explanation.
     """
 
     text = normalize(message)
-    if _COMPARISON.search(text):
+    if _is_comparison(text):
         return QuestionIntent.COMPARISON
     if _HOW_TO.search(text):
         return QuestionIntent.HOW_TO
