@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -165,23 +166,17 @@ def test_retrieval_initialization_failure_logs_the_cause_and_stays_not_ready(
         assert forbidden not in response.text
 
 
-def test_generation_provider_initialization_failure_is_distinguishable(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    settings = Settings(
-        _env_file=None,
-        generation_base_url="not-an-absolute-url",
-        generation_model="synthetic-model",
-    )
+def test_generation_module_is_not_used_by_the_production_chat_path() -> None:
+    """The adapter is kept for future model comparisons, not for serving /chat."""
 
-    with caplog.at_level(logging.ERROR, logger="backend.app.main"):
-        client = TestClient(create_app(settings))
+    import backend.app.chat_service as chat_service
+    import backend.app.main as main_module
 
-    logged = "\n".join(record.getMessage() for record in caplog.records)
-    assert "generation provider" in logged
-    assert "ValueError" in logged
-    assert "single-process" not in logged
+    for module in (chat_service, main_module):
+        source = Path(module.__file__).read_text(encoding="utf-8")
+        assert "from backend.app.generation import" not in source
+        assert "import backend.app.generation" not in source
 
-    response = client.post("/chat", json={"message": "강아지가 사람을 보면 자꾸 뛰어올라요."})
-
-    assert response.status_code == 503
+    assert not hasattr(main_module, "OpenAICompatibleGenerationProvider")
+    assert not hasattr(chat_service, "GenerationProvider")
+    assert not hasattr(chat_service, "GenerationEvidence")

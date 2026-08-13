@@ -1,10 +1,13 @@
 import asyncio
+from collections.abc import Sequence
 from datetime import date
+from pathlib import Path
 from uuid import UUID
 
 from fastapi.testclient import TestClient
 
 from backend.app.chat_service import CANDIDATE_TOP_K, ChatService
+from backend.app.composition import CLAIM_SEPARATOR
 from backend.app.config import Settings
 from backend.app.domain import (
     ChatRequest,
@@ -18,13 +21,13 @@ from backend.app.domain import (
     SourceRef,
     SourceRegistryEntry,
 )
-from backend.app.generation import GenerationEvidence, build_generation_messages
-from backend.app.main import CHAT_NOT_READY_MESSAGE, create_app
+from backend.app.main import create_app
 from backend.app.retrieval import DEFAULT_TOP_K, SearchResult
 
 CARD_ID = UUID("40000000-0000-4000-8000-000000000001")
 OTHER_CARD_ID = UUID("40000000-0000-4000-8000-000000000002")
 HOUSETRAINING_CARD_ID = UUID("40000000-0000-4000-8000-000000000003")
+SECOND_JUMPING_CARD_ID = UUID("40000000-0000-4000-8000-000000000004")
 REQUEST_ID = UUID("50000000-0000-4000-8000-000000000001")
 
 SUPPORTED_QUESTION = "강아지가 사람을 보면 자꾸 뛰어올라요."
@@ -32,6 +35,11 @@ COLLOQUIAL_HOUSETRAINING_QUESTION = "응가를 아무데나 해요ㅠㅠ"
 UNSUPPORTED_QUESTION = "강아지에게 손이나 악수를 가르치고 싶어요."
 SAFETY_QUESTION = "강아지가 초콜릿을 먹었어요."
 UNSUPPORTED_ANSWER = "현재 검증된 훈련 근거 범위에서는 이 질문에 답하기 어렵습니다."
+
+JUMPING_CLAIM = "점프를 하나의 공통 원인으로 단정하기 어려웠다."
+SECOND_JUMPING_CLAIM = "4마리 중 3마리는 점프가 감소했지만 1마리는 반응하지 않았다."
+LEASH_CLAIM = "3주간의 보상 기반 리드줄 보행 수업을 운영할 수 있었다."
+HOUSETRAINING_CLAIM = "사후에 발견한 실수를 처벌하는 방식은 학습에 도움이 되지 않는다."
 
 
 class FakeRetriever:
@@ -52,29 +60,17 @@ class FakeRetriever:
         return self.sources
 
 
-class FakeGenerator:
-    def __init__(self, answer: str = "Synthetic grounded answer.", *, fail: bool = False) -> None:
-        self.answer = answer
-        self.fail = fail
-        self.calls: list[dict[str, object]] = []
+class SpyComposer:
+    """Wraps the real composer so tests can assert it was never reached."""
 
-    async def generate(
-        self,
-        *,
-        message: str,
-        response_language: ContentLanguage,
-        evidence: tuple[GenerationEvidence, ...],
-    ) -> str:
-        self.calls.append(
-            {
-                "message": message,
-                "response_language": response_language,
-                "evidence": evidence,
-            }
-        )
-        if self.fail:
-            raise RuntimeError("synthetic provider failure")
-        return self.answer
+    def __init__(self) -> None:
+        self.calls: list[tuple[UUID, ...]] = []
+
+    def __call__(self, cards: Sequence[EvidenceCard]) -> str:
+        from backend.app.composition import compose_evidence_answer
+
+        self.calls.append(tuple(card.card_id for card in cards))
+        return compose_evidence_answer(cards)
 
 
 def make_source(source_id: str, title: str) -> SourceRegistryEntry:
@@ -92,18 +88,21 @@ def make_source(source_id: str, title: str) -> SourceRegistryEntry:
 def make_card(
     *,
     card_id: UUID = CARD_ID,
+    claim: str = JUMPING_CLAIM,
+    claim_language: ContentLanguage = ContentLanguage.KOREAN,
     topic: str = "synthetic jumping up topic",
     tags: list[str] | None = None,
+    limitations: list[str] | None = None,
 ) -> EvidenceCard:
     """Build a synthetic card whose topic/tags map to one internal scope."""
 
     return EvidenceCard(
         card_id=card_id,
-        claim="Synthetic approved claim.",
-        claim_language=ContentLanguage.ENGLISH,
+        claim=claim,
+        claim_language=claim_language,
         topic=topic,
         tags=tags if tags is not None else ["jumping up"],
-        limitations=["Keep the synthetic limitation."],
+        limitations=limitations if limitations is not None else ["Keep the synthetic limitation."],
         source_refs=[
             SourceRef(
                 source_id="direct-source",
@@ -127,9 +126,19 @@ def make_card(
     )
 
 
+def make_second_jumping_card() -> EvidenceCard:
+    return make_card(
+        card_id=SECOND_JUMPING_CARD_ID,
+        claim=SECOND_JUMPING_CLAIM,
+        topic="synthetic jumping up intervention",
+        limitations=["Keep the second synthetic limitation."],
+    )
+
+
 def make_off_scope_card() -> EvidenceCard:
     return make_card(
         card_id=OTHER_CARD_ID,
+        claim=LEASH_CLAIM,
         topic="synthetic loose leash topic",
         tags=["leash walking"],
     )
@@ -138,6 +147,7 @@ def make_off_scope_card() -> EvidenceCard:
 def make_housetraining_card() -> EvidenceCard:
     return make_card(
         card_id=HOUSETRAINING_CARD_ID,
+        claim=HOUSETRAINING_CLAIM,
         topic="synthetic housetraining topic",
         tags=["housetraining"],
     )
@@ -145,35 +155,29 @@ def make_housetraining_card() -> EvidenceCard:
 
 def make_service_from_results(
     results: list[SearchResult],
-    *,
-    generator: FakeGenerator | None = None,
-) -> tuple[ChatService, FakeRetriever, FakeGenerator]:
+) -> tuple[ChatService, FakeRetriever, SpyComposer]:
     sources = {
         "direct-source": make_source("direct-source", "Deterministic direct source"),
         "context-source": make_source("context-source", "Context-only source"),
     }
     retriever = FakeRetriever(results, sources)
-    resolved_generator = generator or FakeGenerator()
+    composer = SpyComposer()
     service = ChatService(
         retriever=retriever,
-        generator=resolved_generator,
+        composer=composer,
         request_id_factory=lambda: REQUEST_ID,
     )
-    return service, retriever, resolved_generator
+    return service, retriever, composer
 
 
-def make_service(
-    *,
-    score: float | None,
-    generator: FakeGenerator | None = None,
-) -> tuple[ChatService, FakeRetriever, FakeGenerator]:
+def make_service(*, score: float | None) -> tuple[ChatService, FakeRetriever, SpyComposer]:
     card = make_card()
     results = [] if score is None else [SearchResult(card_id=card.card_id, score=score, card=card)]
-    return make_service_from_results(results, generator=generator)
+    return make_service_from_results(results)
 
 
 def test_no_retrieval_results_returns_insufficient_evidence() -> None:
-    service, retriever, generator = make_service(score=None)
+    service, retriever, composer = make_service(score=None)
 
     response = asyncio.run(service.answer(ChatRequest(message=SUPPORTED_QUESTION)))
 
@@ -181,32 +185,64 @@ def test_no_retrieval_results_returns_insufficient_evidence() -> None:
     assert response.citations == []
     assert response.answer_language is ContentLanguage.KOREAN
     assert retriever.search_calls == [(SUPPORTED_QUESTION, CANDIDATE_TOP_K)]
-    assert generator.calls == []
+    assert composer.calls == []
 
 
 def test_scope_matched_result_below_minimum_is_insufficient() -> None:
-    service, _, generator = make_service(score=0.3999)
+    service, _, composer = make_service(score=0.3999)
 
     response = asyncio.run(service.answer(ChatRequest(message=SUPPORTED_QUESTION)))
 
     assert response.status is ChatStatus.INSUFFICIENT_EVIDENCE
     assert response.citations == []
-    assert generator.calls == []
+    assert composer.calls == []
 
 
-def test_scope_matched_result_at_minimum_is_accepted() -> None:
-    service, _, generator = make_service(score=0.40)
+def test_scope_matched_result_at_minimum_is_answered_without_a_generation_provider() -> None:
+    service, _, composer = make_service(score=0.40)
 
     response = asyncio.run(service.answer(ChatRequest(message=SUPPORTED_QUESTION)))
 
     assert response.status is ChatStatus.ANSWERED
+    assert response.answer == JUMPING_CLAIM
     assert [citation.card_id for citation in response.citations] == [CARD_ID]
-    assert len(generator.calls) == 1
+    assert composer.calls == [(CARD_ID,)]
+
+
+def test_answer_is_the_reviewed_claim_verbatim() -> None:
+    service, _, _ = make_service(score=0.8)
+
+    response = asyncio.run(service.answer(ChatRequest(message=SUPPORTED_QUESTION)))
+
+    assert response.answer == JUMPING_CLAIM
+    assert response.answer == make_card().claim
+
+
+def test_multiple_cards_compose_in_citation_order() -> None:
+    first = make_card()
+    second = make_second_jumping_card()
+    service, _, _ = make_service_from_results(
+        [
+            SearchResult(card_id=first.card_id, score=0.81, card=first),
+            SearchResult(card_id=second.card_id, score=0.55, card=second),
+        ]
+    )
+
+    response = asyncio.run(service.answer(ChatRequest(message=SUPPORTED_QUESTION)))
+
+    assert response.answer == JUMPING_CLAIM + CLAIM_SEPARATOR + SECOND_JUMPING_CLAIM
+    citation_order = [citation.card_id for citation in response.citations]
+    assert citation_order == [CARD_ID, SECOND_JUMPING_CARD_ID]
+    assert response.answer.index(JUMPING_CLAIM) < response.answer.index(SECOND_JUMPING_CLAIM)
+    assert response.limitations == [
+        "Keep the synthetic limitation.",
+        "Keep the second synthetic limitation.",
+    ]
 
 
 def test_off_scope_card_is_dropped_even_with_a_higher_score() -> None:
     off_scope = make_off_scope_card()
-    service, retriever, generator = make_service_from_results(
+    service, retriever, composer = make_service_from_results(
         [SearchResult(card_id=off_scope.card_id, score=0.92, card=off_scope)]
     )
 
@@ -215,13 +251,13 @@ def test_off_scope_card_is_dropped_even_with_a_higher_score() -> None:
     assert response.status is ChatStatus.INSUFFICIENT_EVIDENCE
     assert response.citations == []
     assert retriever.search_calls == [(SUPPORTED_QUESTION, CANDIDATE_TOP_K)]
-    assert generator.calls == []
+    assert composer.calls == []
 
 
-def test_citations_never_mix_in_another_scope_card() -> None:
+def test_off_scope_card_reaches_neither_answer_nor_citations() -> None:
     in_scope = make_card()
     off_scope = make_off_scope_card()
-    service, _, generator = make_service_from_results(
+    service, _, composer = make_service_from_results(
         [
             SearchResult(card_id=off_scope.card_id, score=0.92, card=off_scope),
             SearchResult(card_id=in_scope.card_id, score=0.51, card=in_scope),
@@ -231,29 +267,29 @@ def test_citations_never_mix_in_another_scope_card() -> None:
     response = asyncio.run(service.answer(ChatRequest(message=SUPPORTED_QUESTION)))
 
     assert response.status is ChatStatus.ANSWERED
+    assert response.answer == JUMPING_CLAIM
+    assert LEASH_CLAIM not in response.answer
     assert {citation.card_id for citation in response.citations} == {CARD_ID}
-    evidence = generator.calls[0]["evidence"]
-    assert isinstance(evidence, tuple)
-    assert len(evidence) == 1
+    assert composer.calls == [(CARD_ID,)]
 
 
 def test_unmapped_card_is_dropped() -> None:
-    unmapped = make_card(topic="synthetic topic", tags=["not-sent-to-generator"])
-    service, _, generator = make_service_from_results(
+    unmapped = make_card(topic="synthetic topic", tags=["not-a-scope-marker"])
+    service, _, composer = make_service_from_results(
         [SearchResult(card_id=unmapped.card_id, score=0.99, card=unmapped)]
     )
 
     response = asyncio.run(service.answer(ChatRequest(message=SUPPORTED_QUESTION)))
 
     assert response.status is ChatStatus.INSUFFICIENT_EVIDENCE
-    assert generator.calls == []
+    assert composer.calls == []
 
 
-def test_colloquial_housetraining_question_reaches_retrieval_and_generation() -> None:
+def test_colloquial_housetraining_question_reaches_retrieval_and_composition() -> None:
     housetraining = make_housetraining_card()
     leash = make_off_scope_card()
     jumping = make_card()
-    service, retriever, generator = make_service_from_results(
+    service, retriever, composer = make_service_from_results(
         [
             SearchResult(card_id=leash.card_id, score=0.95, card=leash),
             SearchResult(card_id=jumping.card_id, score=0.93, card=jumping),
@@ -264,17 +300,57 @@ def test_colloquial_housetraining_question_reaches_retrieval_and_generation() ->
     response = asyncio.run(service.answer(ChatRequest(message=COLLOQUIAL_HOUSETRAINING_QUESTION)))
 
     assert response.status is ChatStatus.ANSWERED
+    assert response.answer == HOUSETRAINING_CLAIM
     assert retriever.search_calls == [(COLLOQUIAL_HOUSETRAINING_QUESTION, CANDIDATE_TOP_K)]
-    assert len(generator.calls) == 1
     assert {citation.card_id for citation in response.citations} == {HOUSETRAINING_CARD_ID}
-    assert response.limitations == ["Keep the synthetic limitation."]
-    evidence = generator.calls[0]["evidence"]
-    assert isinstance(evidence, tuple)
-    assert [item.topic for item in evidence] == ["synthetic housetraining topic"]
+    assert composer.calls == [(HOUSETRAINING_CARD_ID,)]
 
 
-def test_unsupported_question_skips_retrieval_and_generation() -> None:
-    service, retriever, generator = make_service(score=0.99)
+def test_english_request_without_an_english_claim_is_insufficient() -> None:
+    service, _, composer = make_service(score=0.9)
+
+    response = asyncio.run(
+        service.answer(
+            ChatRequest(message=SUPPORTED_QUESTION, response_language=ContentLanguage.ENGLISH)
+        )
+    )
+
+    assert response.status is ChatStatus.INSUFFICIENT_EVIDENCE
+    assert response.citations == []
+    assert response.answer_language is ContentLanguage.ENGLISH
+    assert composer.calls == []
+
+
+def test_english_request_uses_only_english_claims() -> None:
+    korean = make_card()
+    english = make_card(
+        card_id=SECOND_JUMPING_CARD_ID,
+        claim="Jumping up is maintained by different reinforcers in different dogs.",
+        claim_language=ContentLanguage.ENGLISH,
+        topic="synthetic jumping up intervention",
+    )
+    service, _, _ = make_service_from_results(
+        [
+            SearchResult(card_id=korean.card_id, score=0.95, card=korean),
+            SearchResult(card_id=english.card_id, score=0.42, card=english),
+        ]
+    )
+
+    response = asyncio.run(
+        service.answer(
+            ChatRequest(message=SUPPORTED_QUESTION, response_language=ContentLanguage.ENGLISH)
+        )
+    )
+
+    assert response.status is ChatStatus.ANSWERED
+    assert response.answer == english.claim
+    assert JUMPING_CLAIM not in response.answer
+    assert [citation.card_id for citation in response.citations] == [SECOND_JUMPING_CARD_ID]
+    assert response.answer_language is ContentLanguage.ENGLISH
+
+
+def test_unsupported_question_skips_retrieval_and_composition() -> None:
+    service, retriever, composer = make_service(score=0.99)
 
     response = asyncio.run(service.answer(ChatRequest(message=UNSUPPORTED_QUESTION)))
 
@@ -283,11 +359,11 @@ def test_unsupported_question_skips_retrieval_and_generation() -> None:
     assert response.citations == []
     assert response.safety_notice is None
     assert retriever.search_calls == []
-    assert generator.calls == []
+    assert composer.calls == []
 
 
-def test_safety_question_skips_retrieval_and_generation() -> None:
-    service, retriever, generator = make_service(score=0.99)
+def test_safety_question_skips_retrieval_and_composition() -> None:
+    service, retriever, composer = make_service(score=0.99)
 
     response = asyncio.run(service.answer(ChatRequest(message=SAFETY_QUESTION)))
 
@@ -297,43 +373,15 @@ def test_safety_question_skips_retrieval_and_generation() -> None:
     assert response.safety_notice.level is SafetyLevel.URGENT
     assert "동물병원" in response.safety_notice.message
     assert retriever.search_calls == []
-    assert generator.calls == []
+    assert composer.calls == []
 
 
-def test_safety_and_unsupported_answers_work_without_a_configured_provider() -> None:
-    class UnconfiguredGenerator:
-        async def generate(
-            self,
-            *,
-            message: str,
-            response_language: ContentLanguage,
-            evidence: tuple[GenerationEvidence, ...],
-        ) -> str:
-            raise AssertionError("generation provider must not be called")
+def test_server_side_citation_fields_are_unchanged() -> None:
+    service, _, _ = make_service(score=0.8)
 
-    service = ChatService(
-        retriever=FakeRetriever([]),
-        generator=UnconfiguredGenerator(),
-        request_id_factory=lambda: REQUEST_ID,
-    )
+    response = asyncio.run(service.answer(ChatRequest(message=SUPPORTED_QUESTION)))
 
-    for message in (SAFETY_QUESTION, UNSUPPORTED_QUESTION):
-        response = asyncio.run(service.answer(ChatRequest(message=message)))
-        assert response.status is ChatStatus.INSUFFICIENT_EVIDENCE
-
-
-def test_grounded_result_returns_answered_with_server_citation() -> None:
-    service, _, generator = make_service(score=0.45)
-
-    response = asyncio.run(
-        service.answer(
-            ChatRequest(message=SUPPORTED_QUESTION, response_language=ContentLanguage.ENGLISH)
-        )
-    )
-
-    assert response.status is ChatStatus.ANSWERED
     assert response.request_id == REQUEST_ID
-    assert response.answer == "Synthetic grounded answer."
     assert response.limitations == ["Keep the synthetic limitation."]
     assert len(response.citations) == 1
     citation = response.citations[0]
@@ -345,78 +393,18 @@ def test_grounded_result_returns_answered_with_server_citation() -> None:
     assert citation.evidence_level is EvidenceLevel.DIRECT
     assert all(item.evidence_level is not EvidenceLevel.CONTEXT_ONLY for item in response.citations)
 
-    generation_call = generator.calls[0]
-    assert generation_call["evidence"] == (
-        GenerationEvidence(
-            claim="Synthetic approved claim.",
-            topic="synthetic jumping up topic",
-            limitations=("Keep the synthetic limitation.",),
-        ),
-    )
 
-
-def test_generation_prompt_contains_only_allowed_evidence_fields_and_guardrails() -> None:
-    messages = build_generation_messages(
-        message="synthetic question",
-        response_language=ContentLanguage.KOREAN,
-        evidence=(
-            GenerationEvidence(
-                claim="Synthetic claim.",
-                topic="Synthetic topic.",
-                limitations=("Synthetic limitation.",),
-            ),
-        ),
-    )
-    prompt = "\n".join(message["content"] for message in messages)
-
-    assert '"claim":"Synthetic claim."' in prompt
-    assert '"topic":"Synthetic topic."' in prompt
-    assert '"limitations":["Synthetic limitation."]' in prompt
-    assert "punishment-based or fear-based" in prompt
-    assert "Do not invent steps" in prompt
-    for forbidden in ("locator", "canonical_url", "license", "source_id", "raw_text"):
-        assert forbidden not in prompt
-
-
-def test_unconfigured_provider_returns_structured_503() -> None:
-    settings = Settings(
-        _env_file=None,
-        generation_base_url=None,
-        generation_model=None,
-    )
-    response = TestClient(create_app(settings)).post("/chat", json={"message": SUPPORTED_QUESTION})
-
-    assert response.status_code == 503
-    assert response.json() == {
-        "code": "chat_not_ready",
-        "message": CHAT_NOT_READY_MESSAGE,
-    }
-
-
-def test_provider_failure_returns_structured_503() -> None:
-    service, _, _ = make_service(score=0.8, generator=FakeGenerator(fail=True))
-    response = TestClient(create_app(Settings(_env_file=None), chat_service=service)).post(
-        "/chat", json={"message": SUPPORTED_QUESTION}
-    )
-
-    assert response.status_code == 503
-    assert response.json() == {
-        "code": "chat_not_ready",
-        "message": CHAT_NOT_READY_MESSAGE,
-    }
-
-
-def test_chat_endpoint_returns_grounded_answer_from_injected_service() -> None:
+def test_chat_endpoint_returns_composed_answer_from_injected_service() -> None:
     service, _, _ = make_service(score=0.8)
     response = TestClient(create_app(Settings(_env_file=None), chat_service=service)).post(
         "/chat",
-        json={"message": SUPPORTED_QUESTION, "response_language": "en"},
+        json={"message": SUPPORTED_QUESTION},
     )
 
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "answered"
-    assert body["answer"] == "Synthetic grounded answer."
+    assert body["answer"] == JUMPING_CLAIM
     assert body["citations"][0]["source_id"] == "direct-source"
     assert body["limitations"] == ["Keep the synthetic limitation."]
 
@@ -435,8 +423,29 @@ def test_chat_endpoint_returns_safety_notice_without_citations() -> None:
     assert body["safety_notice"]["level"] == "urgent"
 
 
-def test_default_cors_origin_allows_chat_preflight() -> None:
-    client = TestClient(create_app(Settings(_env_file=None)))
+def test_chat_is_ready_without_any_generation_configuration(tmp_path: Path) -> None:
+    """No Ollama, no GENERATION_* variables: /chat still serves a normal 200."""
+
+    settings = Settings(
+        _env_file=None,
+        generation_base_url=None,
+        generation_api_key=None,
+        generation_model=None,
+        qdrant_path=tmp_path / "qdrant",
+    )
+    client = TestClient(create_app(settings))
+
+    response = client.post("/chat", json={"message": SUPPORTED_QUESTION})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "insufficient_evidence"
+    assert body["citations"] == []
+
+
+def test_default_cors_origin_allows_chat_preflight(tmp_path: Path) -> None:
+    settings = Settings(_env_file=None, qdrant_path=tmp_path / "qdrant")
+    client = TestClient(create_app(settings))
 
     response = client.options(
         "/chat",
