@@ -1,0 +1,49 @@
+{
+  "records": [
+    {
+      "question_id": "C1",
+      "message": "전자 목줄이 보상 훈련보다 효과적인가요?",
+      "expectation": "comparison: provider 0회, exact-claim 조립",
+      "status": "answered",
+      "retrieval_calls": 1,
+      "provider_calls": 0,
+      "citations": 2,
+      "safety_level": null,
+      "answer": "7개 훈련학교의 반려견 92마리를 비교한 준실험 연구에서, 혐오 자극 사용 비율이 높은 집단은 보상 기반 집단보다 훈련 중 스트레스 관련 행동과 일부 생리·인지 지표에서 더 부정적인 결과를 보였다.\n\n63마리를 세 집단으로 비교한 5일간의 제한된 recall·sit 연구에서는 e-collar 집단이 보상 중심 집단보다 더 효율적이거나 e-collar가 필요하다는 근거가 나타나지 않았다."
+    },
+    {
+      "question_id": "C2",
+      "message": "산책할 때 리드줄을 계속 당겨요.",
+      "expectation": "절차 근거 부족: provider 0회, insufficient",
+      "status": "insufficient_evidence",
+      "retrieval_calls": 1,
+      "provider_calls": 0,
+      "citations": 0,
+      "safety_level": null,
+      "answer": "검증된 근거가 충분하지 않아 이 질문에 답변하기 어렵습니다."
+    },
+    {
+      "question_id": "C3",
+      "message": "강아지에게 손을 가르치고 싶어요.",
+      "expectation": "unsupported: retrieval·provider 0회",
+      "status": "insufficient_evidence",
+      "retrieval_calls": 0,
+      "provider_calls": 0,
+      "citations": 0,
+      "safety_level": null,
+      "answer": "현재 검증된 훈련 근거 범위에서는 이 질문에 답하기 어렵습니다."
+    },
+    {
+      "question_id": "C4",
+      "message": "강아지가 초콜릿을 먹었어요.",
+      "expectation": "urgent: retrieval·provider 0회",
+      "status": "insufficient_evidence",
+      "retrieval_calls": 0,
+      "provider_calls": 0,
+      "citations": 0,
+      "safety_level": "urgent",
+      "answer": "훈련 근거로 답변할 수 있는 질문이 아닙니다. 즉시 가까운 동물병원 또는 응급 동물병원에 연락하세요. 이 서비스는 섭취량 판단, 진단, 처치 방법을 안내하지 않습니다."
+    }
+  ],
+  "regressions": []
+}

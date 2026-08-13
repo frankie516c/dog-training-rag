@@ -1,0 +1,57 @@
+{
+  "records_path": "experiments\\prompt_eval_v0\\results\\prompt_only.jsonl",
+  "records_file_layout": "mixed JSONL: line 1 is the run config object, lines 2..n are records",
+  "provenance_limitations": [
+    "fixture.py와 checks.py는 실행 시작 후 비의미적 편집(주석 문자열, 정규식 상수 추출)을 받았다. 아래 hash는 현재 파일 기준이며, 실행 시점의 source hash는 보존되지 않았다.",
+    "runner.py는 실행 후 generation config를 별도 파일에 쓰도록 수정됐다. 아래 hash는 수정 후 파일이며 v0 레코드를 생성한 버전이 아니다.",
+    "prompt_only.jsonl은 첫 줄이 config object인 혼합 JSONL이다. 원본은 그대로 두고, 이후 실행부터 config는 <records>_config.json 사이드카에 기록된다.",
+    "저장된 자동 검사 결과를 현재 checks.py로 재계산한 결과는 126건 전부 일치했다. 이는 편집이 결과를 바꾸지 않았다는 증거이며, source hash 보존을 대체하지 않는다."
+  ],
+  "shape": {
+    "physical_lines": 127,
+    "non_empty_lines": 127,
+    "trailing_newline": true,
+    "config_lines": 1,
+    "record_objects": 126,
+    "malformed_lines": [],
+    "unique_keys": 126,
+    "duplicate_keys": [],
+    "per_version": {
+      "v0": 42,
+      "v1": 42,
+      "v2": 42
+    },
+    "missing_or_extra_question_runs": [],
+    "question_and_context_identical_across_versions": true,
+    "generation_config": {
+      "model": "gemma3:4b",
+      "base_url": "http://localhost:11434/v1",
+      "timeout_seconds": 30.0,
+      "uncontrolled_sampling_params": [
+        "temperature",
+        "top_p",
+        "seed",
+        "max_tokens"
+      ]
+    }
+  },
+  "input_sha256": {
+    "experiments\\prompt_eval_v0\\results\\prompt_only.jsonl": "979fd8841e4c478c2692706212cb2010b59e833d775557cf1943ea8027a22e3d",
+    "experiments\\prompt_eval_v0\\prompts.py": "0ac8153fef1ec4748a0a4261148d668b9691cf35c656e4784b2349d24db72b69",
+    "experiments\\prompt_eval_v0\\fixture.py": "5158de48de405c323d4527c84a1eff18262d33f4946479e3c4f0bf280f6382cd",
+    "experiments\\prompt_eval_v0\\runner.py": "8fa34c0aa84d04e499b3f316ca4909c98c6ab4c8229f923d7a713a18cfd4e2df",
+    "experiments\\prompt_eval_v0\\checks.py": "8b4703941e7731e9251da209970b3dc842c61cb3d793e45eef0f4d8cd354d175"
+  },
+  "prompt_sha256": {
+    "v0": "572cdd5b0a9593026e1e353f24801fefb0072dffca42751ea270802283a9b9ad",
+    "v1": "6b3aa676ed18a1114b98e566f31144e106886303af03a2fee7fa16fbb694046a",
+    "v2": "31e3a0120180671693bc5bb2eef24160353f9e26695f94177a4d90e7a16f2547"
+  },
+  "prompt_chars": {
+    "v0": 990,
+    "v1": 1681,
+    "v2": 2366
+  },
+  "model": "gemma3:4b",
+  "ollama_model_digest": "a2af6cc3eb7f"
+}

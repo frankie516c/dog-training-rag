@@ -1,0 +1,127 @@
+prompt_version,question_id,kind,run_number,provider_result,answerable,used_card_ids_valid,numbers_outside_evidence,latin_outside_evidence,reversal_hits,procedure_hits,fabricated_content,would_fallback,sentence_count,answer_chars,latency_ms
+v0,G1,guidance_how_to,1,not_answerable,False,,,,,,,False,,,16954
+v1,G1,guidance_how_to,1,not_answerable,False,,,,,,,False,,,2506
+v2,G1,guidance_how_to,1,not_answerable,False,,,,,,,False,,,2495
+v0,G2,guidance_how_to,1,accepted,True,True,,,,,False,False,1,46,3198
+v1,G2,guidance_how_to,1,accepted,True,True,,,,,False,False,1,54,3039
+v2,G2,guidance_how_to,1,not_answerable,False,,,,,,,False,,,2387
+v0,G3,guidance_how_to,1,accepted,True,True,,,,,False,False,2,108,3738
+v1,G3,guidance_how_to,1,accepted,True,True,,,,,False,False,1,107,3690
+v2,G3,guidance_how_to,1,not_answerable,False,,,,,,,False,,,2440
+v0,G4,guidance_how_to,1,accepted,True,True,,,,,False,False,2,108,3714
+v1,G4,guidance_how_to,1,accepted,True,True,,,,,False,False,1,106,3679
+v2,G4,guidance_how_to,1,accepted,True,True,,,,,False,False,4,224,5078
+v0,R1,research_explanation,1,accepted,True,True,,,,,False,False,1,110,3949
+v1,R1,research_explanation,1,accepted,True,True,,,,일수 계획,True,False,2,215,5956
+v2,R1,research_explanation,1,accepted,True,True,,,보상 집단이 부정적,,True,False,3,179,5533
+v0,R2,research_explanation,1,accepted,True,True,,,,,False,False,1,110,4108
+v1,R2,research_explanation,1,accepted,True,True,,,,,False,False,2,207,5862
+v2,R2,research_explanation,1,accepted,True,True,,,,,False,False,1,78,3528
+v0,R3,research_explanation,1,not_answerable,False,,,,,,,False,,,3685
+v1,R3,research_explanation,1,not_answerable,False,,,,,,,False,,,3688
+v2,R3,research_explanation,1,accepted,True,True,,,,,False,False,3,223,5953
+v0,R4,research_explanation,1,accepted,True,True,,,,,False,False,1,74,3269
+v1,R4,research_explanation,1,accepted,True,True,,,,,False,False,1,103,3714
+v2,R4,research_explanation,1,accepted,True,True,,,,,False,False,1,36,2863
+v0,R5,research_explanation,1,accepted,True,True,,,feasibility를 효능으로,일수 계획,True,False,2,169,4503
+v1,R5,research_explanation,1,accepted,True,True,,,feasibility를 효능으로,,True,False,1,55,3072
+v2,R5,research_explanation,1,not_answerable,False,,,,,,,False,,,2423
+v0,O1,overreach,1,not_answerable,False,,,,,,,False,,,2420
+v1,O1,overreach,1,not_answerable,False,,,,,,,False,,,2422
+v2,O1,overreach,1,not_answerable,False,,,,,,,False,,,2424
+v0,O2,overreach,1,not_answerable,False,,,,,,,False,,,2418
+v1,O2,overreach,1,not_answerable,False,,,,,,,False,,,2448
+v2,O2,overreach,1,not_answerable,False,,,,,,,False,,,2439
+v0,O3,overreach,1,not_answerable,False,,,,,,,False,,,3710
+v1,O3,overreach,1,accepted,True,True,,,,일수 계획,True,False,2,216,6155
+v2,O3,overreach,1,accepted,True,True,,,,,False,False,2,162,5401
+v0,O4,overreach,1,accepted,True,True,,,,,False,False,1,110,4313
+v1,O4,overreach,1,accepted,True,True,,,,,False,False,1,109,3949
+v2,O4,overreach,1,accepted,True,True,,,,,False,False,3,164,5248
+v0,O5,overreach,1,not_answerable,False,,,,,,,False,,,2432
+v1,O5,overreach,1,not_answerable,False,,,,,,,False,,,2389
+v2,O5,overreach,1,not_answerable,False,,,,,,,False,,,2425
+v0,G1,guidance_how_to,2,not_answerable,False,,,,,,,False,,,2386
+v1,G1,guidance_how_to,2,not_answerable,False,,,,,,,False,,,2414
+v2,G1,guidance_how_to,2,not_answerable,False,,,,,,,False,,,2364
+v0,G2,guidance_how_to,2,accepted,True,True,,,,,False,False,2,105,3772
+v1,G2,guidance_how_to,2,accepted,True,True,,,,,False,False,1,108,3663
+v2,G2,guidance_how_to,2,not_answerable,False,,,,,,,False,,,2358
+v0,G3,guidance_how_to,2,accepted,True,True,,,,,False,False,1,107,3625
+v1,G3,guidance_how_to,2,accepted,True,True,,,,,False,False,1,106,3649
+v2,G3,guidance_how_to,2,not_answerable,False,,,,,,,False,,,2417
+v0,G4,guidance_how_to,2,accepted,True,True,,,,,False,False,2,108,3612
+v1,G4,guidance_how_to,2,accepted,True,True,,,,,False,False,2,108,3617
+v2,G4,guidance_how_to,2,accepted,True,True,,,,,False,False,3,174,4331
+v0,R1,research_explanation,2,accepted,True,True,,,,,False,False,1,110,3895
+v1,R1,research_explanation,2,accepted,True,True,,,,,False,False,1,110,3988
+v2,R1,research_explanation,2,accepted,True,True,,,,,False,False,3,174,5404
+v0,R2,research_explanation,2,accepted,True,True,,,,,False,False,1,113,3867
+v1,R2,research_explanation,2,accepted,True,True,,,,일수 계획,True,False,2,202,5671
+v2,R2,research_explanation,2,accepted,True,True,,,,,False,False,1,88,3593
+v0,R3,research_explanation,2,accepted,True,True,,,인과 단정,,True,False,2,185,5473
+v1,R3,research_explanation,2,accepted,True,True,,,,,False,False,2,186,5447
+v2,R3,research_explanation,2,accepted,True,True,,,,,False,False,3,159,5181
+v0,R4,research_explanation,2,accepted,True,True,,,,,False,False,1,74,3296
+v1,R4,research_explanation,2,accepted,True,True,,,,,False,False,1,103,3806
+v2,R4,research_explanation,2,accepted,True,True,,,,,False,False,3,169,4471
+v0,R5,research_explanation,2,accepted,True,True,,,feasibility를 효능으로,일수 계획,True,False,3,266,5552
+v1,R5,research_explanation,2,accepted,True,True,,,feasibility를 효능으로,일수 계획,True,False,2,202,4913
+v2,R5,research_explanation,2,not_answerable,False,,,,,,,False,,,2503
+v0,O1,overreach,2,not_answerable,False,,,,,,,False,,,2466
+v1,O1,overreach,2,not_answerable,False,,,,,,,False,,,2432
+v2,O1,overreach,2,not_answerable,False,,,,,,,False,,,2426
+v0,O2,overreach,2,not_answerable,False,,,,,,,False,,,2445
+v1,O2,overreach,2,not_answerable,False,,,,,,,False,,,2582
+v2,O2,overreach,2,not_answerable,False,,,,,,,False,,,2505
+v0,O3,overreach,2,not_answerable,False,,,,,,,False,,,3323
+v1,O3,overreach,2,accepted,True,True,,,,일수 계획,True,False,2,216,6028
+v2,O3,overreach,2,accepted,True,True,,,,,False,False,1,77,3609
+v0,O4,overreach,2,accepted,True,True,,,,,False,False,1,113,3994
+v1,O4,overreach,2,accepted,True,True,,,,,False,False,1,110,3940
+v2,O4,overreach,2,accepted,True,True,,,보상 집단이 부정적,,True,False,3,164,5433
+v0,O5,overreach,2,not_answerable,False,,,,,,,False,,,2430
+v1,O5,overreach,2,not_answerable,False,,,,,,,False,,,2409
+v2,O5,overreach,2,not_answerable,False,,,,,,,False,,,2434
+v0,G1,guidance_how_to,3,not_answerable,False,,,,,,,False,,,2375
+v1,G1,guidance_how_to,3,not_answerable,False,,,,,,,False,,,2448
+v2,G1,guidance_how_to,3,not_answerable,False,,,,,,,False,,,2426
+v0,G2,guidance_how_to,3,accepted,True,True,,,,,False,False,1,43,3008
+v1,G2,guidance_how_to,3,accepted,True,True,,,,,False,False,2,110,3780
+v2,G2,guidance_how_to,3,not_answerable,False,,,,,,,False,,,2418
+v0,G3,guidance_how_to,3,accepted,True,True,,,,,False,False,2,109,3685
+v1,G3,guidance_how_to,3,accepted,True,True,,,,,False,False,2,109,3736
+v2,G3,guidance_how_to,3,not_answerable,False,,,,,,,False,,,2440
+v0,G4,guidance_how_to,3,accepted,True,True,,,,,False,False,2,108,3710
+v1,G4,guidance_how_to,3,accepted,True,True,,,,,False,False,1,106,3757
+v2,G4,guidance_how_to,3,accepted,True,True,,,,,False,False,3,176,4584
+v0,R1,research_explanation,3,accepted,True,True,,,,,False,False,1,86,3599
+v1,R1,research_explanation,3,accepted,True,True,,,,,False,False,1,110,3990
+v2,R1,research_explanation,3,accepted,True,True,,,보상 집단이 부정적,,True,False,3,237,6502
+v0,R2,research_explanation,3,accepted,True,True,,,,,False,False,1,110,3976
+v1,R2,research_explanation,3,accepted,True,True,,,,일수 계획,True,False,2,221,6072
+v2,R2,research_explanation,3,accepted,True,True,,,,,False,False,1,83,4478
+v0,R3,research_explanation,3,not_answerable,False,,,,,,,False,,,3467
+v1,R3,research_explanation,3,accepted,True,True,,,,,False,False,2,184,5538
+v2,R3,research_explanation,3,accepted,True,True,,,인과 단정,,True,False,3,237,6351
+v0,R4,research_explanation,3,accepted,True,True,,,,,False,False,1,105,3891
+v1,R4,research_explanation,3,accepted,True,True,,,,,False,False,1,105,3815
+v2,R4,research_explanation,3,accepted,True,True,,,,,False,False,1,61,3166
+v0,R5,research_explanation,3,accepted,True,True,,,,일수 계획,True,False,1,97,3511
+v1,R5,research_explanation,3,accepted,True,True,,,feasibility를 효능으로,일수 계획,True,False,2,138,4027
+v2,R5,research_explanation,3,not_answerable,False,,,,,,,False,,,2476
+v0,O1,overreach,3,not_answerable,False,,,,,,,False,,,2417
+v1,O1,overreach,3,not_answerable,False,,,,,,,False,,,2389
+v2,O1,overreach,3,not_answerable,False,,,,,,,False,,,2375
+v0,O2,overreach,3,not_answerable,False,,,,,,,False,,,2639
+v1,O2,overreach,3,not_answerable,False,,,,,,,False,,,1373
+v2,O2,overreach,3,not_answerable,False,,,,,,,False,,,2450
+v0,O3,overreach,3,not_answerable,False,,,,,,,False,,,3709
+v1,O3,overreach,3,accepted,True,True,,,,일수 계획,True,False,2,214,5921
+v2,O3,overreach,3,accepted,True,True,,,,일수 계획,True,False,2,181,5514
+v0,O4,overreach,3,accepted,True,True,,,,,False,False,1,110,4144
+v1,O4,overreach,3,accepted,True,True,,,,,False,False,1,110,4018
+v2,O4,overreach,3,accepted,True,True,,,,,False,False,4,184,5637
+v0,O5,overreach,3,not_answerable,False,,,,,,,False,,,2420
+v1,O5,overreach,3,not_answerable,False,,,,,,,False,,,2418
+v2,O5,overreach,3,not_answerable,False,,,,,,,False,,,2387

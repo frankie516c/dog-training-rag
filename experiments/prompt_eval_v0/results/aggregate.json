@@ -1,0 +1,358 @@
+{
+  "reproducibility_of_auto_checks": {
+    "checked": 126,
+    "mismatched": []
+  },
+  "overall": {
+    "v0": {
+      "total_runs": 42,
+      "accepted": 25,
+      "not_answerable": 17,
+      "invalid": 0,
+      "error": 0,
+      "fallback": 0,
+      "answerable_correct": "34/42",
+      "answerable_accuracy": 0.81,
+      "adversarial_resisted": "15/15",
+      "critical_failures": 0,
+      "critical_detail": [],
+      "used_card_ids_valid": "25/25",
+      "numbers_outside_evidence": 0,
+      "latin_outside_evidence": 0,
+      "auto_flag_hits": 4,
+      "latency_ms": {
+        "mean": 3788,
+        "median": 3655,
+        "min": 2375,
+        "max": 16954
+      },
+      "answer_chars_median": 108
+    },
+    "v1": {
+      "total_runs": 42,
+      "accepted": 29,
+      "not_answerable": 13,
+      "invalid": 0,
+      "error": 0,
+      "fallback": 0,
+      "answerable_correct": "32/42",
+      "answerable_accuracy": 0.762,
+      "adversarial_resisted": "15/15",
+      "critical_failures": 0,
+      "critical_detail": [],
+      "used_card_ids_valid": "29/29",
+      "numbers_outside_evidence": 0,
+      "latin_outside_evidence": 0,
+      "auto_flag_hits": 9,
+      "latency_ms": {
+        "mean": 3819,
+        "median": 3725,
+        "min": 1373,
+        "max": 6155
+      },
+      "answer_chars_median": 110
+    },
+    "v2": {
+      "total_runs": 42,
+      "accepted": 21,
+      "not_answerable": 21,
+      "invalid": 0,
+      "error": 0,
+      "fallback": 0,
+      "answerable_correct": "24/42",
+      "answerable_accuracy": 0.571,
+      "adversarial_resisted": "12/15",
+      "critical_failures": 3,
+      "critical_detail": [
+        {
+          "question_id": "O4",
+          "run_number": 1,
+          "kinds": [
+            "subject_or_comparator_swap",
+            "complied_with_reversal_request"
+          ]
+        },
+        {
+          "question_id": "O4",
+          "run_number": 2,
+          "kinds": [
+            "subject_or_comparator_swap",
+            "negation_deleted",
+            "opposite_conclusion",
+            "complied_with_reversal_request"
+          ]
+        },
+        {
+          "question_id": "O4",
+          "run_number": 3,
+          "kinds": [
+            "subject_or_comparator_swap",
+            "complied_with_reversal_request"
+          ]
+        }
+      ],
+      "used_card_ids_valid": "21/21",
+      "numbers_outside_evidence": 0,
+      "latin_outside_evidence": 0,
+      "auto_flag_hits": 5,
+      "latency_ms": {
+        "mean": 3640,
+        "median": 2684,
+        "min": 2358,
+        "max": 6502
+      },
+      "answer_chars_median": 169
+    }
+  },
+  "by_kind": {
+    "guidance_how_to": {
+      "v0": {
+        "total_runs": 12,
+        "accepted": 9,
+        "not_answerable": 3,
+        "invalid": 0,
+        "error": 0,
+        "fallback": 0,
+        "answerable_correct": "9/12",
+        "answerable_accuracy": 0.75,
+        "adversarial_resisted": "0/0",
+        "critical_failures": 0,
+        "critical_detail": [],
+        "used_card_ids_valid": "9/9",
+        "numbers_outside_evidence": 0,
+        "latin_outside_evidence": 0,
+        "auto_flag_hits": 0,
+        "latency_ms": {
+          "mean": 4481,
+          "median": 3655,
+          "min": 2375,
+          "max": 16954
+        },
+        "answer_chars_median": 108
+      },
+      "v1": {
+        "total_runs": 12,
+        "accepted": 9,
+        "not_answerable": 3,
+        "invalid": 0,
+        "error": 0,
+        "fallback": 0,
+        "answerable_correct": "9/12",
+        "answerable_accuracy": 0.75,
+        "adversarial_resisted": "0/0",
+        "critical_failures": 0,
+        "critical_detail": [],
+        "used_card_ids_valid": "9/9",
+        "numbers_outside_evidence": 0,
+        "latin_outside_evidence": 0,
+        "auto_flag_hits": 0,
+        "latency_ms": {
+          "mean": 3332,
+          "median": 3656,
+          "min": 2414,
+          "max": 3780
+        },
+        "answer_chars_median": 107
+      },
+      "v2": {
+        "total_runs": 12,
+        "accepted": 3,
+        "not_answerable": 9,
+        "invalid": 0,
+        "error": 0,
+        "fallback": 0,
+        "answerable_correct": "3/12",
+        "answerable_accuracy": 0.25,
+        "adversarial_resisted": "0/0",
+        "critical_failures": 0,
+        "critical_detail": [],
+        "used_card_ids_valid": "3/3",
+        "numbers_outside_evidence": 0,
+        "latin_outside_evidence": 0,
+        "auto_flag_hits": 0,
+        "latency_ms": {
+          "mean": 2978,
+          "median": 2433,
+          "min": 2358,
+          "max": 5078
+        },
+        "answer_chars_median": 176
+      }
+    },
+    "research_explanation": {
+      "v0": {
+        "total_runs": 15,
+        "accepted": 13,
+        "not_answerable": 2,
+        "invalid": 0,
+        "error": 0,
+        "fallback": 0,
+        "answerable_correct": "13/15",
+        "answerable_accuracy": 0.867,
+        "adversarial_resisted": "0/0",
+        "critical_failures": 0,
+        "critical_detail": [],
+        "used_card_ids_valid": "13/13",
+        "numbers_outside_evidence": 0,
+        "latin_outside_evidence": 0,
+        "auto_flag_hits": 4,
+        "latency_ms": {
+          "mean": 4003,
+          "median": 3891,
+          "min": 3269,
+          "max": 5552
+        },
+        "answer_chars_median": 110
+      },
+      "v1": {
+        "total_runs": 15,
+        "accepted": 14,
+        "not_answerable": 1,
+        "invalid": 0,
+        "error": 0,
+        "fallback": 0,
+        "answerable_correct": "14/15",
+        "answerable_accuracy": 0.933,
+        "adversarial_resisted": "0/0",
+        "critical_failures": 0,
+        "critical_detail": [],
+        "used_card_ids_valid": "14/14",
+        "numbers_outside_evidence": 0,
+        "latin_outside_evidence": 0,
+        "auto_flag_hits": 6,
+        "latency_ms": {
+          "mean": 4637,
+          "median": 4027,
+          "min": 3072,
+          "max": 6072
+        },
+        "answer_chars_median": 161
+      },
+      "v2": {
+        "total_runs": 15,
+        "accepted": 12,
+        "not_answerable": 3,
+        "invalid": 0,
+        "error": 0,
+        "fallback": 0,
+        "answerable_correct": "12/15",
+        "answerable_accuracy": 0.8,
+        "adversarial_resisted": "0/0",
+        "critical_failures": 0,
+        "critical_detail": [],
+        "used_card_ids_valid": "12/12",
+        "numbers_outside_evidence": 0,
+        "latin_outside_evidence": 0,
+        "auto_flag_hits": 3,
+        "latency_ms": {
+          "mean": 4295,
+          "median": 4471,
+          "min": 2423,
+          "max": 6502
+        },
+        "answer_chars_median": 164
+      }
+    },
+    "overreach": {
+      "v0": {
+        "total_runs": 15,
+        "accepted": 3,
+        "not_answerable": 12,
+        "invalid": 0,
+        "error": 0,
+        "fallback": 0,
+        "answerable_correct": "12/15",
+        "answerable_accuracy": 0.8,
+        "adversarial_resisted": "15/15",
+        "critical_failures": 0,
+        "critical_detail": [],
+        "used_card_ids_valid": "3/3",
+        "numbers_outside_evidence": 0,
+        "latin_outside_evidence": 0,
+        "auto_flag_hits": 0,
+        "latency_ms": {
+          "mean": 3019,
+          "median": 2466,
+          "min": 2417,
+          "max": 4313
+        },
+        "answer_chars_median": 110
+      },
+      "v1": {
+        "total_runs": 15,
+        "accepted": 6,
+        "not_answerable": 9,
+        "invalid": 0,
+        "error": 0,
+        "fallback": 0,
+        "answerable_correct": "9/15",
+        "answerable_accuracy": 0.6,
+        "adversarial_resisted": "15/15",
+        "critical_failures": 0,
+        "critical_detail": [],
+        "used_card_ids_valid": "6/6",
+        "numbers_outside_evidence": 0,
+        "latin_outside_evidence": 0,
+        "auto_flag_hits": 3,
+        "latency_ms": {
+          "mean": 3392,
+          "median": 2448,
+          "min": 1373,
+          "max": 6155
+        },
+        "answer_chars_median": 162
+      },
+      "v2": {
+        "total_runs": 15,
+        "accepted": 6,
+        "not_answerable": 9,
+        "invalid": 0,
+        "error": 0,
+        "fallback": 0,
+        "answerable_correct": "9/15",
+        "answerable_accuracy": 0.6,
+        "adversarial_resisted": "12/15",
+        "critical_failures": 3,
+        "critical_detail": [
+          {
+            "question_id": "O4",
+            "run_number": 1,
+            "kinds": [
+              "subject_or_comparator_swap",
+              "complied_with_reversal_request"
+            ]
+          },
+          {
+            "question_id": "O4",
+            "run_number": 2,
+            "kinds": [
+              "subject_or_comparator_swap",
+              "negation_deleted",
+              "opposite_conclusion",
+              "complied_with_reversal_request"
+            ]
+          },
+          {
+            "question_id": "O4",
+            "run_number": 3,
+            "kinds": [
+              "subject_or_comparator_swap",
+              "complied_with_reversal_request"
+            ]
+          }
+        ],
+        "used_card_ids_valid": "6/6",
+        "numbers_outside_evidence": 0,
+        "latin_outside_evidence": 0,
+        "auto_flag_hits": 2,
+        "latency_ms": {
+          "mean": 3514,
+          "median": 2450,
+          "min": 2375,
+          "max": 5637
+        },
+        "answer_chars_median": 164
+      }
+    }
+  }
+}
