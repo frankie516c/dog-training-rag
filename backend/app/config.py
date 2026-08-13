@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     qdrant_collection: str = "evidence_cards_v1"
     embedding_model_id: str = "BAAI/bge-m3"
     embedding_device: str | None = None
+    # Provisional minimum cosine score for a candidate whose scope already matches the
+    # routed question. Derived from a 7-question smoke test, not from a retrieval
+    # evaluation; see docs/query-scope-gating.md before changing it.
+    scope_matched_minimum_score: float = Field(default=0.40, ge=0.0, le=1.0)
     generation_base_url: str | None = Field(
         default=None,
         validation_alias=AliasChoices(

@@ -12,12 +12,20 @@ from backend.app.domain import (
     ChatStatus,
     ContentLanguage,
     EvidenceLevel,
+    SafetyNotice,
     SourceRegistryEntry,
 )
 from backend.app.generation import GenerationEvidence, GenerationProvider
 from backend.app.retrieval import DEFAULT_TOP_K, SearchResult
+from backend.app.safety import detect_safety_risk
+from backend.app.scope import card_scope, route_query_scope
 
-PROVISIONAL_COSINE_THRESHOLD = 0.45
+PROVISIONAL_SCOPE_MATCHED_MINIMUM = 0.40
+
+# Candidate pool pulled from the index before scope filtering. It is deliberately larger
+# than the CLI default so an on-topic card is not lost behind off-topic neighbours, and
+# it is not derived from the current corpus size.
+CANDIDATE_TOP_K = 20
 
 
 class ChatServiceUnavailable(RuntimeError):
@@ -36,29 +44,47 @@ class ChatService:
         *,
         retriever: ChatRetriever,
         generator: GenerationProvider,
-        threshold: float = PROVISIONAL_COSINE_THRESHOLD,
+        scope_matched_minimum: float = PROVISIONAL_SCOPE_MATCHED_MINIMUM,
+        candidate_top_k: int = CANDIDATE_TOP_K,
         request_id_factory: Callable[[], UUID] = uuid4,
     ) -> None:
         self._retriever = retriever
         self._generator = generator
-        self._threshold = threshold
+        self._scope_matched_minimum = scope_matched_minimum
+        self._candidate_top_k = candidate_top_k
         self._request_id_factory = request_id_factory
 
     async def answer(self, request: ChatRequest) -> ChatResponse:
-        try:
-            search_results = self._retriever.search(request.message, top_k=DEFAULT_TOP_K)
-        except Exception as exc:
-            raise ChatServiceUnavailable("evidence retrieval failed") from exc
-
-        selected = [result for result in search_results if result.score >= self._threshold]
-        if not selected:
+        safety = detect_safety_risk(request.message)
+        if safety is not None:
             return ChatResponse(
                 request_id=self._request_id_factory(),
                 status=ChatStatus.INSUFFICIENT_EVIDENCE,
-                answer=_insufficient_answer(request.response_language),
+                answer=safety.answer(request.response_language),
                 answer_language=request.response_language,
                 citations=[],
+                safety_notice=SafetyNotice(
+                    level=safety.level,
+                    message=safety.notice_message(request.response_language),
+                ),
             )
+
+        scope = route_query_scope(request.message)
+        if scope is None:
+            return self._insufficient(request, _unsupported_answer(request.response_language))
+
+        try:
+            search_results = self._retriever.search(request.message, top_k=self._candidate_top_k)
+        except Exception as exc:
+            raise ChatServiceUnavailable("evidence retrieval failed") from exc
+
+        selected = [
+            result
+            for result in search_results
+            if card_scope(result.card) is scope and result.score >= self._scope_matched_minimum
+        ]
+        if not selected:
+            return self._insufficient(request, _insufficient_answer(request.response_language))
 
         evidence = tuple(
             GenerationEvidence(
@@ -94,11 +120,26 @@ class ChatService:
             limitations=_collect_limitations(selected),
         )
 
+    def _insufficient(self, request: ChatRequest, answer: str) -> ChatResponse:
+        return ChatResponse(
+            request_id=self._request_id_factory(),
+            status=ChatStatus.INSUFFICIENT_EVIDENCE,
+            answer=answer,
+            answer_language=request.response_language,
+            citations=[],
+        )
+
 
 def _insufficient_answer(language: ContentLanguage) -> str:
     if language is ContentLanguage.ENGLISH:
         return "There is not enough validated evidence to answer this question."
     return "검증된 근거가 충분하지 않아 이 질문에 답변하기 어렵습니다."
+
+
+def _unsupported_answer(language: ContentLanguage) -> str:
+    if language is ContentLanguage.ENGLISH:
+        return "This question is outside the training topics covered by validated evidence."
+    return "현재 검증된 훈련 근거 범위에서는 이 질문에 답하기 어렵습니다."
 
 
 def _collect_limitations(results: list[SearchResult]) -> list[str]:

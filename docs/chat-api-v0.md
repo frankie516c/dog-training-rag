@@ -70,9 +70,9 @@
 
 ## 실행 흐름과 근거 제한
 
-`/chat`은 요청 검증 후 기존 local retrieval을 기본 top-k 5로 호출한다. 검색 결과 중 provisional cosine threshold `0.45` 이상인 카드만 생성 근거로 사용한다. threshold 이상 카드가 없으면 provider를 호출하지 않고 `insufficient_evidence`를 반환한다.
+`/chat`은 요청 검증 후 안전 규칙과 결정적 범위 분류를 먼저 적용한다. 중독 의심 질문과 지원 범주 밖 질문은 retrieval과 generation provider를 **호출하지 않고** `insufficient_evidence`를 반환한다. 지원 범주로 판정된 질문만 local retrieval을 호출하고, 질문과 같은 범주로 매핑되는 카드만 남긴 뒤 그 카드에 provisional scope-matched minimum `0.40`을 적용한다. 남는 카드가 없으면 provider를 호출하지 않는다.
 
-검색 score는 vector 유사도일 뿐 승인 여부나 사실성을 의미하지 않는다. 카드 승인과 RAG 사용 가능성은 기존 JSONL eligibility gate가 별도로 결정하며, `0.45`는 향후 검색 평가 결과로 조정할 임시 기준이다.
+범주 분류 결과와 후보 수는 내부 값이며 요청·응답 계약에 나타나지 않는다. 검색 score는 vector 유사도일 뿐 승인 여부나 사실성을 의미하지 않는다. 카드 승인과 RAG 사용 가능성은 기존 JSONL eligibility gate가 별도로 결정하며, `0.40`은 향후 검색 평가 결과로 조정할 임시 기준이다. 규칙과 실측 근거는 [`query-scope-gating.md`](query-scope-gating.md)에 있다.
 
 생성 provider에는 사용자 질문과 응답 언어 외에 선택된 카드의 `claim`, `topic`, `limitations`만 제공한다. 근거 밖의 절차나 사실을 만들지 않고, 처벌·공포 기반 방법을 새로 권고하지 않으며, limitations를 보존하도록 지시한다. URL, locator, 라이선스 문구, 원문, registry metadata는 prompt 근거 본문에 복제하지 않는다.
 
@@ -111,6 +111,6 @@ GENERATION_MODEL
 
 ## 현재 미구현 범위
 
-실제 EvidenceCard 데이터, 번역·요약 provenance, reranking, 검색 평가, 스트리밍, 대화 저장과 memory는 구현하지 않는다. SafetyNotice의 판정과 고위험 안전 규칙도 후속 계층의 책임이다.
+번역·요약 provenance, reranking, 정식 검색 평가, 스트리밍, 대화 저장과 memory는 구현하지 않는다. `SafetyNotice`는 현재 중독 의심 질문에 한해 `urgent`로만 설정되며, 그 밖의 안전 판정은 후속 계층의 책임이다.
 
 프론트엔드는 provider와 승인 데이터가 준비되기 전까지 mock 모드를 사용할 수 있지만, 503이나 `insufficient_evidence`를 임의의 근거 기반 답변으로 대체해서는 안 된다.

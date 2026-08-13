@@ -89,7 +89,11 @@ def _create_chat_service(settings: Settings) -> ChatService | None:
         )
     except (OSError, RuntimeError, ValueError):
         return None
-    return ChatService(retriever=retriever, generator=generator)
+    return ChatService(
+        retriever=retriever,
+        generator=generator,
+        scope_matched_minimum=settings.scope_matched_minimum_score,
+    )
 
 
 def _chat_not_ready_response() -> JSONResponse:

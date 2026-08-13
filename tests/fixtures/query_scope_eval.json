@@ -1,0 +1,61 @@
+{
+  "note": "Synthetic evaluation questions for the deterministic scope router and safety gate. No source text, no card content, no user data. 'expected' is one supported scope, 'unsupported', or 'safety_urgent'. Extend this file whenever a new evidence category is added.",
+  "cases": [
+    {
+      "message": "강아지가 사람을 보면 자꾸 뛰어올라요.",
+      "expected": "jumping_up"
+    },
+    {
+      "message": "손님만 오면 앞발을 들고 달려들어요.",
+      "expected": "jumping_up"
+    },
+    {
+      "message": "배변 실수를 나중에 발견했는데 혼내야 하나요?",
+      "expected": "housetraining"
+    },
+    {
+      "message": "전자 목줄이 보상 훈련보다 더 효과적인가요?",
+      "expected": "aversive_or_ecollar"
+    },
+    {
+      "message": "강아지가 켄넬 안에서 계속 짖어요.",
+      "expected": "kennel_barking"
+    },
+    {
+      "message": "이동장에 들어가는 것을 무서워해요.",
+      "expected": "crate_adaptation"
+    },
+    {
+      "message": "산책할 때 목줄을 계속 당겨요.",
+      "expected": "leash_walking"
+    },
+    {
+      "message": "강아지에게 손이나 악수를 가르치고 싶어요.",
+      "expected": "unsupported"
+    },
+    {
+      "message": "앉아를 가르치는 순서를 알려주세요.",
+      "expected": "unsupported"
+    },
+    {
+      "message": "날씨가 좋아요.",
+      "expected": "unsupported"
+    },
+    {
+      "message": "강아지가 초콜릿을 먹었어요.",
+      "expected": "safety_urgent"
+    },
+    {
+      "message": "개가 자일리톨을 삼켰어요.",
+      "expected": "safety_urgent"
+    },
+    {
+      "message": "My dog ate chocolate.",
+      "expected": "safety_urgent"
+    },
+    {
+      "message": "강아지가 간식을 먹었어요.",
+      "expected": "unsupported"
+    }
+  ]
+}
