@@ -50,6 +50,10 @@ Payload는 다음 세 값만 저장한다.
 
 claim 원문, locator, `SourceRegistryEntry` 전체는 Qdrant에 복제하지 않는다.
 
+### 임베디드 모드는 단일 프로세스다
+
+`path=`로 여는 Qdrant local persistent mode는 저장소를 **한 프로세스만** 열 수 있다. 백엔드가 떠 있는 상태에서 두 번째 백엔드나 `python -m backend.app.retrieval`을 같은 `data/qdrant`에 실행하면 나중에 뜬 쪽은 저장소를 열지 못한다. 그러면 chat service가 초기화되지 않아 `/chat`이 안전·미지원 질문까지 포함해 전부 503을 반환한다. 증상이 provider 오류와 구분되지 않으므로, 초기화 실패는 예외 유형과 실패 단계를 담은 ERROR 로그로 남긴다. 포트를 바꿔도 해결되지 않는다. 먼저 기존 프로세스를 내리거나 별도 `DOG_TRAINING_RAG_QDRANT_PATH`를 쓴다.
+
 ## 실행 방법
 
 ```powershell

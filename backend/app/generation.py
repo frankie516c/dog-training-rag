@@ -1,12 +1,19 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from typing import Protocol
 
 import httpx
 
 from backend.app.domain import ContentLanguage
+
+# A fence that opens on the first line and closes on the last one, wrapping everything.
+_WRAPPING_CODE_FENCE = re.compile(
+    r"\A```[^\n`]*\n?(?P<body>.*?)\n?```\Z",
+    re.DOTALL,
+)
 
 
 class GenerationError(RuntimeError):
@@ -51,7 +58,12 @@ def build_generation_messages(
         "Do not invent steps, procedures, or facts beyond that evidence. "
         "Do not newly recommend punishment-based or fear-based methods. "
         "Preserve every stated limitation. "
-        f"Write the answer in language code {response_language.value}."
+        f"Write the answer in language code {response_language.value}. "
+        "Reply with plain prose only. "
+        "Do not wrap the reply in a JSON object, a Markdown code fence, or YAML. "
+        "Do not emit field names or a response schema such as answer, citations, or "
+        "limitations. "
+        "The server assembles citations and limitations separately, so do not write them."
     )
     user_message = "\n".join(
         (
@@ -64,6 +76,32 @@ def build_generation_messages(
         {"role": "system", "content": system_message},
         {"role": "user", "content": user_message},
     ]
+
+
+def normalize_generated_answer(content: str) -> str:
+    """Undo whole-response JSON or code-fence wrapping from a local model.
+
+    Deliberately narrow. It only unwraps when the *entire* response is one wrapper, so
+    prose that merely mentions JSON or contains an inline fence is returned untouched.
+    An empty result is left empty for the caller to reject through the existing
+    generation failure path.
+    """
+
+    text = content.strip()
+
+    fence = _WRAPPING_CODE_FENCE.match(text)
+    if fence is not None and "```" not in fence.group("body"):
+        text = fence.group("body").strip()
+
+    if text.startswith("{") and text.endswith("}"):
+        try:
+            payload = json.loads(text)
+        except ValueError:
+            return text
+        if isinstance(payload, dict) and isinstance(payload.get("answer"), str):
+            return payload["answer"].strip()
+
+    return text
 
 
 class OpenAICompatibleGenerationProvider:
@@ -114,9 +152,12 @@ class OpenAICompatibleGenerationProvider:
                 response.raise_for_status()
                 body = response.json()
             content = body["choices"][0]["message"]["content"]
-            if not isinstance(content, str) or not content.strip():
+            if not isinstance(content, str):
                 raise GenerationError("generation provider returned an empty answer")
-            return content.strip()
+            answer = normalize_generated_answer(content)
+            if not answer:
+                raise GenerationError("generation provider returned an empty answer")
+            return answer
         except GenerationError:
             raise
         except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as exc:

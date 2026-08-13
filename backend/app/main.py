@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -12,6 +14,14 @@ from backend.app.generation import OpenAICompatibleGenerationProvider
 from backend.app.retrieval import EvidenceRetrieval
 
 CHAT_NOT_READY_MESSAGE = "검증된 근거를 검색하는 기능을 준비 중입니다."
+
+logger = logging.getLogger(__name__)
+
+INIT_FAILURE_MESSAGE = "chat service disabled: %s initialization failed (%s)"
+QDRANT_SINGLE_PROCESS_HINT = (
+    "the embedded Qdrant storage is single-process; check that no other backend, CLI or "
+    "notebook currently holds it"
+)
 
 
 class HealthResponse(BaseModel):
@@ -78,6 +88,17 @@ def _create_chat_service(settings: Settings) -> ChatService | None:
             model=model,
             api_key=api_key.get_secret_value() if api_key is not None else None,
         )
+    except (OSError, RuntimeError, ValueError) as exc:
+        # Never log the settings values themselves; the API key lives in there.
+        logger.error(
+            INIT_FAILURE_MESSAGE,
+            "generation provider",
+            type(exc).__name__,
+            exc_info=True,
+        )
+        return None
+
+    try:
         retriever = EvidenceRetrieval(
             paths=DataPaths(),
             qdrant_path=settings.qdrant_path,
@@ -87,8 +108,16 @@ def _create_chat_service(settings: Settings) -> ChatService | None:
                 device=settings.embedding_device,
             ),
         )
-    except (OSError, RuntimeError, ValueError):
+    except (OSError, RuntimeError, ValueError) as exc:
+        logger.error(
+            INIT_FAILURE_MESSAGE + "; %s",
+            "evidence retrieval",
+            type(exc).__name__,
+            QDRANT_SINGLE_PROCESS_HINT,
+            exc_info=True,
+        )
         return None
+
     return ChatService(
         retriever=retriever,
         generator=generator,
