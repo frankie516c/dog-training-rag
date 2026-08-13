@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const apiUrl = process.env.NEXT_PUBLIC_CHAT_API_URL;
+  const apiUrl = process.env.CHAT_API_URL;
 
   if (!apiUrl) {
     return NextResponse.json(

@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
-import { ChatApiError, chatMode, sendChat, type MockScenario } from "@/lib/chat-client";
+import { ChatApiError, sendChat } from "@/lib/chat-client";
 import type { ChatCitation, ChatResponse, Locator } from "@/lib/chat-contract";
 
 const MAX_MESSAGE_LENGTH = 1_000;
@@ -96,9 +96,9 @@ export function Chat() {
   const [items, setItems] = useState<ConversationItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [validationMessage, setValidationMessage] = useState("");
-  const [mockScenario, setMockScenario] = useState<MockScenario>("answered");
   const endRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const submissionInFlightRef = useRef(false);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -106,7 +106,7 @@ export function Chat() {
 
   async function handleSubmit(event?: FormEvent) {
     event?.preventDefault();
-    if (isLoading) return;
+    if (submissionInFlightRef.current) return;
 
     const trimmedMessage = message.trim();
     if (!trimmedMessage) {
@@ -120,6 +120,7 @@ export function Chat() {
       return;
     }
 
+    submissionInFlightRef.current = true;
     setValidationMessage("");
     setIsLoading(true);
     setItems((current) => [
@@ -129,10 +130,7 @@ export function Chat() {
     setMessage("");
 
     try {
-      const response = await sendChat(
-        { message: trimmedMessage, response_language: "ko" },
-        mockScenario,
-      );
+      const response = await sendChat({ message: trimmedMessage, response_language: "ko" });
       setItems((current) => [
         ...current,
         { id: crypto.randomUUID(), role: "assistant", response },
@@ -151,6 +149,7 @@ export function Chat() {
         },
       ]);
     } finally {
+      submissionInFlightRef.current = false;
       setIsLoading(false);
       textareaRef.current?.focus();
     }
@@ -165,25 +164,6 @@ export function Chat() {
 
   return (
     <div className="chat-area">
-      {chatMode === "mock" && (
-        <div className="mock-controls">
-          <label htmlFor="mock-scenario">Mock 응답</label>
-          <select
-            id="mock-scenario"
-            value={mockScenario}
-            onChange={(event) => setMockScenario(event.target.value as MockScenario)}
-            disabled={isLoading}
-          >
-            <option value="answered">답변 완료</option>
-            <option value="insufficient">근거 부족</option>
-            <option value="caution">주의 안내</option>
-            <option value="urgent">긴급 안내</option>
-            <option value="unavailable">503 준비 중</option>
-          </select>
-          <span>UI 확인용 합성 fixture</span>
-        </div>
-      )}
-
       <div className="conversation" aria-live="polite" aria-busy={isLoading}>
         {items.length === 0 && (
           <div className="empty-state">
