@@ -132,9 +132,29 @@ _CRATE_ADAPTATION = _pattern(
 _HOUSETRAINING = _pattern(
     ("배변", "대소변", "housetraining", "house training", "potty training", "toilet training")
 )
-_ELIMINATION = _pattern(("소변", "오줌", "대변", "똥", "쉬야", "urinat", "defecat", "poop"))
+# Colloquial 배설 표현을 포함한다. 이 단어들은 단독으로 범주를 정하지 않고 아래 장소·실수
+# 표현과 함께 나올 때만 housetraining이 된다. `쉬`는 "쉬고 있어요", "가르치기 쉬운"과 겹치므로
+# 조사가 붙은 형태만 인식한다.
+_ELIMINATION = _pattern(
+    ("소변", "오줌", "대변", "똥", "응가", "쉬야", "쉬를", "쉬해", "urinat", "defecat", "poop")
+)
 _ELIMINATION_CONTEXT = _pattern(
-    ("실수", "아무 데", "아무데", "가리", "마킹", "훈련", "training", "accident", "indoors")
+    (
+        "실수",
+        "아무 데",
+        "아무데",
+        "가리",
+        "마킹",
+        "훈련",
+        "집 안",
+        "집안",
+        "실내",
+        "바닥",
+        "패드",
+        "training",
+        "accident",
+        "indoors",
+    )
 )
 
 _JUMP = _pattern(

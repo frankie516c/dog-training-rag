@@ -24,9 +24,11 @@ from backend.app.retrieval import DEFAULT_TOP_K, SearchResult
 
 CARD_ID = UUID("40000000-0000-4000-8000-000000000001")
 OTHER_CARD_ID = UUID("40000000-0000-4000-8000-000000000002")
+HOUSETRAINING_CARD_ID = UUID("40000000-0000-4000-8000-000000000003")
 REQUEST_ID = UUID("50000000-0000-4000-8000-000000000001")
 
 SUPPORTED_QUESTION = "강아지가 사람을 보면 자꾸 뛰어올라요."
+COLLOQUIAL_HOUSETRAINING_QUESTION = "응가를 아무데나 해요ㅠㅠ"
 UNSUPPORTED_QUESTION = "강아지에게 손이나 악수를 가르치고 싶어요."
 SAFETY_QUESTION = "강아지가 초콜릿을 먹었어요."
 UNSUPPORTED_ANSWER = "현재 검증된 훈련 근거 범위에서는 이 질문에 답하기 어렵습니다."
@@ -130,6 +132,14 @@ def make_off_scope_card() -> EvidenceCard:
         card_id=OTHER_CARD_ID,
         topic="synthetic loose leash topic",
         tags=["leash walking"],
+    )
+
+
+def make_housetraining_card() -> EvidenceCard:
+    return make_card(
+        card_id=HOUSETRAINING_CARD_ID,
+        topic="synthetic housetraining topic",
+        tags=["housetraining"],
     )
 
 
@@ -237,6 +247,30 @@ def test_unmapped_card_is_dropped() -> None:
 
     assert response.status is ChatStatus.INSUFFICIENT_EVIDENCE
     assert generator.calls == []
+
+
+def test_colloquial_housetraining_question_reaches_retrieval_and_generation() -> None:
+    housetraining = make_housetraining_card()
+    leash = make_off_scope_card()
+    jumping = make_card()
+    service, retriever, generator = make_service_from_results(
+        [
+            SearchResult(card_id=leash.card_id, score=0.95, card=leash),
+            SearchResult(card_id=jumping.card_id, score=0.93, card=jumping),
+            SearchResult(card_id=housetraining.card_id, score=0.44, card=housetraining),
+        ]
+    )
+
+    response = asyncio.run(service.answer(ChatRequest(message=COLLOQUIAL_HOUSETRAINING_QUESTION)))
+
+    assert response.status is ChatStatus.ANSWERED
+    assert retriever.search_calls == [(COLLOQUIAL_HOUSETRAINING_QUESTION, CANDIDATE_TOP_K)]
+    assert len(generator.calls) == 1
+    assert {citation.card_id for citation in response.citations} == {HOUSETRAINING_CARD_ID}
+    assert response.limitations == ["Keep the synthetic limitation."]
+    evidence = generator.calls[0]["evidence"]
+    assert isinstance(evidence, tuple)
+    assert [item.topic for item in evidence] == ["synthetic housetraining topic"]
 
 
 def test_unsupported_question_skips_retrieval_and_generation() -> None:
