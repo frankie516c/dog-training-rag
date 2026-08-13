@@ -93,6 +93,39 @@ def test_procedures_without_approved_evidence_are_unsupported(message: str) -> N
     assert route_query_scope(message) is None
 
 
+@pytest.mark.parametrize(
+    "message",
+    [
+        "응가를 아무데나 해요ㅠㅠ",
+        "집 안에 똥을 싸요",
+        "오줌을 아무데나 싸요",
+        "배변패드에 안 해요",
+        "자꾸 소변 실수를 해요",
+        "집 안에서 쉬를 해요",
+        # 이모티콘, 반복 문장부호, 띄어쓰기 차이가 있어도 같은 판정이어야 한다.
+        "응가를  아무 데나 해요!!!",
+        "집안에 똥을 싸요ㅠㅠㅠ",
+        "실내에서 쉬를 해요…",
+    ],
+)
+def test_colloquial_housetraining_questions_are_routed(message: str) -> None:
+    assert route_query_scope(message) is TrainingScope.HOUSETRAINING
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "강아지가 똥을 먹어요",
+        "응가 냄새가 너무 심해요",
+        "강아지가 쉬고 있어요",
+        "초보자가 가르치기 쉬운 훈련은 뭐예요?",
+        "대변 색깔이 이상해요",
+    ],
+)
+def test_elimination_words_alone_are_not_housetraining(message: str) -> None:
+    assert route_query_scope(message) is not TrainingScope.HOUSETRAINING
+
+
 def test_high_risk_ingestion_is_urgent_and_plain_treats_are_not() -> None:
     assert detect_safety_risk("강아지가 초콜릿을 먹었어요.") is not None
     assert detect_safety_risk("개가 자일리톨을 삼켰어요.") is not None
