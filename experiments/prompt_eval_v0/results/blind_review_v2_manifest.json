@@ -1,0 +1,7 @@
+{
+  "seed": 20260813,
+  "rows": 126,
+  "sheet_sha256": "a8f6a2ad0888ef8ee3341a7bb0e5b02ba84d30445282372cf3900ce5711e40ce",
+  "key_sha256": "f110b268db4e7388b6c4ebcb8a1c39b379219461d54d995b1fbfadd70665f7fc",
+  "superseded": "blind_review.csv leaked prompt_version through row order"
+}

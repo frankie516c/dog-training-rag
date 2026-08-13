@@ -264,7 +264,7 @@ def test_runner_writes_records_only_and_a_separate_config(tmp_path, monkeypatch)
     assert written_config["model"] == "synthetic"
     assert "temperature" in written_config["uncontrolled_sampling_params"]
     # Provenance the v0 run could not prove after the fact.
-    assert set(written_config["prompt_sha256"]) == set(VERSIONS)
+    assert set(written_config["prompt_sha256"]) >= set(VERSIONS)
     assert set(written_config["source_sha256_at_run_time"]) >= {"prompts.py", "fixture.py"}
 
 

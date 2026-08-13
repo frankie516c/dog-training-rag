@@ -25,8 +25,10 @@ from backend.app.domain import ContentLanguage
 from backend.app.generation import GenerationError, OpenAICompatibleGenerationProvider
 from backend.app.grounded import DraftVerdict, validate_draft
 from experiments.prompt_eval_v0.checks import run_auto_checks
+from experiments.prompt_eval_v0.expectation import RunExpectation, write_expectation
 from experiments.prompt_eval_v0.fixture import QUESTIONS, EvalQuestion, QuestionKind, cards_for
 from experiments.prompt_eval_v0.prompts import PROMPT_VERSIONS, build_messages
+from experiments.prompt_eval_v0.provenance import sanitize_endpoint, sha256_file
 
 RESULTS_DIR = Path(__file__).parent / "results"
 VERSIONS = ("v0", "v1", "v2")
@@ -62,9 +64,11 @@ class RunConfig:
     uncontrolled_sampling: tuple[str, ...] = ("temperature", "top_p", "seed", "max_tokens")
 
     def as_dict(self) -> dict:
+        # The raw base_url is never written: gateway URLs can carry credentials in
+        # userinfo, query or path. Only what reproduction needs survives.
         return {
             "model": self.model,
-            "base_url": self.base_url,
+            "endpoint": sanitize_endpoint(self.base_url),
             "timeout_seconds": self.timeout_seconds,
             "uncontrolled_sampling_params": list(self.uncontrolled_sampling),
             "prompt_sha256": {
@@ -131,7 +135,17 @@ async def evaluate_one(
     }
 
     if error is not None:
-        record.update(provider_result="error", answerable=None, answer=None, used_card_ids=[])
+        # A transport failure is not a refusal. In production GroundedAnswerer catches it
+        # and falls back to composition, so record that explicitly instead of leaving the
+        # key absent and letting `.get()` read as "no fallback".
+        record.update(
+            provider_result="error",
+            answerable=None,
+            answer=None,
+            used_card_ids=[],
+            auto_checks=None,
+            would_fallback=True,
+        )
         return record
 
     result = validate_draft(raw or "", cards=cards, response_language=ContentLanguage.KOREAN)
@@ -161,12 +175,20 @@ async def evaluate_one(
     return record
 
 
-async def run_all(config: RunConfig, runs: int) -> list[dict]:
-    provider = OpenAICompatibleGenerationProvider(
+def build_provider(config: RunConfig, settings: Settings) -> OpenAICompatibleGenerationProvider:
+    """Mirror production wiring, including the API key. The key is never recorded."""
+
+    api_key = settings.generation_api_key
+    return OpenAICompatibleGenerationProvider(
         base_url=config.base_url,
         model=config.model,
+        api_key=api_key.get_secret_value() if api_key is not None else None,
         timeout_seconds=config.timeout_seconds,
     )
+
+
+async def run_all(config: RunConfig, runs: int, settings: Settings) -> list[dict]:
+    provider = build_provider(config, settings)
     records: list[dict] = []
     # Run-major, version-interleaved per question: reduces order bias without changing the
     # question order within a run.
@@ -223,11 +245,12 @@ def main(argv: list[str] | None = None) -> int:
         dry_run()
         return 0
 
-    config = load_config(Settings())
+    settings = Settings()
+    config = load_config(settings)
     print(f"config: {json.dumps(config.as_dict(), ensure_ascii=False)}")
     print(f"planned calls: {len(QUESTIONS) * len(VERSIONS) * args.runs}")
 
-    records = asyncio.run(run_all(config, args.runs))
+    records = asyncio.run(run_all(config, args.runs, settings))
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     # One object per line, records only. The v0 run wrote its config as the first line of
@@ -239,10 +262,22 @@ def main(argv: list[str] | None = None) -> int:
 
     config_path = config_path_for(args.out)
     config_path.write_text(
-        json.dumps(config.as_dict(), ensure_ascii=False, indent=2), encoding="utf-8"
+        json.dumps(
+            config.as_dict() | {"records_sha256": sha256_file(args.out)},
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
     )
+    # Declared shape, so a later deletion of a version or a run is detectable.
+    expectation_file = write_expectation(
+        args.out,
+        RunExpectation(versions=VERSIONS, runs=args.runs, questions=len(QUESTIONS)),
+    )
+
     print(f"\nwrote {len(records)} records to {args.out}")
     print(f"wrote run config to {config_path}")
+    print(f"wrote run expectation to {expectation_file}")
     return 0
 
 

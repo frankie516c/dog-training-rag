@@ -1,14 +1,22 @@
 {
   "config": {
     "model": "gemma3:4b",
-    "base_url": "http://localhost:11434/v1",
     "timeout_seconds": 30.0,
     "uncontrolled_sampling_params": [
       "temperature",
       "top_p",
       "seed",
       "max_tokens"
-    ]
+    ],
+    "endpoint": {
+      "provider_type": "openai_compatible",
+      "locality": "local",
+      "sanitized_origin": "http://localhost:11434",
+      "path_label": "/v1",
+      "had_userinfo": false,
+      "had_query_or_fragment": false
+    },
+    "endpoint_recovered_from_legacy_base_url": true
   },
   "overall": {
     "v0": {

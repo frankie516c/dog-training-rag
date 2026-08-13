@@ -1,4 +1,44 @@
-# Prompt Eval v0 — grounded prompt 비교
+﻿# Prompt Eval v0 — grounded prompt 비교
+
+> ## ⚠ Correction Notice (커밋 `303ae01` 이후 정정)
+>
+> 코드 리뷰가 이 보고서의 사실 오류 네 건을 찾았다. **원본 126개 응답과 v0·v1·v2 성능 결과 자체는 바뀌지 않았다** — 수치의 분모, 해석, provenance만 정정한다. `prompt_only.jsonl` SHA-256은 `979fd884…e3d`로 불변이다. 전체 처리 내역은 [`REVIEW_DISPOSITION.md`](REVIEW_DISPOSITION.md).
+>
+> ### 1. 재계산 커버리지 — 사실 오류
+>
+> | | 기존 주장 | 정정 |
+> |---|---|---|
+> | 재계산 대상 | "126건 전부" | **75건** (accepted만) |
+> | 건너뛴 레코드 | 언급 없음 | **51건** (`not_answerable`, `auto_checks` 자체가 없음) |
+> | 불일치 | 0건 | 0건 (**applicable 75건 기준**) |
+>
+> "126건 전부 재계산했다"는 **사실 오류**였다. `auto_checks`가 없는 레코드를 건너뛰면서 분모만 전체로 보고했다. 검증 대상이 아닌 레코드를 통과로 집계하지 않는다. `not_answerable` 51건에는 적용 가능한 별도 계약 검사(answer가 null인지, used_card_ids가 비었는지, answerable 계약)를 수행하며 결과는 위반 0건이다.
+>
+> ### 2. 숫자·라틴어 지표 — 해석 오류
+>
+> `근거 밖 숫자 0건 / 라틴어 0건`은 **post-validation invariant**다. `validate_draft`가 같은 context·같은 정규식으로 그런 답변을 이미 제거한 뒤에 같은 검사를 다시 돌린 것이므로 구조적으로 0일 수밖에 없다.
+>
+> - **prompt comparison metric이 아니다**
+> - **독립적인 안전 검증이 아니다**
+> - validator가 제거한 결과를 재확인한 것뿐이다
+>
+> pre-validation raw draft가 저장돼 있으나 독립 검사기가 없어 prompt metric으로 승격하지 않는다.
+>
+> ### 3. Blind review sheet — 무효
+>
+> 기존 `blind_review.csv`는 정렬 순서로 prompt version을 노출했다(`row_id index %3 → v0/v1/v2` 고정). 버전 열을 숨겨도 행 위치로 복원 가능하다. **공정한 blind review 증거로 사용하지 않는다.**
+>
+> 대체본 `blind_review_v2.csv` — 버전·run 열 제거, 고정 seed 셔플, 불투명 row_id, 대응표는 `blind_review_v2_key.csv`로 분리, 양쪽 hash는 `blind_review_v2_manifest.json`.
+>
+> **대체본의 한계**: `BLIND_SHUFFLE_SEED`가 소스 상수이고 `prompt_only.jsonl`이 저장소에 있으므로, **저장소 접근 권한이 있는 사람은 key 파일을 열지 않고도 row_id → version 대응을 재계산할 수 있다.** 이 sheet은 *sheet만 전달받은 외부 검토자*에게 blind이지, 저장소를 가진 사람에게는 아니다. 저자 본인의 자체 채점은 blind 근거로 쓸 수 없다.
+>
+> ### 4. Manifest hash — 불일치
+>
+> 이 보고서가 수동으로 복사한 해시 표와 `results/manifest.json`이 어긋났다(`runner.py`가 세 값). **수동 표를 제거하고 `results/manifest.json`을 유일한 진실원천으로 한다.** 기준은 해당 파일들의 *현재* 상태이며, v0 레코드를 만든 시점의 상태가 아니다.
+>
+> ### 정정하지 않은 것
+>
+> v0·v1·v2의 accepted/not_answerable 수, critical failure 판정, latency, 대표 사례, 결론(v2 탈락 / v1 잠정 후보)은 그대로다.
 
 모델·임베딩·검색 결과·EvidenceCard context를 고정하고 **grounded system instruction만** v0/v1/v2로 바꿔 측정했다. 126회 prompt-only 실행 후 재실행 없이 집계했다.
 
@@ -12,7 +52,7 @@
 |---|---|---|
 | 자동 검증 | JSON·구조화 출력 유효성, provider_result, used_card_ids, 근거 밖 숫자·라틴어, 길이, fallback, latency | 기계적으로 재현 가능 |
 | **AI-assisted semantic review** | 주어·비교 방향·부정 보존, 인과 과장, 연구→처방 전환, 직접성, 가독성 | **사람 검토 아님.** AI가 claim과 답변을 나란히 읽고 판정 |
-| 사람 확인 필요 | 위 semantic review의 타당성 자체 | `results/blind_review.csv` 126행 |
+| 사람 확인 필요 | 위 semantic review의 타당성 자체 | `results/blind_review_v2.csv` 126행 |
 
 의미 판단을 자동 검증 결과로 표기하지 않았다.
 
@@ -27,16 +67,14 @@ per_version v0=42 v1=42 v2=42, 질문별 버전당 정확히 3회
 question_and_context_identical_across_versions: true
 ```
 
-| 입력 | SHA-256 |
-|---|---|
-| `results/prompt_only.jsonl` | `979fd8841e4c478c2692706212cb2010b59e833d775557cf1943ea8027a22e3d` |
-| `prompts.py` | `0ac8153fef1ec4748a0a4261148d668b9691cf35c656e4784b2349d24db72b69` |
-| `fixture.py` | `5158de48de405c323d4527c84a1eff18262d33f4946479e3c4f0bf280f6382cd` |
-| `runner.py` | `594afb120de0dcb27d52597be49e2c0b0529f2aeade46f874f286f2fd1ca980b` |
-| `checks.py` | `8b4703941e7731e9251da209970b3dc842c61cb3d793e45eef0f4d8cd354d175` |
-| prompt v0 (990자) | `572cdd5b0a9593026e1e353f24801fefb0072dffca42751ea270802283a9b9ad` |
-| prompt v1 (1,681자) | `6b3aa676ed18a1114b98e566f31144e106886303af03a2fee7fa16fbb694046a` |
-| prompt v2 (2,366자) | `31e3a0120180671693bc5bb2eef24160353f9e26695f94177a4d90e7a16f2547` |
+**해시의 진실원천은 [`results/manifest.json`](results/manifest.json) 하나다.** 이전 판에는 손으로 옮긴 표가 있었고 manifest와 어긋났으므로 제거했다. manifest는 다음을 모두 해시한다 — 원본 레코드, 프롬프트 정의 3종, fixture, runner, checks, analyze, integrity, review, semantic_review, provenance, loading, `backend/app/grounded.py`, `data/processed/evidence_cards.jsonl`, `data/sources/source_registry.jsonl`. 여기에 모델명·digest, config 출처, sanitized endpoint, git commit·dirty 여부가 함께 기록된다.
+
+원본 레코드 해시만 본문에 고정해 둔다. 이 값이 달라지면 결과가 바뀐 것이다.
+
+```
+results/prompt_only.jsonl
+  979fd8841e4c478c2692706212cb2010b59e833d775557cf1943ea8027a22e3d
+```
 
 ### Provenance limitation
 
@@ -48,7 +86,13 @@ question_and_context_identical_across_versions: true
 
 이 결함은 runner에서 고쳤다. 이후 실행은 config 사이드카에 `prompt_sha256`과 `source_sha256_at_run_time`을 **실행 시점에** 기록한다(`test_run_config_records_the_hashes_that_were_actually_used`). v0 레코드에는 소급 적용할 수 없다.
 
-별개의 사실로, 저장된 자동 검사 결과를 현재 `checks.py`로 **126건 전부 재계산해 0건 불일치**를 확인했다(`aggregate.json.reproducibility_of_auto_checks`). 이는 편집이 결과를 바꾸지 않았다는 증거이지 **source hash 보존을 대체하지 않는다.**
+별개의 사실로, 저장된 자동 검사 결과를 현재 `checks.py`로 재계산했다.
+
+```
+total_records 126 / applicable 75 / checked 75 / skipped 51 / mismatches 0
+```
+
+**applicable 75건에서 불일치 0건**이다. 나머지 51건은 `not_answerable`이라 `auto_checks` 자체가 없으므로 이 검사의 대상이 아니며, 통과로 집계하지 않는다. 이 결과는 편집이 결과를 바꾸지 않았다는 증거이지 **source hash 보존을 대체하지 않는다.**
 
 ### 파일 구조 결함
 
@@ -92,7 +136,7 @@ question_and_context_identical_across_versions: true
 
 **AI-assisted semantic review에서 발견된 critical failure: v0 0건, v1 0건, v2 3건.**
 
-이 "0건"은 **human-reviewed 결과가 아니며 안전 보증이 아니다.** AI 검토자가 126개 답변을 claim과 나란히 읽고 발견하지 못했다는 뜻이다. 검토 자체의 타당성은 `results/blind_review.csv`로 사람이 확인해야 한다.
+이 "0건"은 **human-reviewed 결과가 아니며 안전 보증이 아니다.** AI 검토자가 126개 답변을 claim과 나란히 읽고 발견하지 못했다는 뜻이다. 검토 자체의 타당성은 `results/blind_review_v2.csv`로 사람이 확인해야 한다.
 
 v2는 O4에서 3회 중 3회 모두 반전 요청에 순응했다. 같은 질문에서 v0·v1은 6회 모두 요청을 거부하고 원래 방향을 다시 말했다.
 
@@ -186,7 +230,7 @@ E2E는 두 지표로 나눠 읽어야 한다.
 
 ## 6. 자동 검사의 한계 — 플래그 수를 왜곡률로 읽지 말 것
 
-`summary.json`의 플래그 수에는 오탐이 섞여 있다. `semantic_review.json`에 목록화했다.
+`prompt_only_summary.json`의 플래그 수에는 오탐이 섞여 있다. `semantic_review.json`에 목록화했다.
 
 | 플래그 | 오탐 사유 |
 |---|---|
@@ -197,7 +241,9 @@ E2E는 두 지표로 나눠 읽어야 한다.
 
 반대로 **누락도 있다**. v2 O4의 반전 3건 중 자동 플래그가 잡은 것은 1건뿐이다. 어휘 기반 검사는 방향 역전을 구조적으로 탐지하지 못한다.
 
-확실하게 자동으로 말할 수 있는 것은 **근거 밖 숫자 0건, 근거 밖 라틴어 0건, used_card_ids 오류 0건, invalid 0건, fallback 0건** — 세 버전 모두.
+확실하게 자동으로 말할 수 있는 것은 **used_card_ids 오류 0건, invalid 0건, provider error 0건, fallback 0건** — 세 버전 모두.
+
+`post_validation_numbers_outside_evidence`와 `post_validation_latin_outside_evidence`도 0건이지만, 이는 프롬프트 품질이 아니라 **validator가 이미 제거한 결과를 재확인한 post-validation invariant**다(Correction Notice 2). 프롬프트 비교 지표로 쓰지 않는다.
 
 ## 7. 결론
 
@@ -240,7 +286,9 @@ production `/chat`에서 comparison intent는 **provider를 호출하지 않고*
 
 ## 8. 사람 확인이 필요한 판단
 
-`results/blind_review.csv` 126행. `prompt_version_hidden`을 숨기고 채점할 수 있다.
+**`results/blind_review_v2.csv` 126행**을 쓴다. 버전·run 열이 없고 고정 seed로 셔플돼 있으며 row_id가 불투명하다. 대응표는 `blind_review_v2_key.csv`, 두 파일 해시는 `blind_review_v2_manifest.json`.
+
+기존 `blind_review.csv`는 행 순서로 버전을 노출했으므로 **공정한 blind review 증거로 사용하지 않는다**(Correction Notice 3).
 
 우선 확인 권장:
 

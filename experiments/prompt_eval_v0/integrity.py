@@ -15,20 +15,50 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+from experiments.prompt_eval_v0.expectation import (
+    check_against,
+    expectation_path,
+    load_expectation,
+    satisfied,
+)
 from experiments.prompt_eval_v0.fixture import QUESTIONS, cards_for
+from experiments.prompt_eval_v0.loading import load_run
 from experiments.prompt_eval_v0.prompts import PROMPT_VERSIONS
+from experiments.prompt_eval_v0.provenance import git_state, sanitize_config
 
 PACKAGE_DIR = Path(__file__).parent
 RESULTS_DIR = PACKAGE_DIR / "results"
 RECORDS_PATH = RESULTS_DIR / "prompt_only.jsonl"
 VERSIONS = ("v0", "v1", "v2")
 
+REPO_ROOT = PACKAGE_DIR.parents[1]
+
+#: Everything that can change a prompt, a screen or a reported number. The v0 manifest
+#: hashed five files and omitted the evidence JSONL that actually determines every prompt,
+#: so editing a claim left the manifest fully green.
 HASHED_INPUTS = (
     RECORDS_PATH,
     PACKAGE_DIR / "prompts.py",
     PACKAGE_DIR / "fixture.py",
     PACKAGE_DIR / "runner.py",
     PACKAGE_DIR / "checks.py",
+    PACKAGE_DIR / "analyze.py",
+    PACKAGE_DIR / "integrity.py",
+    PACKAGE_DIR / "review.py",
+    PACKAGE_DIR / "semantic_review.py",
+    PACKAGE_DIR / "provenance.py",
+    PACKAGE_DIR / "loading.py",
+    PACKAGE_DIR / "fingerprints.py",
+    PACKAGE_DIR / "targeted.py",
+    PACKAGE_DIR / "e2e.py",
+    PACKAGE_DIR / "gate_control.py",
+    # Determines critical_failures: without it no semantic label applies.
+    RESULTS_DIR / "semantic_label_fingerprints.json",
+    # Declares the run shape; deletion is undetectable without it.
+    expectation_path(RECORDS_PATH),
+    REPO_ROOT / "backend" / "app" / "grounded.py",
+    REPO_ROOT / "data" / "processed" / "evidence_cards.jsonl",
+    REPO_ROOT / "data" / "sources" / "source_registry.jsonl",
 )
 
 #: Known gaps between what produced the v0 records and what is hashed here. Recorded so a
@@ -95,13 +125,11 @@ def check_records(path: Path) -> dict:
     duplicates = sorted(key for key, count in keys.items() if count > 1)
 
     per_version = Counter(record["prompt_version"] for record in records)
-    per_question = Counter((record["prompt_version"], record["question_id"]) for record in records)
-    missing = [
-        {"prompt_version": version, "question_id": question.question_id, "found": found}
-        for version in VERSIONS
-        for question in QUESTIONS
-        if (found := per_question.get((version, question.question_id), 0)) != 3
-    ]
+    # Any shape check derived from the observed data is blind to deletion, so the declared
+    # expectation is the authority. `per_question` stays for the human-readable report.
+    expectation = load_expectation(path)
+    shape_vs_declared = check_against(expectation, records)
+    missing = shape_vs_declared["incomplete_version_question_pairs"]
 
     # The same question and the same fixed context must have been sent to every version.
     context_consistent = True
@@ -123,8 +151,11 @@ def check_records(path: Path) -> dict:
         "duplicate_keys": [list(key) for key in duplicates],
         "per_version": dict(per_version),
         "missing_or_extra_question_runs": missing,
+        "declared_shape_check": shape_vs_declared,
+        "matches_declared_shape": satisfied(shape_vs_declared),
         "question_and_context_identical_across_versions": context_consistent,
-        "generation_config": config,
+        # Sanitised: the legacy inline config carries a raw base_url.
+        "generation_config": sanitize_config(config),
     }
 
 
@@ -133,8 +164,16 @@ def main() -> int:
     if not RECORDS_PATH.exists():
         raise SystemExit(f"missing {RECORDS_PATH}")
 
+    # check_records first: it reports malformed lines by number, and load_run would raise
+    # an uncaught JSONDecodeError on the same input, losing that diagnostic.
     shape = check_records(RECORDS_PATH)
-    model = shape["generation_config"].get("model", "")
+    if shape["malformed_lines"]:
+        print(json.dumps(shape, ensure_ascii=False, indent=2))
+        print(f"\nintegrity: FAILED — malformed lines {shape['malformed_lines']}")
+        return 1
+    # Fail closed rather than recording model="" while still printing OK.
+    loaded = load_run(RECORDS_PATH)
+    model = loaded.config["model"]
 
     manifest = {
         "records_path": str(RECORDS_PATH.relative_to(PACKAGE_DIR.parents[1])),
@@ -143,15 +182,27 @@ def main() -> int:
         ),
         "provenance_limitations": list(PROVENANCE_LIMITATIONS),
         "shape": shape,
+        # POSIX keys so two manifests of the same tree diff across machines. A missing
+        # input is recorded as missing rather than silently dropped from the list.
         "input_sha256": {
-            str(path.relative_to(PACKAGE_DIR.parents[1])): sha256_file(path)
+            path.relative_to(PACKAGE_DIR.parents[1]).as_posix(): (
+                sha256_file(path) if path.exists() else None
+            )
             for path in HASHED_INPUTS
-            if path.exists()
         },
+        "missing_inputs": [
+            path.relative_to(PACKAGE_DIR.parents[1]).as_posix()
+            for path in HASHED_INPUTS
+            if not path.exists()
+        ],
         "prompt_sha256": {version: sha256_text(text) for version, text in PROMPT_VERSIONS.items()},
         "prompt_chars": {version: len(text) for version, text in PROMPT_VERSIONS.items()},
         "model": model,
         "ollama_model_digest": ollama_digest(model),
+        "config_source": loaded.config_source,
+        "endpoint": loaded.config.get("endpoint")
+        or {"legacy_raw_base_url_present": "base_url" in loaded.config},
+        "git": git_state(REPO_ROOT),
     }
 
     out = RESULTS_DIR / "manifest.json"
@@ -167,13 +218,16 @@ def main() -> int:
     print(f"\nmodel: {model}  digest: {manifest['ollama_model_digest']}")
     print(f"wrote {out}")
 
+    # Counts derive from the data, not from a hardcoded 126/42/3, so a --runs 5 file is
+    # judged on its own shape.
     ok = (
-        shape["record_objects"] == 126
+        shape["record_objects"] > 0
         and not shape["malformed_lines"]
         and not shape["duplicate_keys"]
-        and not shape["missing_or_extra_question_runs"]
+        and shape["matches_declared_shape"]
         and shape["question_and_context_identical_across_versions"]
-        and set(shape["per_version"].values()) == {42}
+        and bool(model)
+        and not manifest["missing_inputs"]
     )
     print(f"\nintegrity: {'OK' if ok else 'FAILED'}")
     return 0 if ok else 1

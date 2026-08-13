@@ -18,6 +18,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from experiments.prompt_eval_v0.fixture import QUESTIONS, cards_for
+from experiments.prompt_eval_v0.loading import load_run
 
 RESULTS_DIR = Path(__file__).parent / "results"
 VERSIONS = ("v0", "v1", "v2")
@@ -43,17 +44,10 @@ CSV_FIELDS = (
 
 
 def load_records(path: Path) -> tuple[dict, list[dict]]:
-    config: dict = {}
-    records: list[dict] = []
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
-        payload = json.loads(line)
-        if "config" in payload and "prompt_version" not in payload:
-            config = payload["config"]
-            continue
-        records.append(payload)
-    return config, records
+    """Read records plus config through the shared loader, which fails closed."""
+
+    loaded = load_run(path)
+    return loaded.config, loaded.records
 
 
 def flatten(record: dict) -> dict:
@@ -187,20 +181,25 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Aggregate Prompt Eval v0 results.")
     parser.add_argument("--records", type=Path, default=RESULTS_DIR / "prompt_only.jsonl")
     parser.add_argument("--run-for-table", type=int, default=1)
+    # Outputs follow the input, so analysing another file cannot overwrite a frozen run.
+    parser.add_argument("--out-dir", type=Path, default=None)
     args = parser.parse_args(argv)
 
     config, records = load_records(args.records)
     summary = summarise(records)
     kind_summary = by_kind(records)
 
-    csv_path = RESULTS_DIR / "prompt_only.csv"
+    out_dir = args.out_dir or args.records.parent
+    out_dir.mkdir(parents=True, exist_ok=True)
+    stem = args.records.stem
+    csv_path = out_dir / f"{stem}.csv"
     with csv_path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS)
         writer.writeheader()
         for record in records:
             writer.writerow(flatten(record))
 
-    summary_path = RESULTS_DIR / "summary.json"
+    summary_path = out_dir / f"{stem}_summary.json"
     summary_path.write_text(
         json.dumps(
             {"config": config, "overall": summary, "by_kind": kind_summary},
@@ -210,7 +209,7 @@ def main(argv: list[str] | None = None) -> int:
         encoding="utf-8",
     )
 
-    table_path = RESULTS_DIR / "comparison_table.md"
+    table_path = out_dir / f"{stem}_comparison_table.md"
     table_path.write_text(
         "# 검토된 claim 대 생성된 답변 (run "
         f"{args.run_for_table})\n\n자동 검사는 어휘만 본다. 방향 보존과 한국어 의미는 "
