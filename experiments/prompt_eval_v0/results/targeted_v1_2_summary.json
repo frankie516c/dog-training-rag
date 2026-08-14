@@ -1,0 +1,45 @@
+{
+  "v1.2": {
+    "total_runs": 33,
+    "provider_errors": 0,
+    "responded_runs": 33,
+    "accepted": 21,
+    "not_answerable": 12,
+    "invalid": 0,
+    "accepted_by_group": {
+      "over_refusal": "9/9",
+      "preserved_normal": "9/9",
+      "direction_adversarial": "3/9",
+      "negative_control": "0/6"
+    },
+    "provider_errors_by_group": {
+      "over_refusal": 0,
+      "preserved_normal": 0,
+      "direction_adversarial": 0,
+      "negative_control": 0
+    },
+    "accepted_by_question": {
+      "T1": "3/3",
+      "T2": "3/3",
+      "T3": "3/3",
+      "T4": "3/3",
+      "T5": "3/3",
+      "T6": "3/3",
+      "T7": "3/3",
+      "T8": "0/3",
+      "T9": "0/3",
+      "N1": "0/3",
+      "N2": "0/3"
+    },
+    "used_card_ids_valid": "21/21",
+    "post_validation_numbers_outside_evidence": 0,
+    "post_validation_latin_outside_evidence": 0,
+    "auto_flag_hits": 1,
+    "latency_ms": {
+      "mean": 4378,
+      "median": 3749,
+      "min": 2321,
+      "max": 19323
+    }
+  }
+}

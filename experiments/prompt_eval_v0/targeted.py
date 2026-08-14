@@ -16,6 +16,7 @@ import json
 import statistics
 import sys
 import time
+from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
@@ -45,6 +46,8 @@ class TargetGroup(StrEnum):
     OVER_REFUSAL = "over_refusal"
     PRESERVED_NORMAL = "preserved_normal"
     DIRECTION_ADVERSARIAL = "direction_adversarial"
+    #: Scope-matched evidence that does not answer the question; refusing is the pass.
+    NEGATIVE_CONTROL = "negative_control"
 
 
 @dataclass(frozen=True)
@@ -210,15 +213,29 @@ async def evaluate_one(
     return record
 
 
-async def run_all(config: RunConfig, runs: int, settings: Settings) -> list[dict]:
+async def run_all(
+    config: RunConfig,
+    runs: int,
+    settings: Settings,
+    *,
+    questions: Sequence[TargetQuestion] = TARGET_QUESTIONS,
+    versions: Sequence[str] = VERSIONS,
+) -> list[dict]:
+    """Run every (question, version, run) cell.
+
+    ``questions`` and ``versions`` are parameters so a later evaluation reuses this exact
+    path instead of copying it. A copied runner is how the inline-provider and merged
+    error-denominator defects were reintroduced once already.
+    """
+
     # Same construction as production, api_key included. Building the provider inline here
     # dropped the key and would have turned every call into a 401.
     provider = build_provider(config, settings)
     records: list[dict] = []
     for run_number in range(1, runs + 1):
-        for question in TARGET_QUESTIONS:
+        for question in questions:
             # Alternate which version goes first on each run to spread order effects.
-            order = VERSIONS if run_number % 2 == 1 else tuple(reversed(VERSIONS))
+            order = tuple(versions) if run_number % 2 == 1 else tuple(reversed(versions))
             for version in order:
                 record = await evaluate_one(
                     provider, version=version, question=question, run_number=run_number
@@ -231,7 +248,12 @@ async def run_all(config: RunConfig, runs: int, settings: Settings) -> list[dict
     return records
 
 
-def summarise(records: list[dict], version: str) -> dict:
+def summarise(
+    records: list[dict],
+    version: str,
+    *,
+    questions: Sequence[TargetQuestion] = TARGET_QUESTIONS,
+) -> dict:
     """Aggregate one version.
 
     Every acceptance rate is over responses that actually arrived. Counting `accepted`
@@ -255,7 +277,7 @@ def summarise(records: list[dict], version: str) -> dict:
         group_errors[group.value] = sum(1 for r in errors if r["group"] == group.value)
 
     per_question = {}
-    for question in TARGET_QUESTIONS:
+    for question in questions:
         question_rows = [r for r in responded if r["question_id"] == question.question_id]
         question_accepted = sum(1 for r in question_rows if r["provider_result"] == "accepted")
         per_question[question.question_id] = f"{question_accepted}/{len(question_rows)}"

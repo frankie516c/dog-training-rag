@@ -1,0 +1,33 @@
+{
+  "model": "gemma3:4b",
+  "endpoint": {
+    "provider_type": "openai_compatible",
+    "locality": "local",
+    "sanitized_origin": "http://localhost:11434",
+    "path_label": "/v1",
+    "had_userinfo": false,
+    "had_query_or_fragment": false
+  },
+  "timeout_seconds": 30.0,
+  "uncontrolled_sampling_params": [
+    "temperature",
+    "top_p",
+    "seed",
+    "max_tokens"
+  ],
+  "prompt_sha256": {
+    "v0": "572cdd5b0a9593026e1e353f24801fefb0072dffca42751ea270802283a9b9ad",
+    "v1": "6b3aa676ed18a1114b98e566f31144e106886303af03a2fee7fa16fbb694046a",
+    "v1.1": "f7aa94b7c863e37816b701e617de0378b4af646885d0e95313ffdf1e8914ced2",
+    "v1.2": "d44fd145210e2311c02847e6fdfd1a3db29b00353d79594d7fc25e396e44a8fa",
+    "v1.2.1": "ae20fd766a87740d7461d2057772a5744dac4e120025e516dadacf38919111e0",
+    "v2": "31e3a0120180671693bc5bb2eef24160353f9e26695f94177a4d90e7a16f2547"
+  },
+  "source_sha256_at_run_time": {
+    "prompts.py": "e9b313a652da3a83e42fb59edc69e271dd911674627ffa8a1c78c97e71a1ef11",
+    "fixture.py": "5158de48de405c323d4527c84a1eff18262d33f4946479e3c4f0bf280f6382cd",
+    "runner.py": "c8ddf8149c8d299fec5206608f49257f921c70e1e2862789fcfcda1b6caad4cb",
+    "checks.py": "8b4703941e7731e9251da209970b3dc842c61cb3d793e45eef0f4d8cd354d175"
+  },
+  "records_sha256": "8ebf6193b2e0cc9c157d6fcc1ef565292e138c0c2e0a7656c06977c41237082e"
+}

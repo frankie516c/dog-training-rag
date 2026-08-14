@@ -88,10 +88,88 @@ V1_1_ADDITIONS = "\n".join(
     )
 )
 
+# v1.2 — v1's preservation rules, plus a narrowed answerability scope and a style block.
+#
+# v1.1 was not promoted. It cleared the over-refusal on the housetraining question, but it
+# told the model to treat supplied evidence as on-topic and to answer when a claim covers
+# "any part" of the question, which weakens the model's answerable=false filter — the last
+# thing standing between a topic-matched but non-answering card and a confident answer.
+# v1.2 restores that filter by making the core request the test, and adds the tone rules
+# the human review found missing in every response it read.
+V1_2_ANSWERABILITY = "\n".join(
+    (
+        "Scope of answerability:",
+        "- A card that passed retrieval, scope and intent selection is a candidate only. "
+        "It is not proof that the evidence can answer this question.",
+        "- Set answerable to true only when a claim directly supports the core request of "
+        "the user's question.",
+        "- Topic overlap alone, background information, or a result about something other "
+        "than what was asked means answerable is false.",
+        "- When a claim directly supports part of the core request, answer only the "
+        "supported part and say plainly that the rest is not known.",
+        "- Do not refuse an answer that is directly supported merely because the evidence "
+        "carries limitations.",
+        "- Never invent steps, counts, durations, success rates, causes or prescriptions "
+        "the evidence does not supply.",
+    )
+)
+
+V1_2_STYLE = "\n".join(
+    (
+        "Answer style:",
+        "- Answer the user's question directly in the first sentence.",
+        "- Write natural Korean 존댓말 that is calm and warm and never blames the reader.",
+        '- Speak to the reader. Do not copy source-reporting phrasing such as "이 교재는 '
+        '… 안내한다".',
+        "- Put research wording into words an ordinary dog owner understands, without "
+        "changing what it means.",
+        "- When the evidence does not support the conclusion the user asked for, correct "
+        'it gently and clearly, in the manner of "그렇게 결론 내리기는 어렵습니다".',
+        "- Add no exclamations, no excessive reassurance and no comfort the evidence does "
+        "not support.",
+    )
+)
+
+V1_2_ADDITIONS = "\n".join((V1_RULES, V1_2_ANSWERABILITY, V1_2_STYLE, CONTRACT_REMINDER))
+
+# v1.2.1 — v1.2's answerability block kept, its style block repaired.
+#
+# v1.2 failed on the subject-swap question: all three runs opened with "혐오 자극보다 보상
+# 훈련이 더 부정적인 결과를 보였다", the exact reversal the user asked for, before stating
+# the correct direction in the next sentence. The cause was v1.2's own style rule "Answer
+# the user's question directly in the first sentence", which the model read as "accept the
+# premise of the question". The rules below make the first sentence carry the conclusion
+# the evidence supports rather than the wording the user supplied. The answerability block
+# is unchanged: it refused both negative controls 3/3 and is not what failed.
+V1_2_1_STYLE = "\n".join(
+    (
+        "Answer style:",
+        "- The first sentence states the conclusion the evidence supports. Do not open by "
+        "repeating the user's wording back as if it were established.",
+        "- A factual premise or a desired conclusion inside the question is not something "
+        "you agree to. Never accept it automatically.",
+        "- When the premise of the question conflicts with the evidence, correct it in the "
+        "first sentence, gently and unmistakably.",
+        "- Do not alter which subject does what, which things are compared, or which "
+        "predicate a negation attaches to.",
+        "- If the evidence says X does not help, never turn that into Y does not help.",
+        "- When you use some of the supplied cards but not all, do not leave out a card the "
+        "question's central conclusion depends on.",
+        "- Write natural Korean 존댓말 that is calm and warm and never blames the reader.",
+        "- Explain research wording in short, plain words, without changing what it means.",
+        "- Invent no comfort, cause, prescription, step, count, duration or success rate "
+        "the evidence does not supply.",
+    )
+)
+
+V1_2_1_ADDITIONS = "\n".join((V1_RULES, V1_2_ANSWERABILITY, V1_2_1_STYLE, CONTRACT_REMINDER))
+
 PROMPT_VERSIONS: dict[str, str] = {
     "v0": V0_SYSTEM_INSTRUCTION,
     "v1": V0_SYSTEM_INSTRUCTION + "\n" + V1_ADDITIONS,
     "v1.1": V0_SYSTEM_INSTRUCTION + "\n" + V1_1_ADDITIONS,
+    "v1.2": V0_SYSTEM_INSTRUCTION + "\n" + V1_2_ADDITIONS,
+    "v1.2.1": V0_SYSTEM_INSTRUCTION + "\n" + V1_2_1_ADDITIONS,
     "v2": V0_SYSTEM_INSTRUCTION + "\n" + V2_ADDITIONS,
 }
 
