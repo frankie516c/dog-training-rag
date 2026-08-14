@@ -139,6 +139,13 @@ _PROBLEM_STATEMENT = compile_terms(
         "겁내",
         "만 보면",
         "만 오면",
+        # Reporting a mess found after the fact is a request for what to do about it,
+        # not a request to explain why it happened. Checkpoint 5J; the same shape as the
+        # colloquial markers added in 5F-3.
+        "실수를 발견",
+        "실수를 나중에 발견",
+        "발견했어요",
+        "발견했는데",
     )
 )
 

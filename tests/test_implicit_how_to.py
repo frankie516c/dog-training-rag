@@ -18,8 +18,15 @@ from backend.app.data_validation import (
     DEFAULT_EVIDENCE_CARDS_PATH,
     DEFAULT_SOURCE_REGISTRY_PATH,
 )
-from backend.app.domain import ChatRequest, ChatStatus, EvidenceCard, SourceRegistryEntry
+from backend.app.domain import (
+    ChatRequest,
+    ChatStatus,
+    ContentLanguage,
+    EvidenceCard,
+    SourceRegistryEntry,
+)
 from backend.app.grounded import GroundedAnswerer
+from backend.app.response_plans import plan_for
 from backend.app.retrieval import SearchResult
 from backend.app.scope import TrainingScope, card_scope
 
@@ -126,10 +133,14 @@ def test_guidance_backed_statements_are_answered(question: str, scope: TrainingS
     assert response.status is ChatStatus.ANSWERED
     assert response.citations
     assert response.limitations
-    assert len(provider.calls) == 1, "guidance-backed how_to should reach generation"
-    # The stub provider fails, so this answer is the deterministic fallback.
-    assert len(composer.calls) == 1
-    assert response.answer in {card.claim for card in cards_in(scope)}
+    # Checkpoint 5J: a reviewed response plan covers both guidance scopes, so the answer
+    # is fixed curated text. Generation is never reached and the claim composer is not
+    # used — this used to fall through to a bare claim sentence.
+    assert provider.calls == [], "a reviewed plan must not reach generation"
+    assert composer.calls == []
+    plan = plan_for(cards_in(scope)[0], language=ContentLanguage.KOREAN)
+    assert plan is not None
+    assert response.answer == plan.render()
 
 
 @pytest.mark.parametrize(

@@ -23,9 +23,10 @@ from backend.app.domain import (
     SourceRegistryEntry,
 )
 from backend.app.grounded import DraftVerdict, GroundedAnswerer
+from backend.app.response_plans import compose_planned_answer
 from backend.app.retrieval import DEFAULT_TOP_K, SearchResult
 from backend.app.safety import detect_safety_risk
-from backend.app.scope import card_scope, route_query_scope
+from backend.app.scope import TrainingScope, card_scope, route_query_scope
 
 PROVISIONAL_SCOPE_MATCHED_MINIMUM = 0.40
 
@@ -44,6 +45,12 @@ CANDIDATE_TOP_K = 20
 # Until a semantic guard exists, a comparison answer is the reviewed claim itself.
 GENERATED_INTENTS = frozenset({QuestionIntent.HOW_TO, QuestionIntent.EXPLANATION})
 
+# Checkpoint 5J-1. One fixed Korean query, in the vocabulary the housetraining card is
+# written in, used only to retry a housetraining how_to that retrieved nothing. It never
+# reaches the user: scope, intent, citations and the answer all come from the original
+# question. No other scope has a retry.
+HOUSETRAINING_CANONICAL_QUERY = "강아지 배변 훈련 배변 실수"
+
 
 class ChatServiceUnavailable(RuntimeError):
     """The retrieval-backed chat service cannot safely answer right now."""
@@ -56,16 +63,19 @@ class ChatRetriever(Protocol):
 
 
 class ChatService:
-    """Answer from retrieved evidence, generating only when the draft validates.
+    """Answer from retrieved evidence, without writing a sentence of its own.
 
-    Two paths share one selection pipeline. When a grounded answerer is configured and the
-    intent is allowed to use it, the model may phrase an answer over the selected cards, but
-    the draft must survive validation against those exact cards. When there is no answerer,
-    when the intent is excluded, or when the draft fails any check, the reviewed claims are
-    composed deterministically (checkpoint 5H). See GENERATED_INTENTS for the exclusion.
+    One selection pipeline, three ways to answer from what it selects, tried in order:
 
-    Neither path runs when the evidence cannot answer the kind of question that was
-    asked. See docs/grounded-rag.md.
+    * a reviewed response plan, when one is bound to this exact card, hash and language
+      (checkpoint 5J) — the only path that gives procedural guidance;
+    * a generated draft, only if an answerer was passed in and the intent allows it. The
+      application does not pass one; see `backend.app.main`. Comparison never uses it, for
+      the reason recorded at GENERATED_INTENTS;
+    * the reviewed claims themselves, composed verbatim (checkpoint 5H).
+
+    None of them runs when the evidence cannot answer the kind of question that was asked.
+    See docs/grounded-rag.md.
     """
 
     def __init__(
@@ -109,17 +119,31 @@ class ChatService:
         except Exception as exc:
             raise ChatServiceUnavailable("evidence retrieval failed") from exc
 
-        # A card is only usable when its scope matches, its dense score clears the
-        # provisional minimum, and its reviewed claim is already written in the requested
-        # language. Nothing is translated, so a language mismatch removes the card from the
-        # answer, the citations and the limitations alike.
-        selected = [
-            result
-            for result in search_results
-            if card_scope(result.card) is scope
-            and result.card.claim_language is request.response_language
-            and result.score >= self._scope_matched_minimum
-        ]
+        selected = self._eligible(search_results, scope=scope, request=request)
+        intent = classify_question_intent(request.message)
+
+        # Checkpoint 5J-1. "응가를 아무 데나 해요" routes to housetraining and reads as a
+        # how_to, but the colloquial wording scores its own card below the threshold —
+        # 0.378 against a 0.40 minimum — so the user gets nothing while the evidence sits
+        # one place down the list. Rather than lower the bar for every question, the
+        # question is asked again in the corpus's own words. The threshold, the index and
+        # the cards are untouched, and every gate below runs on the result exactly as it
+        # runs on the original.
+        if (
+            not selected
+            and scope is TrainingScope.HOUSETRAINING
+            and intent is QuestionIntent.HOW_TO
+        ):
+            try:
+                retried = self._retriever.search(
+                    HOUSETRAINING_CANONICAL_QUERY, top_k=self._candidate_top_k
+                )
+            except Exception as exc:
+                raise ChatServiceUnavailable("evidence retrieval failed") from exc
+            selected = self._eligible(
+                _merge_by_card(search_results, retried), scope=scope, request=request
+            )
+
         if not selected:
             return self._insufficient(request, _insufficient_answer(request.response_language))
 
@@ -127,10 +151,24 @@ class ChatService:
         # how_to request, so it is removed here — before generation and before the
         # deterministic fallback, so the fallback never shows a research summary as if it
         # were the requested procedure.
-        intent = classify_question_intent(request.message)
         usable = [result for result in selected if card_supports_intent(result.card, intent)]
         if not usable:
             return self._insufficient(request, _insufficient_answer(request.response_language))
+
+        # A reviewed procedural answer, when one exists for this exact card and language.
+        # Checked before generation and before composition: it is the only path that can
+        # tell the reader what to do, and it is fixed text, so it cannot drift from the
+        # evidence. No plan means no procedural answer — fall through, never improvise.
+        if intent is QuestionIntent.HOW_TO:
+            planned = compose_planned_answer(
+                [result.card for result in usable], language=request.response_language
+            )
+            if planned is not None:
+                answer, plan_cards = planned
+                planned_ids = {card.card_id for card in plan_cards}
+                cited = [item for item in usable if item.card.card_id in planned_ids]
+                if cited:
+                    return self._answered(request, answer, cited)
 
         if self._grounded is not None and intent in GENERATED_INTENTS:
             result = await self._grounded.draft(
@@ -152,6 +190,27 @@ class ChatService:
         except EvidenceCompositionError:
             return self._insufficient(request, _insufficient_answer(request.response_language))
         return self._answered(request, answer, usable)
+
+    def _eligible(
+        self,
+        results: Sequence[SearchResult],
+        *,
+        scope: TrainingScope,
+        request: ChatRequest,
+    ) -> list[SearchResult]:
+        """Cards this request may use: right scope, right language, over the threshold.
+
+        Nothing is translated, so a language mismatch removes the card from the answer,
+        the citations and the limitations alike.
+        """
+
+        return [
+            result
+            for result in results
+            if card_scope(result.card) is scope
+            and result.card.claim_language is request.response_language
+            and result.score >= self._scope_matched_minimum
+        ]
 
     def _answered(
         self,
@@ -182,6 +241,19 @@ class ChatService:
             answer_language=request.response_language,
             citations=[],
         )
+
+
+def _merge_by_card(
+    first: Sequence[SearchResult], second: Sequence[SearchResult]
+) -> list[SearchResult]:
+    """One entry per card, keeping the higher score, first list's order first."""
+
+    best: dict[UUID, SearchResult] = {}
+    for result in (*first, *second):
+        current = best.get(result.card.card_id)
+        if current is None or result.score > current.score:
+            best[result.card.card_id] = result
+    return sorted(best.values(), key=lambda result: result.score, reverse=True)
 
 
 def _insufficient_answer(language: ContentLanguage) -> str:
