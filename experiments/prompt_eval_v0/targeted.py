@@ -26,6 +26,7 @@ from backend.app.generation import GenerationError, OpenAICompatibleGenerationPr
 from backend.app.grounded import DraftVerdict, validate_draft
 from backend.app.scope import TrainingScope
 from experiments.prompt_eval_v0.checks import run_auto_checks
+from experiments.prompt_eval_v0.expectation import RunExpectation, write_expectation
 from experiments.prompt_eval_v0.fixture import cards_for
 from experiments.prompt_eval_v0.prompts import PROMPT_VERSIONS, build_messages
 from experiments.prompt_eval_v0.provenance import sha256_file
@@ -332,6 +333,12 @@ def main(argv: list[str] | None = None) -> int:
             indent=2,
         ),
         encoding="utf-8",
+    )
+
+    # Declared shape, so a later deletion of a version, run or question is detectable.
+    write_expectation(
+        args.out,
+        RunExpectation(versions=VERSIONS, runs=args.runs, questions=len(TARGET_QUESTIONS)),
     )
 
     summary = {version: summarise(records, version) for version in VERSIONS}

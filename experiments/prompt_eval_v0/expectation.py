@@ -36,8 +36,14 @@ def expectation_path(records_path: Path) -> Path:
     return records_path.with_name(records_path.stem + "_expectation.json")
 
 
-def load_expectation(records_path: Path) -> RunExpectation:
-    path = expectation_path(records_path)
+def load_expectation(records_path: Path, *, path: Path | None = None) -> RunExpectation:
+    """Load the declared shape, from ``path`` when given, otherwise from beside the records.
+
+    The override exists so a checker can be pointed at an arbitrary run instead of one
+    hardcoded records file; see ``verify_run.py``.
+    """
+
+    path = path or expectation_path(records_path)
     if not path.exists():
         raise ExpectationError(
             f"missing {path.name}; without a declared shape a deleted version or run "

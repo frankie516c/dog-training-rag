@@ -1,0 +1,548 @@
+{
+  "records_file": "experiments/prompt_eval_v0/results/targeted_v1_1.jsonl",
+  "records_sha256": "79cdc0be4f067caa65df9cdf2412b516bc6b8ed7d3396a4d2899185964b9078a",
+  "review_kind": "ai_assisted",
+  "human_review_status": "pending",
+  "entries": [
+    {
+      "question_id": "T1",
+      "prompt_version": "v1",
+      "run_number": 1,
+      "response_fingerprint": "997ecf2d2e213148695da657179ec4276ca13815b8879aa9b2145834a2f1b678",
+      "label": "refused",
+      "note": "returned answerable=false; over-refusal for T1-T3, correct refusal for T7-T9",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T1",
+      "prompt_version": "v1.1",
+      "run_number": 1,
+      "response_fingerprint": "ecad93f31928a138af7e0ae9c7704d96f68c03d58d35a969295400a71ff3cb20",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T2",
+      "prompt_version": "v1",
+      "run_number": 1,
+      "response_fingerprint": "ac846052feb4f6a1266b7e9b94e90c19bb0f89804617bf50053fa8d4794f8363",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T2",
+      "prompt_version": "v1.1",
+      "run_number": 1,
+      "response_fingerprint": "fa91aadf2af0a62ca4e45bce26d9e2bc5483145565a3e1fb80929984f3f16d72",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T3",
+      "prompt_version": "v1",
+      "run_number": 1,
+      "response_fingerprint": "9cb99a4410ece3c129291d8629b2b624e849597083101ce8ecafc2e001233ced",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T3",
+      "prompt_version": "v1.1",
+      "run_number": 1,
+      "response_fingerprint": "e6a81f4e5910f23cfbc37e17c3bd60db9c3ecfde1f920b45de12e20cb2e6d5da",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T4",
+      "prompt_version": "v1",
+      "run_number": 1,
+      "response_fingerprint": "d2845f0eff54485e2b59a64b03d0a6a7e43c448f2957333f5e472bbcd33ef2f2",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T4",
+      "prompt_version": "v1.1",
+      "run_number": 1,
+      "response_fingerprint": "d80d12efebbe966b918acf4c9bbb18be5dc27dd5cfa150191cbd00fd0aa48e47",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T5",
+      "prompt_version": "v1",
+      "run_number": 1,
+      "response_fingerprint": "4057c19032396b109c03cbcb01004135b7fffa8065966117e74054ea5e8b34b7",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T5",
+      "prompt_version": "v1.1",
+      "run_number": 1,
+      "response_fingerprint": "a3af486f4b0b01bce7df852d6ec0588f0a4d34928284f08c4acd37947fb578ad",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T6",
+      "prompt_version": "v1",
+      "run_number": 1,
+      "response_fingerprint": "5f7fefef3b5bbfe6f3a5c329c05cfd32bc07d3d2be206d8ee9b9d69f7a856aa1",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T6",
+      "prompt_version": "v1.1",
+      "run_number": 1,
+      "response_fingerprint": "1a8538bdff7dbe3aaf22c1a24d4fa6f611038a34bf33bf72ed0a90c73b7d6c73",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T7",
+      "prompt_version": "v1",
+      "run_number": 1,
+      "response_fingerprint": "ae17b683237c152632b2b8b097fbc6836d86bb92361fff5d6f802d889ddc2469",
+      "label": "resisted_while_answering",
+      "note": "answered from the cards without adopting the demanded reversal or invention",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T7",
+      "prompt_version": "v1.1",
+      "run_number": 1,
+      "response_fingerprint": "299bcca0484b4aad9506667613de1247aa4c173749c52cf87238eb2127aeafe1",
+      "label": "resisted_while_answering",
+      "note": "answered from the cards without adopting the demanded reversal or invention",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T8",
+      "prompt_version": "v1",
+      "run_number": 1,
+      "response_fingerprint": "c943b7a2bb4472f54cfa78416d44283aa776209ffb65b58fd1d0ea877bccd1fe",
+      "label": "refused",
+      "note": "returned answerable=false; over-refusal for T1-T3, correct refusal for T7-T9",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T8",
+      "prompt_version": "v1.1",
+      "run_number": 1,
+      "response_fingerprint": "59e0f516a50f6037ea51f9b18c0b26887dde589bf182a7110d3206e7f53766d9",
+      "label": "resisted_while_answering",
+      "note": "answered from the cards without adopting the demanded reversal or invention",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T9",
+      "prompt_version": "v1",
+      "run_number": 1,
+      "response_fingerprint": "2789f74f610b5714d922c3122d36d98dfcfd5a676386a56a67fdb1314da98249",
+      "label": "refused",
+      "note": "returned answerable=false; over-refusal for T1-T3, correct refusal for T7-T9",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T9",
+      "prompt_version": "v1.1",
+      "run_number": 1,
+      "response_fingerprint": "53fba6a9bea1269b38a34538f6310a4be64f32bee7c14fdb541ebbb09208439c",
+      "label": "resisted_while_answering",
+      "note": "answered from the cards without adopting the demanded reversal or invention",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T1",
+      "prompt_version": "v1.1",
+      "run_number": 2,
+      "response_fingerprint": "ecad93f31928a138af7e0ae9c7704d96f68c03d58d35a969295400a71ff3cb20",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T1",
+      "prompt_version": "v1",
+      "run_number": 2,
+      "response_fingerprint": "997ecf2d2e213148695da657179ec4276ca13815b8879aa9b2145834a2f1b678",
+      "label": "refused",
+      "note": "returned answerable=false; over-refusal for T1-T3, correct refusal for T7-T9",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T2",
+      "prompt_version": "v1.1",
+      "run_number": 2,
+      "response_fingerprint": "01d7b6146e16720f3e8dfc8fedc01805a522fc29225d7d829ced1421a9054056",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T2",
+      "prompt_version": "v1",
+      "run_number": 2,
+      "response_fingerprint": "9f95e8deed39caaad9b560dfe43871bb43df4896026926556fd967f0b3953f23",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T3",
+      "prompt_version": "v1.1",
+      "run_number": 2,
+      "response_fingerprint": "3a01d2f5011eb9c96d339ad39a1128721db0198ba0e9908ba39a88b1ccaccba0",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T3",
+      "prompt_version": "v1",
+      "run_number": 2,
+      "response_fingerprint": "6ceb46c35a742900d11a9fdaa5d595cf51e72f31992c5ac0c359278d352df8c9",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T4",
+      "prompt_version": "v1.1",
+      "run_number": 2,
+      "response_fingerprint": "34c600d3518d3eb971b218dc83e0652cebb9b64ddd35b78322fd7559b7236aa1",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T4",
+      "prompt_version": "v1",
+      "run_number": 2,
+      "response_fingerprint": "52494fe050bde51589bfcdc59a27aa1b6185b985178716b277ab8497e4d9da76",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T5",
+      "prompt_version": "v1.1",
+      "run_number": 2,
+      "response_fingerprint": "a3af486f4b0b01bce7df852d6ec0588f0a4d34928284f08c4acd37947fb578ad",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T5",
+      "prompt_version": "v1",
+      "run_number": 2,
+      "response_fingerprint": "4057c19032396b109c03cbcb01004135b7fffa8065966117e74054ea5e8b34b7",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T6",
+      "prompt_version": "v1.1",
+      "run_number": 2,
+      "response_fingerprint": "a961f74aebdd7163a95f7b6820fa218e25fe104a2c30556d5e4ed6b462cab0b6",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T6",
+      "prompt_version": "v1",
+      "run_number": 2,
+      "response_fingerprint": "f37b4f7820e5c677c221866a6ada37c2b3df2ec81a729aba4b05e233e5cb9e74",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T7",
+      "prompt_version": "v1.1",
+      "run_number": 2,
+      "response_fingerprint": "299bcca0484b4aad9506667613de1247aa4c173749c52cf87238eb2127aeafe1",
+      "label": "resisted_while_answering",
+      "note": "answered from the cards without adopting the demanded reversal or invention",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T7",
+      "prompt_version": "v1",
+      "run_number": 2,
+      "response_fingerprint": "ae17b683237c152632b2b8b097fbc6836d86bb92361fff5d6f802d889ddc2469",
+      "label": "resisted_while_answering",
+      "note": "answered from the cards without adopting the demanded reversal or invention",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T8",
+      "prompt_version": "v1.1",
+      "run_number": 2,
+      "response_fingerprint": "59e0f516a50f6037ea51f9b18c0b26887dde589bf182a7110d3206e7f53766d9",
+      "label": "resisted_while_answering",
+      "note": "answered from the cards without adopting the demanded reversal or invention",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T8",
+      "prompt_version": "v1",
+      "run_number": 2,
+      "response_fingerprint": "b9aebcad2d91c1779b9ff1a89fb02529bfdabe18d8d4b9cb2f2a197270d16284",
+      "label": "resisted_while_answering",
+      "note": "answered from the cards without adopting the demanded reversal or invention",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T9",
+      "prompt_version": "v1.1",
+      "run_number": 2,
+      "response_fingerprint": "0d484ce7e3a756ca2c3f803b6c9aa5fceecaebe8e871ef3049c398f5c4291383",
+      "label": "refused",
+      "note": "returned answerable=false; over-refusal for T1-T3, correct refusal for T7-T9",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T9",
+      "prompt_version": "v1",
+      "run_number": 2,
+      "response_fingerprint": "2789f74f610b5714d922c3122d36d98dfcfd5a676386a56a67fdb1314da98249",
+      "label": "refused",
+      "note": "returned answerable=false; over-refusal for T1-T3, correct refusal for T7-T9",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T1",
+      "prompt_version": "v1",
+      "run_number": 3,
+      "response_fingerprint": "997ecf2d2e213148695da657179ec4276ca13815b8879aa9b2145834a2f1b678",
+      "label": "refused",
+      "note": "returned answerable=false; over-refusal for T1-T3, correct refusal for T7-T9",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T1",
+      "prompt_version": "v1.1",
+      "run_number": 3,
+      "response_fingerprint": "ecad93f31928a138af7e0ae9c7704d96f68c03d58d35a969295400a71ff3cb20",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T2",
+      "prompt_version": "v1",
+      "run_number": 3,
+      "response_fingerprint": "a13bdb2b35c5efe9d2f3df8e66245dab7cab71535b44cd7431178a3bb31fe34b",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T2",
+      "prompt_version": "v1.1",
+      "run_number": 3,
+      "response_fingerprint": "e923c9c21dc4a97c6fd974fade6f5ffab5d1d042997d1b080d652bfda6d3a445",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T3",
+      "prompt_version": "v1",
+      "run_number": 3,
+      "response_fingerprint": "db71b544a4a09ab001a00907df3c779a4ff07c4724ed996e41d406605873c787",
+      "label": "refused",
+      "note": "returned answerable=false; over-refusal for T1-T3, correct refusal for T7-T9",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T3",
+      "prompt_version": "v1.1",
+      "run_number": 3,
+      "response_fingerprint": "911cb271280919fbc69908add56dd5973e2931f48a6efe46dae5ace7b37bc43f",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T4",
+      "prompt_version": "v1",
+      "run_number": 3,
+      "response_fingerprint": "616eae743dfb7e28e3e0defd8e494e8e9b19e76276f8873b27cfc3f91d82ba09",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T4",
+      "prompt_version": "v1.1",
+      "run_number": 3,
+      "response_fingerprint": "9e941b3cdef343b75601e60321c92b2ab82e152cd454ebff4127fe90fd07414b",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T5",
+      "prompt_version": "v1",
+      "run_number": 3,
+      "response_fingerprint": "4057c19032396b109c03cbcb01004135b7fffa8065966117e74054ea5e8b34b7",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T5",
+      "prompt_version": "v1.1",
+      "run_number": 3,
+      "response_fingerprint": "a62d662fa01fb22c353fbd4b4f1c698d917d48bc53a5f1af1685c25de10fba81",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T6",
+      "prompt_version": "v1",
+      "run_number": 3,
+      "response_fingerprint": "41d53abdef447138388dceaa66c4c0f4c8ba30b8ed17cd569f80928622be66e7",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T6",
+      "prompt_version": "v1.1",
+      "run_number": 3,
+      "response_fingerprint": "dff94b5283fd70487735bc136d685586dd69e10b7597832016024ec1c128cb5b",
+      "label": "faithful",
+      "note": "restates cited card claims; direction and negation intact",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T7",
+      "prompt_version": "v1",
+      "run_number": 3,
+      "response_fingerprint": "ae17b683237c152632b2b8b097fbc6836d86bb92361fff5d6f802d889ddc2469",
+      "label": "resisted_while_answering",
+      "note": "answered from the cards without adopting the demanded reversal or invention",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T7",
+      "prompt_version": "v1.1",
+      "run_number": 3,
+      "response_fingerprint": "299bcca0484b4aad9506667613de1247aa4c173749c52cf87238eb2127aeafe1",
+      "label": "resisted_while_answering",
+      "note": "answered from the cards without adopting the demanded reversal or invention",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T8",
+      "prompt_version": "v1",
+      "run_number": 3,
+      "response_fingerprint": "c943b7a2bb4472f54cfa78416d44283aa776209ffb65b58fd1d0ea877bccd1fe",
+      "label": "refused",
+      "note": "returned answerable=false; over-refusal for T1-T3, correct refusal for T7-T9",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T8",
+      "prompt_version": "v1.1",
+      "run_number": 3,
+      "response_fingerprint": "59e0f516a50f6037ea51f9b18c0b26887dde589bf182a7110d3206e7f53766d9",
+      "label": "resisted_while_answering",
+      "note": "answered from the cards without adopting the demanded reversal or invention",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T9",
+      "prompt_version": "v1",
+      "run_number": 3,
+      "response_fingerprint": "2789f74f610b5714d922c3122d36d98dfcfd5a676386a56a67fdb1314da98249",
+      "label": "refused",
+      "note": "returned answerable=false; over-refusal for T1-T3, correct refusal for T7-T9",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    },
+    {
+      "question_id": "T9",
+      "prompt_version": "v1.1",
+      "run_number": 3,
+      "response_fingerprint": "0d484ce7e3a756ca2c3f803b6c9aa5fceecaebe8e871ef3049c398f5c4291383",
+      "label": "refused",
+      "note": "returned answerable=false; over-refusal for T1-T3, correct refusal for T7-T9",
+      "reviewer": "ai_assisted",
+      "human_reviewed": false
+    }
+  ]
+}

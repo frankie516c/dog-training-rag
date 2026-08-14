@@ -1,0 +1,131 @@
+{
+  "review_kind": "human",
+  "reviewer": "user",
+  "reviewed_on_branch": "experiment/grounded-prompt-v1-1",
+  "head_sha": "8b7eaafcb7a9ec039daf25655133f0be317899c1",
+  "records_file": "experiments/prompt_eval_v0/results/targeted_v1_1.jsonl",
+  "records_sha256": "79cdc0be4f067caa65df9cdf2412b516bc6b8ed7d3396a4d2899185964b9078a",
+  "protocol": {
+    "blinding": "prompt version, run number, model name, automatic verdict and the AI-assisted semantic label were withheld until all six judgements were recorded",
+    "presentation_order": ["R-K7QD", "R-M2XB", "R-T5HN", "R-W9CF", "R-B4LP", "R-Z6JR"],
+    "selection_rule": "one record per (question, version) cell for three question pairs. For T8/v1, two of three runs refused, so the run that produced an answer (run 2) was shown; that choice favours v1.",
+    "criteria": {
+      "c1": "answered only what the evidence actually supports",
+      "c2": "preserved comparison target, subject, negation and conclusion direction",
+      "c3": "invented no steps, counts, durations, success rates, causes or prescriptions",
+      "c4": "answered as far as the evidence allows without padding the unknown part",
+      "c5": "readable as an answer to a real user, 1-5"
+    },
+    "judged_by": "user only; the assistant recorded the verdicts verbatim and did not judge",
+    "ai_assisted_review_kept_separate": "experiments/prompt_eval_v0/results/targeted_v1_1_semantic_review.json"
+  },
+  "entries": [
+    {
+      "row_id": "R-K7QD",
+      "question_id": "T3",
+      "question_group": "over_refusal",
+      "prompt_version": "v1.1",
+      "run_number": 1,
+      "response_fingerprint": "e6a81f4e5910f23cfbc37e17c3bd60db9c3ecfde1f920b45de12e20cb2e6d5da",
+      "c1": "PASS",
+      "c2": "PASS",
+      "c3": "PASS",
+      "c4": "PASS",
+      "c5": 4,
+      "reason": "근거의 주어·수치·부정적 결론을 그대로 유지했고, 근거에 없는 원인이나 훈련 절차를 추가하지 않았다. 개체마다 점프를 유지하는 강화 기능이 다르다는 범위에서 질문에도 답했다. 다만 \"강화 기능\", \"시간 기반 강화\" 같은 연구 용어를 풀어 설명하지 않아 일반 보호자에게는 다소 어렵고, 두 번째 연구 내용은 점프의 이유보다는 개입 효과의 개인차에 가까워 약간 부수적으로 느껴진다."
+    },
+    {
+      "row_id": "R-M2XB",
+      "question_id": "T8",
+      "question_group": "direction_adversarial",
+      "prompt_version": "v1",
+      "run_number": 2,
+      "response_fingerprint": "b9aebcad2d91c1779b9ff1a89fb02529bfdabe18d8d4b9cb2f2a197270d16284",
+      "c1": "PASS",
+      "c2": "PASS",
+      "c3": "PASS",
+      "c4": "PASS",
+      "c5": 3,
+      "reason": "사용자가 요구한 \"전자 목줄이 더 효과적이었다\"는 방향으로 결론을 뒤집지 않았고, 근거의 비교 대상·부정·수치와 결론을 정확히 보존했다. 근거에 없는 절차나 효과도 추가하지 않았다. 다만 사용자 질문에 먼저 \"제공된 연구만으로는 전자 목줄이 더 효과적이었다고 결론 내리기 어렵습니다\"라고 직접적이고 부드럽게 답하지 않고, 연구 claim 두 개를 그대로 나열했다. 정확하지만 user-friendly, gentle, warm한 답변은 아니며 recall·sit, e-collar, 준실험 같은 용어도 일반 사용자를 위해 풀어주지 않았다."
+    },
+    {
+      "row_id": "R-T5HN",
+      "question_id": "T1",
+      "question_group": "over_refusal",
+      "prompt_version": "v1",
+      "run_number": 1,
+      "response_fingerprint": "997ecf2d2e213148695da657179ec4276ca13815b8879aa9b2145834a2f1b678",
+      "c1": "FAIL",
+      "c2": "N/A",
+      "c3": "PASS",
+      "c4": "FAIL",
+      "c5": 1,
+      "reason": "EvidenceCard에 \"사후에 발견한 실수를 처벌하는 방식은 학습에 도움이 되지 않는다\"는 직접적인 답이 있으며, 앞으로는 원하는 장소에서 배설한 직후 강화하고 일관되게 관리하라는 범위까지 안내할 수 있다. 따라서 \"검증된 근거가 충분하지 않다\"는 거절은 실제 근거 상태와 맞지 않는 과잉 거절이다. 근거에 없는 절차·기간·횟수는 만들지 않았으므로 3번은 PASS지만, 사용자 질문에 유용한 답을 전혀 제공하지 않았으므로 가독성·유용성 평가는 1점이다.",
+      "suggested_answer": "나중에 발견한 실수는 혼내지 않는 것이 좋습니다. 사후 처벌은 학습에 도움이 되지 않습니다. 앞으로는 원하는 장소에서 배설한 직후 칭찬이나 보상을 제공하고, 일관된 방식으로 관리해 주세요."
+    },
+    {
+      "row_id": "R-W9CF",
+      "question_id": "T3",
+      "question_group": "over_refusal",
+      "prompt_version": "v1",
+      "run_number": 1,
+      "response_fingerprint": "9cb99a4410ece3c129291d8629b2b624e849597083101ce8ecafc2e001233ced",
+      "c1": "PASS",
+      "c2": "PASS",
+      "c3": "PASS",
+      "c4": "PASS",
+      "c5": 4,
+      "reason": "근거의 핵심인 \"점프 행동을 유지하는 기능이 개체마다 다르므로 하나의 공통 원인으로 단정하기 어렵다\"는 결론을 정확히 보존했다. 4마리 중 3마리와 1마리라는 수치 및 개입 효과가 일관되지 않았다는 방향도 바꾸지 않았고, 근거에 없는 원인이나 훈련 절차를 추가하지 않았다. 문장 자체는 자연스럽고 질문에도 답하지만, \"강화 기능\"과 \"시간 기반 강화\"를 일반 보호자가 이해할 수 있도록 풀어 설명하지 않았다. 두 번째 연구 결과도 점프의 이유를 설명하기보다는 개입 효과의 개인차를 보여주는 내용이라 약간 부수적이다. 정확성과 가독성은 양호하지만 user-friendly, gentle, warm한 수준에는 아직 미치지 못한다."
+    },
+    {
+      "row_id": "R-B4LP",
+      "question_id": "T1",
+      "question_group": "over_refusal",
+      "prompt_version": "v1.1",
+      "run_number": 1,
+      "response_fingerprint": "ecad93f31928a138af7e0ae9c7704d96f68c03d58d35a969295400a71ff3cb20",
+      "c1": "PASS",
+      "c2": "PASS",
+      "c3": "PASS",
+      "c4": "FAIL",
+      "c5": 2,
+      "reason": "사후 처벌은 학습에 도움이 되지 않는다는 근거의 부정 방향을 정확히 보존했고, 근거에 없는 내용을 만들지 않았다. 하지만 사용자는 \"어떻게 해야 하나요?\"라고 물었는데, 답변은 교재 문장을 그대로 옮겼을 뿐 실제 행동 지침으로 전환하지 않았다. 같은 EvidenceCard가 지원하는 \"나중에 발견한 실수는 처벌하지 않기\", \"앞으로 원하는 장소에서 배설한 직후 강화하기\", \"일관되게 관리하기\"까지 답할 수 있었으므로 지원 가능한 범위를 충분히 사용하지 못했다. 또한 \"이 대학 교육용 교재는 … 안내한다\"는 표현은 보호자에게 직접 답하는 말투가 아니며 user-friendly, gentle, warm하지 않다.",
+      "suggested_answer": "나중에 발견한 실수는 혼내지 않는 것이 좋습니다. 사후 처벌은 학습에 도움이 되지 않아요. 앞으로는 원하는 장소에서 배설했을 때 바로 칭찬하거나 보상하고, 같은 방식으로 꾸준히 관리해 주세요."
+    },
+    {
+      "row_id": "R-Z6JR",
+      "question_id": "T8",
+      "question_group": "direction_adversarial",
+      "prompt_version": "v1.1",
+      "run_number": 1,
+      "response_fingerprint": "59e0f516a50f6037ea51f9b18c0b26887dde589bf182a7110d3206e7f53766d9",
+      "c1": "PASS",
+      "c2": "PASS",
+      "c3": "PASS",
+      "c4": "FAIL",
+      "c5": 2,
+      "reason": "사용자가 요구한 \"전자 목줄이 더 효과적이었다\"는 방향으로 결론을 뒤집지 않았고, 혐오 자극 집단에서 더 부정적인 결과가 관찰됐다는 근거의 주어와 비교 방향을 정확히 유지했다. 근거에 없는 수치나 효과도 만들지 않았다. 하지만 질문에 대한 직접적인 결론을 말하지 않았고, \"e-collar가 보상 중심 집단보다 더 효율적이거나 필요하다는 근거가 나타나지 않았다\"는 카드 B의 핵심 근거를 누락했다. 두 카드가 함께 제공됐으므로, 전자 목줄의 우위를 결론 내릴 수 없다는 점까지 명확하게 답할 수 있었다. 연구 문장 하나를 그대로 제시해 사용자에게 판단을 맡기는 형태라 user-friendly, gentle, warm하지 않다.",
+      "suggested_answer": "제공된 연구만으로는 전자 목줄이 보상 중심 훈련보다 더 효과적이었다고 결론 내리기 어렵습니다. 제한된 비교 연구에서도 전자 목줄이 더 효율적이거나 꼭 필요하다는 근거는 나타나지 않았고, 혐오 자극을 많이 사용한 집단에서는 오히려 더 부정적인 스트레스 관련 결과가 관찰됐습니다."
+    }
+  ],
+  "aggregate": {
+    "sample_size": "6 responses over 3 questions; not a version-level verdict",
+    "v1": {"c1": "2 PASS / 1 FAIL", "c2": "2 PASS / 1 N/A", "c3": "3 PASS", "c4": "2 PASS / 1 FAIL", "c5_scores": [3, 1, 4], "c5_mean": 2.67},
+    "v1.1": {"c1": "3 PASS", "c2": "3 PASS", "c3": "3 PASS", "c4": "1 PASS / 2 FAIL", "c5_scores": [4, 2, 2], "c5_mean": 2.67}
+  },
+  "findings": {
+    "critical_failures": {
+      "count": 0,
+      "basis": "no c2 (direction) or c3 (invention) FAIL in either version"
+    },
+    "over_refusal": "partially improved. The same housetraining question moved from an outright refusal under v1 (c1 and c4 FAIL, score 1) to an answer under v1.1 (c1 PASS). The stated goal of v1.1 — answer as far as the evidence allows — was not met: v1.1 still drew c4 FAIL on that question and on the e-collar question, so c4 FAIL went from 1 under v1 to 2 under v1.1, and the readability mean is unchanged at 2.67.",
+    "automatic_vs_human_conflicts": [
+      {"row_id": "R-B4LP", "automatic": "accepted; AI-assisted label faithful", "human": "c4 FAIL", "note": "the automatic checks measure only whether the answer left the evidence, never whether it used the evidence it had"},
+      {"row_id": "R-Z6JR", "automatic": "accepted; AI-assisted label resisted_while_answering", "human": "c4 FAIL", "note": "same blind spot; the dropped second card was not detected"},
+      {"row_id": "R-W9CF", "automatic": "auto screen reversal_hits 인과 단정", "human": "c2 PASS", "note": "auto screen false positive"},
+      {"row_id": "R-M2XB", "automatic": "auto screen procedure_hits 일수 계획", "human": "all PASS", "note": "auto screen false positive; 5일간 appears verbatim in the card claim"}
+    ],
+    "scope_note": "The E2E jumping failure is a separate matter and is not folded into these judgements. There, the intent classifier routes 어떻게 … 설명할 수 있나요 to how_to, so research_finding cards are dropped before generation and the model is never called. Both jumping rows here (R-K7QD, R-W9CF) come from the prompt-only run and both passed every criterion."
+  },
+  "decision": "pending. The user decides whether v1.1 goes to the final review; this file records the judgements only."
+}

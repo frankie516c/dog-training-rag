@@ -71,16 +71,19 @@ V1_1_ADDITIONS = "\n".join(
     (
         V1_RULES,
         "Scope of answerability:",
-        "- If the selected evidence directly answers any essential part of the question, "
-        "set answerable to true.",
-        "- Answer only as far as the evidence supports, even when no complete procedure exists.",
-        "- When the evidence is practice guidance stating an actual behavioural principle, "
-        "do not refuse merely because it gives no schedule, duration or success rate.",
-        "- When the evidence is a research finding, you may describe what was observed and "
-        "what was not established.",
-        "- Never invent steps, counts, durations or success rates the evidence does not supply.",
-        "- Do not refuse the whole question because one part of it cannot be answered. "
-        "Answer the part the evidence covers and say what it does not cover.",
+        "- The evidence you were given has already been selected as relevant to this "
+        "question. Treat it as on-topic.",
+        "- If a claim directly answers any part of the question, set answerable to true.",
+        "- Answer only as far as the evidence supports, even when it does not give a "
+        "complete solution.",
+        "- The presence of limitations, or the absence of a schedule or a success rate, is "
+        "not on its own a reason to refuse the whole question.",
+        "- When the evidence only reports what was observed, say what was observed and "
+        "state separately what it did not establish.",
+        "- Never invent steps, counts, durations, success rates, causes or prescriptions "
+        "the evidence does not supply.",
+        "- When part of the question is answerable and part is not, answer the part the "
+        "evidence covers and say plainly that the rest is not covered. Do not fill it in.",
         CONTRACT_REMINDER,
     )
 )

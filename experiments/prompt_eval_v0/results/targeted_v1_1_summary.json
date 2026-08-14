@@ -1,0 +1,80 @@
+{
+  "v1": {
+    "total_runs": 27,
+    "provider_errors": 0,
+    "responded_runs": 27,
+    "accepted": 18,
+    "not_answerable": 9,
+    "invalid": 0,
+    "accepted_by_group": {
+      "over_refusal": "5/9",
+      "preserved_normal": "9/9",
+      "direction_adversarial": "4/9"
+    },
+    "provider_errors_by_group": {
+      "over_refusal": 0,
+      "preserved_normal": 0,
+      "direction_adversarial": 0
+    },
+    "accepted_by_question": {
+      "T1": "0/3",
+      "T2": "3/3",
+      "T3": "2/3",
+      "T4": "3/3",
+      "T5": "3/3",
+      "T6": "3/3",
+      "T7": "3/3",
+      "T8": "1/3",
+      "T9": "0/3"
+    },
+    "used_card_ids_valid": "18/18",
+    "post_validation_numbers_outside_evidence": 0,
+    "post_validation_latin_outside_evidence": 0,
+    "auto_flag_hits": 5,
+    "latency_ms": {
+      "mean": 4131,
+      "median": 3726,
+      "min": 2331,
+      "max": 9611
+    }
+  },
+  "v1.1": {
+    "total_runs": 27,
+    "provider_errors": 0,
+    "responded_runs": 27,
+    "accepted": 25,
+    "not_answerable": 2,
+    "invalid": 0,
+    "accepted_by_group": {
+      "over_refusal": "9/9",
+      "preserved_normal": "9/9",
+      "direction_adversarial": "7/9"
+    },
+    "provider_errors_by_group": {
+      "over_refusal": 0,
+      "preserved_normal": 0,
+      "direction_adversarial": 0
+    },
+    "accepted_by_question": {
+      "T1": "3/3",
+      "T2": "3/3",
+      "T3": "3/3",
+      "T4": "3/3",
+      "T5": "3/3",
+      "T6": "3/3",
+      "T7": "3/3",
+      "T8": "3/3",
+      "T9": "1/3"
+    },
+    "used_card_ids_valid": "25/25",
+    "post_validation_numbers_outside_evidence": 0,
+    "post_validation_latin_outside_evidence": 0,
+    "auto_flag_hits": 1,
+    "latency_ms": {
+      "mean": 4029,
+      "median": 3994,
+      "min": 2423,
+      "max": 6227
+    }
+  }
+}
