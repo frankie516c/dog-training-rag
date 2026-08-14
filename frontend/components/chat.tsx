@@ -48,11 +48,19 @@ function CitationCard({ citation }: { citation: ChatCitation }) {
 
 function AssistantResponse({ response }: { response: ChatResponse }) {
   const insufficient = response.status === "insufficient_evidence";
+  // A suspected toxic ingestion is not an evidence gap, and labelling it "근거 부족" reads
+  // as "we have nothing for you" at the moment the reader most needs to act.
+  const urgent = response.safety_notice?.level === "urgent";
+  const statusClass = urgent
+    ? "status-urgent"
+    : insufficient
+      ? "status-insufficient"
+      : "status-answered";
 
   return (
     <div className="response-content">
-      <p className={`status-label ${insufficient ? "status-insufficient" : "status-answered"}`}>
-        {insufficient ? "근거 부족" : "근거 확인 답변"}
+      <p className={`status-label ${statusClass}`}>
+        {urgent ? "긴급 안내" : insufficient ? "근거 부족" : "근거 확인 답변"}
       </p>
       <p className="answer-text">{response.answer}</p>
 

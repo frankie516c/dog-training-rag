@@ -214,6 +214,11 @@ a:focus-visible {
   color: #525b57;
 }
 
+.status-urgent {
+  background: var(--urgent-soft);
+  color: #7b2925;
+}
+
 .safety-notice {
   padding: 11px 13px;
   border: 1px solid;

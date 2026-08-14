@@ -36,13 +36,20 @@ _HIGH_RISK_SUBSTANCES = compile_terms(
     )
 )
 
+# Ingestion, stated or suspected. Korean marks suspicion with a following modifier
+# ("먹은 것 같아요", "삼킨 듯해요"), so the verb form is what has to be recognised — the
+# adnominal 먹은 / 삼킨 are separate syllables from 먹었 / 삼키 and matched nothing before.
+# A substance alone is still not enough: "초콜릿색 래브라도" carries no ingestion at all.
 _INGESTION = compile_terms(
     (
         "먹었",
         "먹어",
         "먹고",
+        "먹은",
         "삼켰",
         "삼키",
+        "삼킨",
+        "삼켜",
         "섭취",
         "주워 먹",
         "주워먹",
@@ -63,14 +70,21 @@ _URGENT_MESSAGE_EN = (
     "This question is outside training guidance. Possible poisoning is time critical, so "
     "contact your nearest veterinary clinic or an emergency veterinary hospital now."
 )
+# The first sentence is the action. What this service cannot do comes after it: a reader
+# in this situation should not have to get past a scope disclaimer to find "call a vet".
 _URGENT_ANSWER_KO = (
-    "훈련 근거로 답변할 수 있는 질문이 아닙니다. 즉시 가까운 동물병원 또는 응급 동물병원에 "
-    "연락하세요. 이 서비스는 섭취량 판단, 진단, 처치 방법을 안내하지 않습니다."
+    "지금 바로 가까운 동물병원이나 야간·응급 동물병원에 연락해 주세요. "
+    "중독 가능성이 있어 시간이 중요합니다.\n\n"
+    "무엇을 얼마나 먹었는지, 언제 먹었는지 알고 계신 만큼 수의사에게 전달해 주세요.\n\n"
+    "이 서비스는 훈련 근거로만 답변하기 때문에 섭취량 판단, 진단, 구토 유도를 비롯한 "
+    "처치 방법은 안내하지 않습니다."
 )
 _URGENT_ANSWER_EN = (
-    "This is not a question that training evidence can answer. Contact your nearest "
-    "veterinary clinic or an emergency veterinary hospital immediately. This service does "
-    "not assess dose, diagnose, or advise on treatment."
+    "Contact your nearest veterinary clinic or an emergency veterinary hospital right now. "
+    "Possible poisoning is time critical.\n\n"
+    "Tell the veterinarian what was eaten, how much, and when, as far as you know.\n\n"
+    "This service answers from training evidence only, so it does not assess dose, "
+    "diagnose, or advise on treatment including inducing vomiting."
 )
 
 
