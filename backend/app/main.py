@@ -76,11 +76,10 @@ def create_app(
 
 
 def _create_chat_service(settings: Settings) -> ChatService | None:
-    """Build the evidence-only chat service.
+    """Build the chat service, with grounded generation only if a provider is configured.
 
-    No generation provider is constructed or called here. `/chat` answers by composing
-    reviewed EvidenceCard claims, so the service is ready without Ollama and without any
-    GENERATION_* variable being set.
+    A missing or unusable provider is not an error: the service still starts and answers
+    by composing reviewed claims. Only retrieval initialization failure disables `/chat`.
     """
 
     try:
@@ -103,6 +102,12 @@ def _create_chat_service(settings: Settings) -> ChatService | None:
         )
         return None
 
+    # No generation provider is built, so none can be called. Checkpoint 5J answers from
+    # reviewed response plans and reviewed claim text; three prompt experiments (v1.1,
+    # v1.2, v1.2.1) each traded one meaning defect for another on this corpus, and the
+    # records are in experiments/prompt_eval_v0. GENERATION_* settings are read by the
+    # evaluation harness only.
+    logger.info("grounded generation disabled: answers come from reviewed evidence only")
     return ChatService(
         retriever=retriever,
         scope_matched_minimum=settings.scope_matched_minimum_score,

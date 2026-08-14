@@ -127,6 +127,19 @@ class OpenAICompatibleGenerationProvider:
         self._api_key = api_key.strip() if api_key and api_key.strip() else None
         self._timeout_seconds = timeout_seconds
 
+    async def complete(self, messages: list[dict[str, str]]) -> str:
+        """Return the raw assistant content for a caller-built message list.
+
+        Unlike `generate()` this applies no normalization, because the grounded path
+        expects a structured payload and must parse it itself.
+        """
+
+        body = await self._post({"model": self._model, "messages": messages, "stream": False})
+        content = (body["choices"][0]["message"] or {}).get("content")
+        if not isinstance(content, str) or not content.strip():
+            raise GenerationError("generation provider returned an empty completion")
+        return content
+
     async def generate(
         self,
         *,
@@ -134,9 +147,6 @@ class OpenAICompatibleGenerationProvider:
         response_language: ContentLanguage,
         evidence: tuple[GenerationEvidence, ...],
     ) -> str:
-        headers = {"Content-Type": "application/json"}
-        if self._api_key is not None:
-            headers["Authorization"] = f"Bearer {self._api_key}"
         payload = {
             "model": self._model,
             "messages": build_generation_messages(
@@ -147,10 +157,7 @@ class OpenAICompatibleGenerationProvider:
             "stream": False,
         }
         try:
-            async with httpx.AsyncClient(timeout=self._timeout_seconds) as client:
-                response = await client.post(self._endpoint, headers=headers, json=payload)
-                response.raise_for_status()
-                body = response.json()
+            body = await self._post(payload)
             content = body["choices"][0]["message"]["content"]
             if not isinstance(content, str):
                 raise GenerationError("generation provider returned an empty answer")
@@ -161,4 +168,16 @@ class OpenAICompatibleGenerationProvider:
         except GenerationError:
             raise
         except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as exc:
+            raise GenerationError("generation provider request failed") from exc
+
+    async def _post(self, payload: dict[str, object]) -> dict:
+        headers = {"Content-Type": "application/json"}
+        if self._api_key is not None:
+            headers["Authorization"] = f"Bearer {self._api_key}"
+        try:
+            async with httpx.AsyncClient(timeout=self._timeout_seconds) as client:
+                response = await client.post(self._endpoint, headers=headers, json=payload)
+                response.raise_for_status()
+                return response.json()
+        except (httpx.HTTPError, TypeError, ValueError) as exc:
             raise GenerationError("generation provider request failed") from exc
