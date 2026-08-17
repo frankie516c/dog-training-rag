@@ -1,6 +1,9 @@
 # 수집 데이터는 저장소에 올리지 않는다.
 # 자막/오디오는 용량 문제도 있지만, 무엇보다 원저작물이라 배포 대상이 아니다.
-data/
+data/*
+!data/reviews/
+data/reviews/*
+!data/reviews/bodeum_youtube_manual_reviews.csv
 *.vtt
 *.srt
 *.wav
