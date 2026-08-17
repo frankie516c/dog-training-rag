@@ -4,6 +4,14 @@ data/*
 !data/reviews/
 data/reviews/*
 !data/reviews/bodeum_youtube_manual_reviews.csv
+
+# 평가 질문셋은 수집물이 아니라 사람이 작성·검토하는 산출물이라 추적한다.
+# 생성물(results/, review/, cache/)은 계속 제외한다.
+!data/eval/
+data/eval/*
+!data/eval/queries/
+data/eval/queries/*
+!data/eval/queries/youtube_retrieval_queries.jsonl
 *.vtt
 *.srt
 *.wav
