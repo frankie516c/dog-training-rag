@@ -527,8 +527,11 @@ class ReportTests(unittest.TestCase):
         self.assertIn("test 결과를 보면서 threshold", report)
 
 
+PROVISIONAL_REASON = "MVP baseline 실행을 위한 임시 승인. 영상 근거 및 ASR 품질 정밀 검토 필요"
+
+
 class RealQuerySetTests(unittest.TestCase):
-    """The shipped candidate set must validate against the real corpus, unreviewed."""
+    """The shipped query set must validate against the real corpus."""
 
     query_set = REPO / module.DEFAULT_QUERY_SET
     chunk_dir = REPO / module.DEFAULT_CHUNK_DIR
@@ -547,10 +550,23 @@ class RealQuerySetTests(unittest.TestCase):
         self.assertEqual(53, len(chunks))
         self.assertEqual(42, len(module.eligible_chunks(chunks)))
 
-    def test_every_candidate_starts_pending(self):
+    def test_dev_is_provisionally_approved_and_test_stays_untouched(self):
+        """dev carries a provisional MVP approval; test must stay unreviewed."""
         queries = module.load_queries(self.query_set)
-        self.assertEqual({"PENDING"}, {row["review_status"] for row in queries})
-        self.assertEqual({None}, {row["reviewed_at"] for row in queries})
+        by_split: dict[str, list] = {}
+        for row in queries:
+            by_split.setdefault(row["split"], []).append(row)
+
+        dev = by_split["dev"]
+        self.assertEqual({"APPROVED"}, {row["review_status"] for row in dev})
+        self.assertEqual({"2026-08-17"}, {row["reviewed_at"] for row in dev})
+        self.assertEqual({PROVISIONAL_REASON}, {row["review_reason"] for row in dev})
+
+        # The held-out split must not be touched until the final check.
+        held_out = by_split["test"]
+        self.assertEqual({"PENDING"}, {row["review_status"] for row in held_out})
+        self.assertEqual({None}, {row["reviewed_at"] for row in held_out})
+        self.assertEqual({""}, {row["review_reason"] for row in held_out})
 
     def test_split_and_type_distribution(self):
         queries = module.load_queries(self.query_set)
