@@ -30,6 +30,9 @@ QUERY_PREFIX = "query: "
 PASSAGE_PREFIX = "passage: "
 DEPENDENCY_PACKAGES = ("sentence-transformers", "transformers", "torch", "tokenizers")
 
+DEFAULT_DEVICE = "cpu"
+DEVICE_CHOICES = ("cpu", "cuda")
+
 MIN_TOP_K = 5
 DEFAULT_TOP_K = 5
 HIT_CUTOFFS = (1, 3, 5)
@@ -72,6 +75,7 @@ class RunSettings:
     top_k: int = DEFAULT_TOP_K
     model_name: str = SUPPORTED_MODEL
     split: str = "dev"
+    device: str = DEFAULT_DEVICE
 
     def validate(self) -> None:
         if self.top_k < MIN_TOP_K:
@@ -87,6 +91,10 @@ class RunSettings:
             )
         if self.split not in SPLIT_CHOICES:
             raise EvaluationError(f"--split must be one of {list(SPLIT_CHOICES)} (got {self.split!r})")
+        if self.device not in DEVICE_CHOICES:
+            raise EvaluationError(
+                f"--device must be one of {list(DEVICE_CHOICES)} (got {self.device!r})"
+            )
 
 
 @dataclass(frozen=True)
@@ -721,7 +729,28 @@ def dependency_versions(packages: Sequence[str] = DEPENDENCY_PACKAGES) -> dict[s
     return resolved
 
 
-def load_encoder(model_name: str) -> Encoder:
+def cuda_is_available() -> bool:
+    """Probe CUDA only. Importing torch here never pulls in a model or its weights."""
+    try:
+        import torch
+    except ImportError:  # pragma: no cover - depends on optional extra
+        return False
+    return bool(torch.cuda.is_available())
+
+
+def ensure_device_available(device: str) -> None:
+    """Fail before the model is loaded when the requested device cannot serve it."""
+    if device == DEFAULT_DEVICE:
+        return
+    if not cuda_is_available():
+        raise EvaluationError(
+            "--device cuda was requested but no usable CUDA device was found "
+            "(torch.cuda.is_available() is False). Re-run with --device cpu. "
+            "The embedding model is not loaded."
+        )
+
+
+def load_encoder(model_name: str, device: str = DEFAULT_DEVICE) -> Encoder:
     """Import and load the embedding model. Never called by --review-only."""
     if model_name != SUPPORTED_MODEL:
         raise EvaluationError(f"unsupported model: {model_name!r}")
@@ -733,7 +762,7 @@ def load_encoder(model_name: str) -> Encoder:
             "(`uv add sentence-transformers`); --review-only does not need it"
         ) from exc
 
-    model = SentenceTransformer(model_name)
+    model = SentenceTransformer(model_name, device=device)
 
     class SentenceTransformerEncoder:
         info = EncoderInfo(name=model_name, dependency_versions=dependency_versions())
@@ -791,9 +820,11 @@ def run_evaluation(
         )
 
     # Every schema, span, video_id and eligible-mapping check is done above,
-    # so this is the first line that may import or download a model.
+    # so this is the first line that may import or download a model. The device is
+    # probed first: an unusable --device cuda must not cost a model load.
+    ensure_device_available(settings.device)
     if encoder is None:
-        encoder = load_encoder(settings.model_name)
+        encoder = load_encoder(settings.model_name, settings.device)
 
     started = time.perf_counter()
     corpus_vectors = encoder.encode([PASSAGE_PREFIX + chunk["text"] for chunk in corpus])
@@ -863,7 +894,8 @@ def run_evaluation(
     write_text(
         json.dumps(
             {
-                "note": "latency and timestamps are environment dependent and are excluded from determinism checks",
+                "note": "device, latency and timestamps are environment dependent and are excluded from determinism checks",
+                "device": settings.device,
                 "run_started_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 "corpus_encode_ms": round(corpus_seconds * 1000, 3),
                 "per_query": latencies,
@@ -895,6 +927,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="validate the query set and write the review report without loading any model",
     )
     parser.add_argument("--split", default="dev", help=f"one of {list(SPLIT_CHOICES)}")
+    parser.add_argument(
+        "--device",
+        default=DEFAULT_DEVICE,
+        help=f"one of {list(DEVICE_CHOICES)} (default: {DEFAULT_DEVICE}); ignored by --review-only",
+    )
     parser.add_argument("--top-k", type=int, default=DEFAULT_TOP_K, help=f"must be >= {MIN_TOP_K}")
     parser.add_argument(
         "--model-name",
@@ -928,7 +965,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print(f"  PENDING {plan.query_id} [{plan.query['query_type']}/{plan.split}] {spans}")
             return 0
 
-        settings = RunSettings(top_k=args.top_k, model_name=args.model_name, split=args.split)
+        settings = RunSettings(
+            top_k=args.top_k, model_name=args.model_name, split=args.split, device=args.device
+        )
         settings.validate()
         result = run_evaluation(
             args.query_set,

@@ -153,8 +153,8 @@ class ExplodingLoader:
     def __init__(self, test):
         self.test = test
 
-    def __call__(self, model_name):
-        raise AssertionError(f"load_encoder must not be called (model_name={model_name!r})")
+    def __call__(self, *args, **kwargs):
+        raise AssertionError(f"load_encoder must not be called (args={args!r} {kwargs!r})")
 
 
 class Fixture:
@@ -201,6 +201,22 @@ def no_model_load(test):
         yield
     finally:
         module.load_encoder = original
+
+
+@contextlib.contextmanager
+def cuda(available):
+    """Pin the CUDA probe. `available=None` fails the test if the probe runs at all."""
+    def probe():
+        if available is None:
+            raise AssertionError("the CUDA probe must not run for this command")
+        return available
+
+    original = module.cuda_is_available
+    module.cuda_is_available = probe
+    try:
+        yield
+    finally:
+        module.cuda_is_available = original
 
 
 def run_main(argv):
@@ -400,6 +416,88 @@ class ApprovedGateTests(unittest.TestCase):
         payload = fixture.evaluate()["payload"]
         self.assertEqual(1, payload["query_set"]["evaluated_queries"])
         self.assertEqual(["q1"], [row["query_id"] for row in payload["per_query"]])
+
+
+class DeviceTests(unittest.TestCase):
+    def _cli(self, fixture, *extra):
+        return run_main([
+            "--query-set", str(fixture.query_set),
+            "--chunk-dir", str(fixture.chunk_dir),
+            "--transcript-dir", str(fixture.transcript_dir),
+            "--result-dir", str(fixture.result_dir),
+            *extra,
+        ])
+
+    def test_cpu_is_the_default(self):
+        self.assertEqual("cpu", module.RunSettings().device)
+        self.assertEqual("cpu", module.build_parser().parse_args([]).device)
+
+    def test_only_cpu_and_cuda_are_accepted(self):
+        for device in ("cpu", "cuda"):
+            module.RunSettings(device=device).validate()
+        for device in ("gpu", "mps", "cuda:0", "CPU", ""):
+            with self.assertRaises(module.EvaluationError) as caught:
+                module.RunSettings(device=device).validate()
+            self.assertIn("--device must be one of", str(caught.exception))
+
+    def test_unusable_cuda_fails_before_the_model_is_loaded(self):
+        fixture = Fixture()
+        with no_model_load(self), cuda(False):
+            with self.assertRaises(module.EvaluationError) as caught:
+                module.run_evaluation(
+                    fixture.query_set, fixture.chunk_dir, fixture.transcript_dir,
+                    fixture.result_dir, module.RunSettings(device="cuda"), encoder=None,
+                )
+        self.assertIn("no usable CUDA device", str(caught.exception))
+        self.assertIn("The embedding model is not loaded.", str(caught.exception))
+        self.assertFalse(fixture.result_dir.exists())
+
+    def test_cli_exits_non_zero_when_cuda_is_unusable(self):
+        fixture = Fixture()
+        with no_model_load(self), cuda(False):
+            code, output = self._cli(fixture, "--device", "cuda")
+        self.assertEqual(1, code)
+        self.assertIn("no usable CUDA device", output)
+        self.assertIn("--device cpu", output)
+        self.assertFalse(fixture.result_dir.exists())
+
+    def test_cli_rejects_an_unknown_device_without_loading_a_model(self):
+        fixture = Fixture()
+        with no_model_load(self), cuda(None):
+            code, output = self._cli(fixture, "--device", "gpu")
+        self.assertEqual(1, code)
+        self.assertIn("--device must be one of", output)
+        self.assertFalse(fixture.result_dir.exists())
+
+    def test_available_cuda_is_recorded_in_the_runtime_artifact(self):
+        with cuda(True):
+            result = Fixture().evaluate(device="cuda")
+        runtime = json.loads(result["runtime_path"].read_text(encoding="utf-8"))
+        self.assertEqual("cuda", runtime["device"])
+
+    def test_cpu_run_records_the_device_outside_the_metrics_artifact(self):
+        with cuda(None):  # a cpu run has nothing to probe
+            result = Fixture().evaluate()
+        runtime = json.loads(result["runtime_path"].read_text(encoding="utf-8"))
+        self.assertEqual("cpu", runtime["device"])
+        # The device is an environment property, so it stays out of the
+        # deterministic metrics artifact along with the timings.
+        payload = json.loads(result["metrics_path"].read_text(encoding="utf-8"))
+        self.assertNotIn("device", set(json_keys(payload)))
+
+    def test_review_only_never_probes_the_device_or_loads_a_model(self):
+        fixture = Fixture()
+        with no_model_load(self), cuda(None):
+            code, output = run_main([
+                "--review-only", "--device", "cuda",
+                "--query-set", str(fixture.query_set),
+                "--chunk-dir", str(fixture.chunk_dir),
+                "--transcript-dir", str(fixture.transcript_dir),
+                "--review-path", str(fixture.review_path),
+            ])
+        self.assertEqual(0, code)
+        self.assertIn("review report:", output)
+        self.assertTrue(fixture.review_path.is_file())
 
 
 class MetricTests(unittest.TestCase):
