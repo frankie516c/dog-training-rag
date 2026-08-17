@@ -90,6 +90,23 @@ uv run python scripts/check_subs.py data/bodeum_index.tsv 20
 uv run python scripts/vtt_stats.py "data/subs/*.vtt"
 ```
 
+### YouTube 메타데이터 검토 CSV
+
+`.env.example`을 참고해 `.env`에 `YOUTUBE_API_KEY`를 설정합니다. 채널 handle은
+`YOUTUBE_CHANNEL_HANDLE`로 바꿀 수 있으며 기본값은 `Bodeumofficial`입니다.
+영상, 음원, 자막 및 원본 API 응답은 저장하지 않습니다.
+
+```powershell
+# 확인용 제한 수집
+uv run python scripts/collect_youtube_metadata.py --max-videos 100
+
+# 채널 전체 수집
+uv run python scripts/collect_youtube_metadata.py
+```
+
+기본 출력 파일은 `data/reviews/bodeum_youtube_metadata.csv`입니다. 다른 위치는
+`--output <경로>`로 지정할 수 있습니다.
+
 의존성을 추가할 때도 `uv add <패키지>`로 넣습니다. `uv.lock`은 커밋합니다.
 
 ### 외부 도구는 필요 없습니다
