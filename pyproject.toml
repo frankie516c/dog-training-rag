@@ -4,5 +4,6 @@ version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
     "python-dotenv>=1.2.3",
+    "webvtt-py>=0.5.1",
     "yt-dlp>=2026.7.4",
 ]
