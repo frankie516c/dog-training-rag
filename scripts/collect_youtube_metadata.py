@@ -22,7 +22,8 @@ DEFAULT_HANDLE = "Bodeumofficial"
 DEFAULT_OUTPUT = Path("data/reviews/bodeum_youtube_metadata.csv")
 API_BASE = "https://www.googleapis.com/youtube/v3"
 METADATA_FIELDS = [
-    "video_id", "title", "description", "published_at", "channel_id",
+    "video_id", "title", "description", "description_intro", "chapters",
+    "content_signals", "published_at", "channel_id",
     "channel_title", "duration", "definition", "caption", "licensed_content",
     "privacy_status", "view_count", "like_count", "comment_count", "tags",
     "thumbnail_url", "playlist_id", "playlist_title", "fetched_at",
@@ -47,6 +48,11 @@ STRONG_TITLE_KEYWORDS = [
     "분리불안", "분리 불안", "입질", "공격성", "리콜",
 ]
 SOLUTION_EXPRESSIONS = ["해결", "고치는 법", "훈련하는 방법", "교육하는 방법"]
+BEHAVIOR_RESPONSE_EXPRESSIONS = [
+    "방법", "훈련법", "교육법", "대처", "적응", "줄이는", "고치는", "가르치기",
+    "어떻게 해야", "물었을 때", "달려들 때", "입질", "배변", "짖", "하네스",
+    "목줄", "문제행동", "문제 행동",
+]
 PLAYLIST_CANDIDATE_KEYWORDS = [
     "퍼피교육", "퍼피 교육", "주니어교육", "주니어 교육",
 ]
@@ -61,6 +67,15 @@ _BOILERPLATE_MARKERS = (
     "구독과 좋아요", "구독, 좋아요", "비즈니스 문의", "광고 문의", "협찬 문의",
     "공식 홈페이지", "official website",
 )
+_INTRO_STOP_MARKERS = _BOILERPLATE_MARKERS + (
+    "출연 모집", "보듬숍", "인스타그램", "비즈니스 문의", "할인 혜택",
+    "특가 구성", "유튜브 채널 성장", "번역 자막",
+)
+_CHAPTER_RE = re.compile(
+    r"^\s*(?:\[)?(?P<timestamp>(?:\d{1,2}:)?\d{1,2}:\d{2})(?:\])?"
+    r"\s*[-–—|:：]?\s*(?P<title>.*)\s*$"
+)
+_NON_EVIDENCE_CHAPTERS = ("하이라이트", "오프닝", "인트로", "엔딩", "클로징")
 
 
 class ConfigurationError(RuntimeError):
@@ -222,6 +237,70 @@ def classification_description(description: str) -> str:
     return "\n".join(kept)
 
 
+def timestamp_to_seconds(timestamp: str) -> int:
+    parts = [int(part) for part in timestamp.split(":")]
+    if len(parts) == 2:
+        minutes, seconds = parts
+        return minutes * 60 + seconds
+    hours, minutes, seconds = parts
+    return hours * 3600 + minutes * 60 + seconds
+
+
+def parse_description(description: str) -> tuple[str, list[dict[str, Any]]]:
+    """Extract an unchanged intro prefix and timestamp chapters from description."""
+    lines = description.splitlines()
+    intro_end = len(lines)
+    chapters: list[dict[str, Any]] = []
+    for index, line in enumerate(lines):
+        match = _CHAPTER_RE.match(line)
+        if match:
+            intro_end = min(intro_end, index)
+            timestamp = match.group("timestamp")
+            chapters.append({
+                "timestamp": timestamp,
+                "start_seconds": timestamp_to_seconds(timestamp),
+                "title": match.group("title").strip(),
+            })
+            continue
+        stripped = line.strip()
+        folded = stripped.casefold()
+        if (
+            stripped.startswith("#")
+            or "http://" in folded
+            or "https://" in folded
+            or any(marker in folded for marker in _INTRO_STOP_MARKERS)
+        ):
+            intro_end = min(intro_end, index)
+    return "\n".join(lines[:intro_end]).strip(), chapters
+
+
+def _contains_any(text: str, expressions: list[str]) -> bool:
+    folded = text.casefold()
+    return any(expression.casefold() in folded for expression in expressions)
+
+
+def extract_content_signals(
+    title: str, intro: str, chapters: list[dict[str, Any]]
+) -> list[str]:
+    """Return source text evidence without summarization or rewriting."""
+    signals: list[str] = []
+    signal_expressions = list(dict.fromkeys(
+        STRONG_TITLE_KEYWORDS + TRAINING_KEYWORDS + BEHAVIOR_RESPONSE_EXPRESSIONS
+    ))
+    for line in [title, *intro.splitlines()]:
+        stripped = line.strip()
+        if stripped and _contains_any(stripped, signal_expressions):
+            source = "title" if line == title else "intro"
+            signals.append(f"{source}:{stripped}")
+    for chapter in chapters:
+        chapter_title = chapter["title"]
+        if any(marker in chapter_title.casefold() for marker in _NON_EVIDENCE_CHAPTERS):
+            continue
+        if _contains_any(chapter_title, signal_expressions):
+            signals.append(f"chapter:{chapter_title}")
+    return list(dict.fromkeys(signals))
+
+
 def _source_matches(source: str, text: str, keywords: list[str]) -> list[str]:
     folded = text.casefold()
     return [f"{source}:{keyword}" for keyword in keywords if keyword.casefold() in folded]
@@ -233,7 +312,8 @@ def classify(
     duration: int | None = None,
     playlist_titles: list[str] | None = None,
 ) -> tuple[str, list[str], str]:
-    cleaned_description = classification_description(description)
+    description_intro, chapters = parse_description(description)
+    cleaned_description = classification_description(description_intro)
     playlist_titles = playlist_titles or []
     excluded = list(dict.fromkeys(
         _source_matches("title", title, EXCLUDE_KEYWORDS)
@@ -261,6 +341,18 @@ def classify(
     if excluded:
         return "EXCLUDE", excluded, f"제외 키워드 일치: {', '.join(excluded)}"
     candidate_evidence = title_evidence + playlist_evidence
+    title_or_intro_has_response = _contains_any(
+        "\n".join((title, description_intro)),
+        STRONG_TITLE_KEYWORDS + TRAINING_KEYWORDS + BEHAVIOR_RESPONSE_EXPRESSIONS,
+    )
+    chapter_has_concrete_response = any(
+        not any(marker in chapter["title"].casefold() for marker in _NON_EVIDENCE_CHAPTERS)
+        and _contains_any(chapter["title"], BEHAVIOR_RESPONSE_EXPRESSIONS)
+        for chapter in chapters
+    )
+    if title_or_intro_has_response and chapter_has_concrete_response:
+        candidate_evidence.append("structure:소개+구체적 챕터")
+        candidate_evidence = list(dict.fromkeys(candidate_evidence))
     if candidate_evidence and (duration is None or duration >= 180):
         return "CANDIDATE", candidate_evidence, f"강한 후보 근거: {', '.join(candidate_evidence)}"
     review_evidence = candidate_evidence + description_evidence
@@ -283,8 +375,13 @@ def normalize_video(
     tags = snippet.get("tags") or []
     memberships = memberships or []
     duration = iso8601_duration_to_seconds(details.get("duration", "PT0S"))
+    description = snippet.get("description", "")
+    description_intro, chapters = parse_description(description)
+    content_signals = extract_content_signals(
+        snippet.get("title", ""), description_intro, chapters
+    )
     classification, matched, reason = classify(
-        snippet.get("title", ""), snippet.get("description", ""), duration,
+        snippet.get("title", ""), description, duration,
         [membership["title"] for membership in memberships],
     )
     thumbnails = snippet.get("thumbnails") or {}
@@ -294,7 +391,10 @@ def normalize_video(
     return {
         "video_id": item.get("id", ""),
         "title": snippet.get("title", ""),
-        "description": snippet.get("description", ""),
+        "description": description,
+        "description_intro": description_intro,
+        "chapters": json.dumps(chapters, ensure_ascii=False),
+        "content_signals": json.dumps(content_signals, ensure_ascii=False),
         "published_at": snippet.get("publishedAt", ""),
         "channel_id": snippet.get("channelId", ""),
         "channel_title": snippet.get("channelTitle", ""),

@@ -74,6 +74,42 @@ class CollectorTests(unittest.TestCase):
         self.assertEqual(183845, module.iso8601_duration_to_seconds("P2DT3H4M5S"))
         self.assertEqual(300, module.iso8601_duration_to_seconds("PT5M"))
 
+    def test_description_parser_preserves_intro_and_supports_chapter_formats(self):
+        description = (
+            "첫 문단 원문입니다.\n두 번째 줄입니다.\n\n"
+            "00:00 하이라이트\n01:23 목줄 훈련\n1:02:15 긴 챕터\n"
+            "https://example.com\n#강아지"
+        )
+        intro, chapters = module.parse_description(description)
+        self.assertEqual("첫 문단 원문입니다.\n두 번째 줄입니다.", intro)
+        self.assertEqual(
+            [
+                {"timestamp": "00:00", "start_seconds": 0, "title": "하이라이트"},
+                {"timestamp": "01:23", "start_seconds": 83, "title": "목줄 훈련"},
+                {"timestamp": "1:02:15", "start_seconds": 3735, "title": "긴 챕터"},
+            ],
+            chapters,
+        )
+
+    def test_intro_stops_at_promotion_and_recruitment_is_not_evidence(self):
+        description = "내용 소개 원문\n[퍼피교육] 출연 모집처\nhttps://example.com"
+        intro, chapters = module.parse_description(description)
+        self.assertEqual("내용 소개 원문", intro)
+        self.assertEqual([], chapters)
+        result = module.classify("강아지 이야기", "[퍼피교육] 출연 모집처\nhttps://x.test", 600)
+        self.assertEqual("REVIEW", result[0])
+        self.assertNotIn("퍼피교육", " ".join(result[1]))
+
+    def test_navigation_chapters_are_stored_but_not_content_signals(self):
+        intro, chapters = module.parse_description(
+            "교육 내용\n00:00 하이라이트\n00:15 오프닝\n01:20 목줄 훈련\n05:00 엔딩"
+        )
+        signals = module.extract_content_signals("퍼피교육", intro, chapters)
+        self.assertIn("chapter:목줄 훈련", signals)
+        self.assertFalse(any("하이라이트" in signal for signal in signals))
+        self.assertFalse(any("오프닝" in signal for signal in signals))
+        self.assertFalse(any("엔딩" in signal for signal in signals))
+
     def test_missing_statistics_remain_blank(self):
         row = module.normalize_video(
             {"id": "x", "snippet": {}, "contentDetails": {"duration": "PT1S"}}, "now"
@@ -94,6 +130,47 @@ class CollectorTests(unittest.TestCase):
         result = module.classify("강아지 영접하고 옴", "훈련사 이야기", 600, ["안고독한 훈련사"])
         self.assertEqual("REVIEW", result[0])
         self.assertEqual(["description:훈련"], result[1])
+
+    def test_candidate_titles_from_latest_collection_remain_candidates(self):
+        titles = [
+            '"내 몸 만지지마!!" 개통령 손길도 피하는 예민쓰 파피용 [퍼피교육]',
+            "개 조심. 귀여우니까 조심 [퍼피교육]",
+            "강형욱도 무장 해제 시킨 '사람 좋아 강아지' [퍼피교육]",
+            "잘생긴 남자만 좋아한다는 콩이 [주니어 교육]",
+            "그냥 보호자님이 자랑하러 나온 게 확실. [주니어 교육]",
+            "강형욱에게 쫄지 않기 위해 기립한 콩알 치와와씨 [퍼피교육]",
+            "말랑콩떡 왕찹쌀떡 강아지에 감겨버렸습니다 [퍼피교육]",
+            "외모 미쳤다 G무비네 강아지 [퍼피교육]",
+            "훈련하기 싫어서 눈알 굴리는 댕쪽이 [퍼피교육]",
+            "자신감 심어줬더니 종이컵 물고 튀는 강아지 [퍼피교육]",
+            "하네스가 입기 싫은 강아지 [퍼피교육]",
+        ]
+        for title in titles:
+            with self.subTest(title=title):
+                self.assertEqual("CANDIDATE", module.classify(title, "", 600)[0])
+
+    def test_safety_response_video_is_promoted_by_intro_and_chapters(self):
+        description = (
+            "안전한 반려견 문화를 위해 만든 영상입니다.\n\n"
+            "00:00 인트로\n01:12 Step.1 위험 시그널\n"
+            "03:34 Step.2 개가 달려들 때\n06:40 Step.3 개가 물었을 때"
+        )
+        result = module.classify(
+            "'길에서 사나운 개를 만났다면?' 어떻게 해야할지 강형욱이 알려드립니다",
+            description,
+            789,
+        )
+        self.assertEqual("CANDIDATE", result[0])
+        self.assertIn("structure:소개+구체적 챕터", result[1])
+
+    def test_breed_characteristic_chapters_remain_review(self):
+        description = (
+            "오늘 견종백과로 만나볼 친구는 아키타이누입니다.\n"
+            "00:00 하이라이트\n03:50 아키타이누의 활동량?\n06:19 아키타이누의 분리불안?"
+        )
+        self.assertEqual(
+            "REVIEW", module.classify("견종백과 아키타이누편", description, 600)[0]
+        )
 
     def test_description_only_matches_stay_review(self):
         for keyword in ("산책", "교육", "훈련", "짖음", "기다려", "배변"):
@@ -177,6 +254,8 @@ class CollectorTests(unittest.TestCase):
             self.assertEqual(["훈련"], json.loads(saved["tags"]))
             self.assertEqual(["p1"], json.loads(saved["playlist_id"]))
             self.assertEqual(["퍼피교육"], json.loads(saved["playlist_title"]))
+            self.assertIsInstance(json.loads(saved["chapters"]), list)
+            self.assertIsInstance(json.loads(saved["content_signals"]), list)
 
 
 if __name__ == "__main__":
