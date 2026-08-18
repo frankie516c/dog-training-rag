@@ -41,8 +41,8 @@ SCORE_DECIMALS = 6
 REVIEW_SAMPLE_CHARS = 120
 
 REVIEW_STATUSES = ("PENDING", "APPROVED", "REJECTED")
-SPLITS = ("dev", "test")
-SPLIT_CHOICES = ("dev", "test", "all")
+SPLITS = ("dev", "test", "synthetic")
+SPLIT_CHOICES = ("dev", "test", "synthetic", "all")
 QUERY_TYPES = (
     "direct_lookup",
     "paraphrase",
