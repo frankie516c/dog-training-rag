@@ -39,6 +39,30 @@ def json_keys(value):
             yield from json_keys(item)
 
 
+def _load_script(name):
+    """Import a sibling script the same way this module imports the one under test."""
+    spec = importlib.util.spec_from_file_location(name, REPO / "scripts" / f"{name}.py")
+    loaded = importlib.util.module_from_spec(spec)
+    assert spec.loader
+    sys.modules[name] = loaded
+    spec.loader.exec_module(loaded)
+    return loaded
+
+
+def _chunk_kwargs(row):
+    """Reverse of `chunk()`, so a fixture row can be rebuilt with one field changed."""
+    return {
+        "chunk_id": row["chunk_id"],
+        "video_id": row["video_id"],
+        "index": row["chunk_index"],
+        "start": row["start_ms"],
+        "end": row["end_ms"],
+        "text": row["text"],
+        "eligible": row["embedding_eligible"],
+        "chapter_title": row["chapter_title"],
+    }
+
+
 def write_jsonl(path, rows):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="\n") as file:
@@ -46,7 +70,11 @@ def write_jsonl(path, rows):
             file.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
-def chunk(chunk_id, video_id, index, start, end, text, eligible=True, chapter_title="본문"):
+# What scripts/chunk_approved_youtube.py writes into every chunk record.
+FIXTURE_CHUNKING = {"target_chars": 420, "min_chars": 150, "max_chars": 480, "overlap_segments": 0}
+
+
+def chunk(chunk_id, video_id, index, start, end, text, eligible=True, chapter_title="본문", chunking=FIXTURE_CHUNKING):
     return {
         "schema_version": "youtube-chunk-v1",
         "chunk_id": chunk_id,
@@ -63,6 +91,7 @@ def chunk(chunk_id, video_id, index, start, end, text, eligible=True, chapter_ti
         "source_segment_indices": [index],
         "source_cue_indices": [index],
         "char_count": len(text),
+        **({} if chunking is None else {"chunking": dict(chunking)}),
     }
 
 
@@ -625,7 +654,200 @@ class ReportTests(unittest.TestCase):
         self.assertIn("test 결과를 보면서 threshold", report)
 
 
+class ChunkingSettingsTests(unittest.TestCase):
+    """The corpus must say which chunker run produced it."""
+
+    def _chunks(self, **overrides):
+        rows = {video_id: [dict(row) for row in rows] for video_id, rows in CHUNKS.items()}
+        for chunk_id, chunking in overrides.items():
+            for video_rows in rows.values():
+                for row in video_rows:
+                    if row["chunk_id"] == chunk_id:
+                        if chunking is None:
+                            row.pop("chunking", None)
+                        else:
+                            row["chunking"] = chunking
+        return rows
+
+    def test_settings_reach_the_metrics_corpus_block(self):
+        payload = Fixture().evaluate()["payload"]
+        self.assertEqual(FIXTURE_CHUNKING, payload["corpus"]["chunking"])
+
+    def test_settings_are_a_data_property_so_metrics_stay_byte_identical(self):
+        first = Fixture().evaluate()["metrics_path"].read_bytes()
+        second = Fixture().evaluate()["metrics_path"].read_bytes()
+        self.assertEqual(first, second)
+        self.assertIn(b'"target_chars": 420', first)
+        runtime = json.loads(Fixture().evaluate()["runtime_path"].read_text(encoding="utf-8"))
+        self.assertNotIn("chunking", set(json_keys(runtime)))
+
+    def test_a_corpus_mixing_two_chunker_runs_is_rejected(self):
+        mixed = {"target_chars": 220, "min_chars": 80, "max_chars": 320, "overlap_segments": 0}
+        fixture = Fixture(chunks=self._chunks(**{"chunk-b1": mixed}))
+        with no_model_load(self), self.assertRaises(module.EvaluationError) as caught:
+            fixture.evaluate()
+        message = str(caught.exception)
+        self.assertIn("mixes chunking settings", message)
+        self.assertIn("chunk-b1", message)
+
+    def test_a_corpus_missing_the_field_on_some_chunks_is_also_mixed(self):
+        fixture = Fixture(chunks=self._chunks(**{"chunk-a2": None}))
+        with no_model_load(self), self.assertRaises(module.EvaluationError):
+            fixture.evaluate()
+
+    def test_a_legacy_corpus_without_the_field_reports_null(self):
+        """Corpora chunked before the field existed stay evaluable, and say nothing."""
+        legacy = {
+            video_id: [chunk(**{**_chunk_kwargs(row), "chunking": None}) for row in rows]
+            for video_id, rows in CHUNKS.items()
+        }
+        payload = Fixture(chunks=legacy).evaluate()["payload"]
+        self.assertIsNone(payload["corpus"]["chunking"])
+        self.assertEqual(3, payload["metrics"]["hit@5"]["successful_queries"])
+
+    def test_a_malformed_settings_object_is_rejected_at_load(self):
+        broken = {"target_chars": 420, "min_chars": 150, "max_chars": "480", "overlap_segments": 0}
+        fixture = Fixture(chunks=self._chunks(**{"chunk-a1": broken}))
+        with no_model_load(self), self.assertRaises(module.EvaluationError) as caught:
+            fixture.evaluate()
+        self.assertIn("chunking.max_chars", str(caught.exception))
+
+    def test_the_chunker_writes_what_the_evaluator_reads(self):
+        """Pin the contract between the two scripts, not each side's idea of it."""
+        chunker = _load_script("chunk_approved_youtube")
+        written = chunker.ChunkingConfig().payload()
+        self.assertEqual(sorted(module.CHUNKING_SETTING_KEYS), sorted(written))
+        # The adopted defaults must be what a plain, flagless chunker run produces.
+        self.assertEqual(ADOPTED_CHUNKING, written)
+
+
+class SimilarityStatisticsTests(unittest.TestCase):
+    """Per query similarity spread, recorded so a threshold can be chosen later."""
+
+    # top1 0.9 stands well clear of the rest; the tail sits outside top-5 on purpose.
+    PEAKED = {"산책 인사법은?": [0.9, 0.2, 0.15, 0.1, 0.05, 0.05, 0.05]}
+    # No chunk answers the question: everything crowds together near the mean.
+    FLAT = {"산책 인사법은?": [0.84, 0.83, 0.82, 0.81, 0.80, 0.79, 0.78]}
+
+    def _inputs(self, weights=None, top_k=module.DEFAULT_TOP_K, queries=QUERIES):
+        """Rebuild what run_evaluation feeds build_metrics, without writing artifacts."""
+        fixture = Fixture(queries=queries)
+        chunks = module.load_chunks(fixture.chunk_dir)
+        corpus = module.eligible_chunks(chunks)
+        bounds = module.load_transcript_bounds(
+            fixture.transcript_dir, [row["video_id"] for row in chunks]
+        )
+        plans = module.build_query_plans(module.load_queries(fixture.query_set), chunks, bounds)
+        encoder = ScriptedEncoder(weights=weights)
+        corpus_vectors = encoder.encode([module.PASSAGE_PREFIX + row["text"] for row in corpus])
+        chunk_ids = [row["chunk_id"] for row in corpus]
+        rankings, stats = {}, {}
+        for plan in plans:
+            query_vector = encoder.encode([module.QUERY_PREFIX + plan.query["question"]])[0]
+            scores = module.similarity_scores(query_vector, corpus_vectors)
+            rankings[plan.query_id] = module.rank_scores(scores, chunk_ids, top_k)
+            stats[plan.query_id] = module.score_statistics(scores)
+        return plans, rankings, {row["chunk_id"]: row for row in corpus}, stats
+
+    def _row(self, weights):
+        fixture = Fixture(queries=[QUERIES[0]])
+        payload = fixture.evaluate(encoder=ScriptedEncoder(weights=weights))["payload"]
+        return payload["per_query"][0]
+
+    def test_per_query_rows_record_top1_mean_and_gap(self):
+        row = self._row(self.PEAKED)
+        self.assertEqual(0.9, row["top1_score"])
+        self.assertEqual(0.214286, row["corpus_mean_score"])
+        self.assertEqual(0.685714, row["score_gap"])
+
+    def test_statistics_average_the_whole_corpus_not_the_top_k(self):
+        row = self._row(self.PEAKED)
+        returned = [result["score"] for result in row["results"]]
+        self.assertEqual(5, len(returned))
+        # Mean of the returned five is 0.28; the corpus mean must include the tail.
+        self.assertNotEqual(0.28, row["corpus_mean_score"])
+        self.assertEqual(0.214286, row["corpus_mean_score"])
+
+    def test_top1_score_matches_the_first_ranked_result(self):
+        for row in Fixture().evaluate()["payload"]["per_query"]:
+            self.assertEqual(row["results"][0]["score"], row["top1_score"], row["query_id"])
+
+    def test_a_flat_distribution_reports_a_small_gap(self):
+        # The absolute top1 is high in both cases; only the gap separates them.
+        peaked, flat = self._row(self.PEAKED), self._row(self.FLAT)
+        self.assertEqual(0.84, flat["top1_score"])
+        self.assertEqual(0.81, flat["corpus_mean_score"])
+        self.assertEqual(0.03, flat["score_gap"])
+        self.assertGreater(peaked["score_gap"], flat["score_gap"])
+
+    def test_build_metrics_runs_without_the_statistics_argument(self):
+        plans, rankings, chunk_by_id, _ = self._inputs()
+        metrics, per_query = module.build_metrics(plans, rankings, chunk_by_id)
+        self.assertEqual(3, metrics["hit@5"]["successful_queries"])
+        for row in per_query:
+            for key in module.SCORE_STAT_KEYS:
+                self.assertNotIn(key, row)
+            self.assertEqual(5, len(row["results"]))
+
+    def test_statistics_never_move_the_existing_metrics(self):
+        plans, rankings, chunk_by_id, stats = self._inputs()
+        without, rows_without = module.build_metrics(plans, rankings, chunk_by_id)
+        with_stats, rows_with = module.build_metrics(plans, rankings, chunk_by_id, stats)
+        self.assertEqual(without, with_stats)
+        stripped = [
+            {key: value for key, value in row.items() if key not in module.SCORE_STAT_KEYS}
+            for row in rows_with
+        ]
+        self.assertEqual(rows_without, stripped)
+
+    def test_statistics_land_in_metrics_not_in_the_runtime_artifact(self):
+        result = Fixture().evaluate()
+        payload = json.loads(result["metrics_path"].read_text(encoding="utf-8"))
+        runtime = json.loads(result["runtime_path"].read_text(encoding="utf-8"))
+        recorded = set(json_keys(payload))
+        for key in module.SCORE_STAT_KEYS:
+            self.assertIn(key, recorded)
+            self.assertNotIn(key, set(json_keys(runtime)))
+
+    def test_statistics_stay_byte_identical_across_runs(self):
+        first = Fixture().evaluate()["metrics_path"].read_bytes()
+        second = Fixture().evaluate()["metrics_path"].read_bytes()
+        self.assertEqual(first, second)
+
+    def test_an_empty_corpus_score_list_is_an_error(self):
+        with self.assertRaises(module.EvaluationError):
+            module.score_statistics([])
+
+
 PROVISIONAL_REASON = "MVP baseline 실행을 위한 임시 승인. 영상 근거 및 ASR 품질 정밀 검토 필요"
+
+# Corpus size is a function of the chunking settings in scripts/chunk_approved_youtube.py,
+# not a target of its own. It moves whenever those settings move:
+#
+#   target / min / max   chunks / eligible  run           corpus
+#   220 / 80 / 320       53 / 42            baseline_v1   data/processed/youtube/chunks_v1 (kept)
+#   520 / 200 / 640      29 / 20            exp_a_v2      not kept
+#   420 / 150 / 480      35 / 26            exp_a2_v3     data/processed/youtube/chunks (adopted)
+#
+# The adopted settings merge the short ASR segments into fewer and longer chunks, hence
+# 53 -> 35. Snapshots of each run are under data/eval/results/*_e5_metrics.json.
+#
+# The settings are no longer pinned by hand: each chunk record carries them, so
+# ADOPTED_CHUNKING is checked against what the corpus actually says about itself. The
+# counts still have to be pinned — no amount of reading the data reproduces a count
+# without re-running the chunker, and that is exactly what makes them a useful tripwire.
+#
+# To update after an intentional re-chunk: re-run the chunker, confirm the new counts are
+# the ones you meant to produce, then update ADOPTED_CHUNKING and both counts together and
+# add a row above. Do not change them to whatever the failure happens to print.
+ADOPTED_CHUNKING = {
+    "target_chars": 420,
+    "min_chars": 150,
+    "max_chars": 480,
+    "overlap_segments": 0,
+}
+CORPUS_CHUNKS = 35
+CORPUS_ELIGIBLE_CHUNKS = 26
 
 
 class RealQuerySetTests(unittest.TestCase):
@@ -645,8 +867,49 @@ class RealQuerySetTests(unittest.TestCase):
         with no_model_load(self):
             plans = module.build_query_plans(module.load_queries(self.query_set), chunks, bounds)
         self.assertEqual(18, len(plans))
-        self.assertEqual(53, len(chunks))
-        self.assertEqual(42, len(module.eligible_chunks(chunks)))
+        # The message carries the cause: a count mismatch here is a re-chunk, not a
+        # broken query set. See the constants above for the settings each count belongs to.
+        # The corpus records the settings it was built with, so the message can name the
+        # cause instead of describing it: re-chunk, or a corpus edit under the same settings.
+        recorded = module.corpus_chunking(chunks)
+        cause = (
+            f"the corpus was chunked with {recorded}, not the adopted {ADOPTED_CHUNKING}"
+            if recorded != ADOPTED_CHUNKING
+            else "the chunking settings still match, so the corpus content itself changed "
+            "(a video added, removed or re-transcribed)"
+        )
+        rechunked = (
+            f"corpus size changed: {cause}. Confirm the new corpus is the one you meant to "
+            f"build, then update CORPUS_CHUNKS / CORPUS_ELIGIBLE_CHUNKS and the settings "
+            f"table next to them."
+        )
+        self.assertEqual(CORPUS_CHUNKS, len(chunks), rechunked)
+        self.assertEqual(CORPUS_ELIGIBLE_CHUNKS, len(module.eligible_chunks(chunks)), rechunked)
+
+    def test_corpus_records_the_adopted_chunking_settings(self):
+        """Read the settings off the corpus instead of trusting a hand-kept constant."""
+        chunks = module.load_chunks(self.chunk_dir)
+        self.assertEqual(
+            ADOPTED_CHUNKING,
+            module.corpus_chunking(chunks),
+            "the corpus was built by a chunker run with different settings than the "
+            "adopted ones; see the settings table above",
+        )
+
+    def test_corpus_content_obeys_the_settings_it_records(self):
+        """A record could claim settings its text does not satisfy; check the claim.
+
+        The chunker never emits a chunk longer than max_chars, so an over-long chunk
+        means the recorded settings do not describe how the text was actually cut.
+        """
+        chunks = module.load_chunks(self.chunk_dir)
+        longest = max(chunks, key=lambda row: row["char_count"])
+        self.assertLessEqual(
+            longest["char_count"],
+            ADOPTED_CHUNKING["max_chars"],
+            f"chunk {longest['chunk_id']} is longer than the max_chars its own record "
+            f"claims: the corpus and its recorded settings disagree",
+        )
 
     def test_dev_is_provisionally_approved_and_test_stays_untouched(self):
         """dev carries a provisional MVP approval; test must stay unreviewed."""

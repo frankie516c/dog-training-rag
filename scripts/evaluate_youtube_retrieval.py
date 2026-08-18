@@ -40,6 +40,15 @@ RANK_CUTOFF = 5
 SCORE_DECIMALS = 6
 REVIEW_SAMPLE_CHARS = 120
 
+# Similarity spread recorded per query for threshold research. Observation only:
+# nothing in this script rejects a query on these numbers yet.
+SCORE_STAT_KEYS = ("top1_score", "corpus_mean_score", "score_gap")
+
+# Chunking settings each chunk record carries, written by scripts/chunk_approved_youtube.py.
+# A corpus built before that field existed has none; such a corpus is still evaluable and
+# reports `chunking: null` rather than a guess.
+CHUNKING_SETTING_KEYS = ("target_chars", "min_chars", "max_chars", "overlap_segments")
+
 REVIEW_STATUSES = ("PENDING", "APPROVED", "REJECTED")
 SPLITS = ("dev", "test", "synthetic")
 SPLIT_CHOICES = ("dev", "test", "synthetic", "all")
@@ -191,6 +200,13 @@ def load_chunks(chunk_dir: Path) -> list[dict[str, Any]]:
                     raise EvaluationError(f"invalid {key} at {path}:{line_number}")
             if not isinstance(row.get("embedding_eligible"), bool):
                 raise EvaluationError(f"invalid embedding_eligible at {path}:{line_number}")
+            if "chunking" in row:
+                settings = row["chunking"]
+                if not isinstance(settings, dict):
+                    raise EvaluationError(f"invalid chunking at {path}:{line_number}")
+                for key in CHUNKING_SETTING_KEYS:
+                    if not isinstance(settings.get(key), int) or isinstance(settings.get(key), bool):
+                        raise EvaluationError(f"invalid chunking.{key} at {path}:{line_number}")
             if row["start_ms"] < 0 or row["start_ms"] > row["end_ms"]:
                 raise EvaluationError(f"invalid chunk interval at {path}:{line_number}")
             if row["chunk_id"] in seen:
@@ -374,6 +390,24 @@ def build_query_plans(
     return plans
 
 
+def similarity_scores(
+    query_vector: Sequence[float],
+    corpus_vectors: Sequence[Sequence[float]],
+) -> list[float]:
+    """Raw score against every corpus vector, in corpus order and before any cutoff."""
+    return [sum(a * b for a, b in zip(query_vector, vector)) for vector in corpus_vectors]
+
+
+def rank_scores(
+    scores: Sequence[float],
+    chunk_ids: Sequence[str],
+    top_k: int,
+) -> list[tuple[str, float]]:
+    """Rank on the raw score; ties break on ascending chunk_id."""
+    order = sorted(range(len(chunk_ids)), key=lambda index: (-scores[index], chunk_ids[index]))
+    return [(chunk_ids[index], scores[index]) for index in order[:top_k]]
+
+
 def rank_chunks(
     query_vector: Sequence[float],
     corpus_vectors: Sequence[Sequence[float]],
@@ -381,9 +415,26 @@ def rank_chunks(
     top_k: int,
 ) -> list[tuple[str, float]]:
     """Rank on the raw score; ties break on ascending chunk_id."""
-    scores = [sum(a * b for a, b in zip(query_vector, vector)) for vector in corpus_vectors]
-    order = sorted(range(len(chunk_ids)), key=lambda index: (-scores[index], chunk_ids[index]))
-    return [(chunk_ids[index], scores[index]) for index in order[:top_k]]
+    return rank_scores(similarity_scores(query_vector, corpus_vectors), chunk_ids, top_k)
+
+
+def score_statistics(scores: Sequence[float]) -> dict[str, float]:
+    """Similarity spread over the whole corpus, measured before the top-k cutoff.
+
+    Observation only: no threshold is applied here. The absolute top1 score moves
+    with the question, so `score_gap` (top1 minus the corpus mean) is recorded as
+    the steadier signal. The gap is computed on raw scores and serialized once, so
+    it can differ from `top1_score - corpus_mean_score` in the last decimal.
+    """
+    if not scores:
+        raise EvaluationError("cannot summarize similarity over an empty corpus")
+    top1 = max(scores)
+    mean = sum(scores) / len(scores)
+    return {
+        "top1_score": serialize_score(top1),
+        "corpus_mean_score": serialize_score(mean),
+        "score_gap": serialize_score(top1 - mean),
+    }
 
 
 def _ratio(numerator: float, denominator: float) -> float:
@@ -394,7 +445,15 @@ def build_metrics(
     plans: Sequence[QueryPlan],
     rankings: dict[str, list[tuple[str, float]]],
     chunk_by_id: dict[str, dict[str, Any]],
+    score_stats: dict[str, dict[str, float]] | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """Build the metrics payload; `score_stats` adds per-query similarity spread.
+
+    `score_stats` is optional so existing callers keep working. A query without an
+    entry simply carries no similarity fields, rather than a fabricated zero. The
+    aggregate metrics never read it: adding statistics must not move hit@k, mrr,
+    recall or span coverage.
+    """
     total = len(plans)
     hits = {cutoff: 0 for cutoff in HIT_CUTOFFS}
     reciprocal_sum = 0.0
@@ -435,33 +494,36 @@ def build_metrics(
         span_recall = query_covered / len(plan.spans)
         span_recall_sum += span_recall
 
-        per_query.append(
+        row: dict[str, Any] = {
+            "query_id": plan.query_id,
+            "split": plan.split,
+            "query_type": plan.query["query_type"],
+            "video_id": plan.query["video_id"],
+            "gold_span_count": len(plan.spans),
+            "relevant_chunk_count": len(relevant),
+            "first_relevant_rank": first_rank,
+            "reciprocal_rank": serialize_score(reciprocal),
+            "recall@5": serialize_score(recall),
+            "span_recall@5": serialize_score(span_recall),
+            "covered_spans": query_covered,
+        }
+        stats = (score_stats or {}).get(plan.query_id)
+        if stats is not None:
+            for key in SCORE_STAT_KEYS:
+                row[key] = stats[key]
+        row["results"] = [
             {
-                "query_id": plan.query_id,
-                "split": plan.split,
-                "query_type": plan.query["query_type"],
-                "video_id": plan.query["video_id"],
-                "gold_span_count": len(plan.spans),
-                "relevant_chunk_count": len(relevant),
-                "first_relevant_rank": first_rank,
-                "reciprocal_rank": serialize_score(reciprocal),
-                "recall@5": serialize_score(recall),
-                "span_recall@5": serialize_score(span_recall),
-                "covered_spans": query_covered,
-                "results": [
-                    {
-                        "rank": position,
-                        "chunk_id": chunk_id,
-                        "video_id": chunk_by_id[chunk_id]["video_id"],
-                        "chunk_index": chunk_by_id[chunk_id]["chunk_index"],
-                        "chapter_title": chunk_by_id[chunk_id].get("chapter_title", ""),
-                        "score": serialize_score(score),
-                        "relevant": chunk_id in relevant,
-                    }
-                    for position, (chunk_id, score) in enumerate(ranked, start=1)
-                ],
+                "rank": position,
+                "chunk_id": chunk_id,
+                "video_id": chunk_by_id[chunk_id]["video_id"],
+                "chunk_index": chunk_by_id[chunk_id]["chunk_index"],
+                "chapter_title": chunk_by_id[chunk_id].get("chapter_title", ""),
+                "score": serialize_score(score),
+                "relevant": chunk_id in relevant,
             }
-        )
+            for position, (chunk_id, score) in enumerate(ranked, start=1)
+        ]
+        per_query.append(row)
 
     metrics = {
         **{
@@ -499,6 +561,36 @@ def _counts(values: Iterable[str]) -> dict[str, int]:
     for value in values:
         counted[value] = counted.get(value, 0) + 1
     return dict(sorted(counted.items()))
+
+
+def corpus_chunking(chunks: Sequence[dict[str, Any]]) -> dict[str, int] | None:
+    """The settings the corpus was chunked with, or None if no chunk records them.
+
+    Mixed settings are an error, not a warning: chunk length drives every number in
+    this report, so a corpus assembled from two chunker runs is not one corpus. A
+    corpus written before chunk records carried the settings is still evaluable and
+    reports null, which says "unknown" instead of inventing a value.
+    """
+    variants: dict[str, tuple[dict[str, int] | None, str]] = {}
+    for chunk in chunks:
+        settings = chunk.get("chunking")
+        if settings is None:
+            key = "unrecorded"
+            normalized = None
+        else:
+            normalized = {name: int(settings[name]) for name in CHUNKING_SETTING_KEYS}
+            key = json.dumps(normalized, sort_keys=True)
+        variants.setdefault(key, (normalized, str(chunk["chunk_id"])))
+    if len(variants) > 1:
+        listed = "; ".join(
+            f"{key} (e.g. {chunk_id})" for key, (_, chunk_id) in sorted(variants.items())
+        )
+        raise EvaluationError(
+            "the corpus mixes chunking settings, so its chunks come from more than one "
+            f"chunker run and cannot be compared as one corpus: {listed}. "
+            "Re-chunk the whole corpus with one setting before evaluating."
+        )
+    return next(iter(variants.values()))[0] if variants else None
 
 
 def corpus_fingerprint(chunks: Sequence[dict[str, Any]]) -> str:
@@ -802,6 +894,9 @@ def run_evaluation(
     corpus = eligible_chunks(chunks)
     if not corpus:
         raise EvaluationError("no embedding_eligible chunk in the corpus")
+    # Read here, not at payload time: a corpus mixing chunker runs must fail before
+    # the model is loaded, like every other corpus check in this function.
+    chunking = corpus_chunking(chunks)
     bounds = load_transcript_bounds(transcript_dir, (chunk["video_id"] for chunk in chunks))
     queries = load_queries(query_set)
     plans = build_query_plans(queries, chunks, bounds)
@@ -834,12 +929,16 @@ def run_evaluation(
         raise EvaluationError("encoder returned a different number of passage vectors")
 
     rankings: dict[str, list[tuple[str, float]]] = {}
+    score_stats: dict[str, dict[str, float]] = {}
     latencies: list[dict[str, Any]] = []
     for plan in selected:
         query_started = time.perf_counter()
         query_vector = encoder.encode([QUERY_PREFIX + str(plan.query["question"])])[0]
-        ranked = rank_chunks(query_vector, corpus_vectors, chunk_ids, settings.top_k)
+        # Statistics are taken from the full corpus scores, before the top-k cut.
+        scores = similarity_scores(query_vector, corpus_vectors)
+        ranked = rank_scores(scores, chunk_ids, settings.top_k)
         rankings[plan.query_id] = ranked
+        score_stats[plan.query_id] = score_statistics(scores)
         latencies.append(
             {
                 "query_id": plan.query_id,
@@ -848,7 +947,7 @@ def run_evaluation(
         )
 
     chunk_by_id = {chunk["chunk_id"]: chunk for chunk in corpus}
-    metrics, per_query = build_metrics(selected, rankings, chunk_by_id)
+    metrics, per_query = build_metrics(selected, rankings, chunk_by_id, score_stats)
 
     payload = {
         "schema_version": METRICS_SCHEMA_VERSION,
@@ -870,6 +969,7 @@ def run_evaluation(
             "videos": len({chunk["video_id"] for chunk in chunks}),
             "total_chunks": len(chunks),
             "eligible_chunks": len(corpus),
+            "chunking": chunking,
             "fingerprint": corpus_fingerprint(corpus),
         },
         "query_set": {

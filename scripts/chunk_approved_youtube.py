@@ -33,9 +33,18 @@ class ChunkingError(ValueError):
 
 @dataclass(frozen=True)
 class ChunkingConfig:
-    target_chars: int = 220
-    min_chars: int = 80
-    max_chars: int = 320
+    """Chunking settings. The defaults are the settings the corpus was adopted with.
+
+    Changing a default re-chunks the corpus on the next plain `python
+    chunk_approved_youtube.py` run: chunk_id hashes these values, so every id, the
+    corpus fingerprint and every committed metrics snapshot stop lining up. The
+    settings are written into each chunk record (see `build_chunks`) so a corpus
+    always says which run produced it.
+    """
+
+    target_chars: int = 420
+    min_chars: int = 150
+    max_chars: int = 480
     overlap_segments: int = 0
 
     def validate(self) -> None:
@@ -285,6 +294,9 @@ def build_chunks(segments: Sequence[dict[str, Any]], config: ChunkingConfig) -> 
             "source_segment_indices": source_segments,
             "source_cue_indices": source_cues,
             "char_count": len(text),
+            # Emitted only. `payload` above is the chunk_id hash input and must keep
+            # its exact keys and order; adding a field there would change every id.
+            "chunking": config.payload(),
         })
     return output
 
@@ -327,10 +339,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--metadata", type=Path, default=DEFAULT_METADATA)
     parser.add_argument("--transcript-dir", type=Path, default=DEFAULT_TRANSCRIPT_DIR)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
-    parser.add_argument("--target-chars", type=int, default=220)
-    parser.add_argument("--min-chars", type=int, default=80)
-    parser.add_argument("--max-chars", type=int, default=320)
-    parser.add_argument("--overlap-segments", type=int, default=0)
+    # Read off the dataclass so a CLI default can never drift from the adopted one.
+    defaults = ChunkingConfig()
+    parser.add_argument("--target-chars", type=int, default=defaults.target_chars)
+    parser.add_argument("--min-chars", type=int, default=defaults.min_chars)
+    parser.add_argument("--max-chars", type=int, default=defaults.max_chars)
+    parser.add_argument("--overlap-segments", type=int, default=defaults.overlap_segments)
     return parser
 
 
