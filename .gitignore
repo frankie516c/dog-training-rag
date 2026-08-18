@@ -41,3 +41,8 @@ __pycache__/
 .idea/
 Thumbs.db
 desktop.ini
+
+!data/eval/results/
+data/eval/results/*
+!data/eval/results/baseline_*
+!data/eval/results/exp_a*
