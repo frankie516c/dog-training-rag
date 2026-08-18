@@ -631,7 +631,7 @@ class DeterminismTests(unittest.TestCase):
         self.assertEqual("query: ", payload["run"]["query_prefix"])
         self.assertEqual("passage: ", payload["run"]["passage_prefix"])
         self.assertTrue(payload["corpus"]["fingerprint"].startswith("sha256:"))
-        self.assertTrue(payload["query_set"]["fingerprint"].startswith("sha256:"))
+        self.assertTrue(payload["query_set"]["content_fingerprint"].startswith("sha256:"))
 
     def test_dependency_versions_resolve_without_importing_a_model(self):
         versions = module.dependency_versions(("definitely-not-installed-pkg",))
@@ -652,6 +652,91 @@ class ReportTests(unittest.TestCase):
         self.assertIn("smoke benchmark", report)
         self.assertIn("일반적인 한국어 검색 성능을 증명하지 않는다", report)
         self.assertIn("test 결과를 보면서 threshold", report)
+
+
+class QuerySetFingerprintTests(unittest.TestCase):
+    """Provenance must identify the query set, not the checkout it came from."""
+
+    LF = "\n"
+    CRLF = "\r\n"
+
+    def _write(self, rows, newline, *, sort_keys=False):
+        """Write the same queries in a deliberately different byte layout."""
+        directory = Path(tempfile.mkdtemp(prefix="eval-fingerprint-"))
+        path = directory / "queries.jsonl"
+        with path.open("w", encoding="utf-8", newline="") as file:
+            for row in rows:
+                file.write(json.dumps(row, ensure_ascii=False, sort_keys=sort_keys))
+                file.write(newline)
+        return path
+
+    def test_crlf_and_lf_files_fingerprint_the_same(self):
+        """The bug this replaced: a Windows checkout hashed differently than Linux."""
+        lf = self._write(QUERIES, self.LF)
+        crlf = self._write(QUERIES, self.CRLF)
+        self.assertNotEqual(lf.read_bytes(), crlf.read_bytes())
+        self.assertEqual(
+            module.query_set_fingerprint(module.load_queries(lf)),
+            module.query_set_fingerprint(module.load_queries(crlf)),
+        )
+
+    def test_key_order_and_line_order_do_not_move_the_fingerprint(self):
+        plain = self._write(QUERIES, self.LF)
+        reordered = self._write(list(reversed(QUERIES)), self.LF, sort_keys=True)
+        self.assertNotEqual(plain.read_bytes(), reordered.read_bytes())
+        self.assertEqual(
+            module.query_set_fingerprint(module.load_queries(plain)),
+            module.query_set_fingerprint(module.load_queries(reordered)),
+        )
+
+    def test_an_edited_question_changes_the_fingerprint(self):
+        edited = [dict(QUERIES[0], question="다른 질문입니다"), *QUERIES[1:]]
+        self.assertNotEqual(
+            module.query_set_fingerprint(QUERIES),
+            module.query_set_fingerprint(edited),
+        )
+
+    def test_an_edited_span_changes_the_fingerprint(self):
+        moved = [dict(row) for row in QUERIES]
+        spans = [dict(span) for span in moved[0]["relevant_spans"]]
+        spans[0] = {**spans[0], "end_ms": spans[0]["end_ms"] + 1000}
+        moved[0]["relevant_spans"] = spans
+        self.assertNotEqual(
+            module.query_set_fingerprint(QUERIES),
+            module.query_set_fingerprint(moved),
+        )
+
+    def test_a_removed_query_changes_the_fingerprint(self):
+        self.assertNotEqual(
+            module.query_set_fingerprint(QUERIES),
+            module.query_set_fingerprint(QUERIES[:-1]),
+        )
+
+    def test_the_metrics_artifact_names_the_new_field_and_schema(self):
+        fixture = Fixture()
+        payload = fixture.evaluate()["payload"]
+        self.assertEqual("youtube-retrieval-metrics-v2", payload["schema_version"])
+        # The old byte-based key must be gone, so an old and a new snapshot cannot be
+        # compared field to field without noticing that the definition changed.
+        self.assertNotIn("fingerprint", payload["query_set"])
+        self.assertEqual(
+            module.query_set_fingerprint(module.load_queries(fixture.query_set)),
+            payload["query_set"]["content_fingerprint"],
+        )
+
+    def test_line_endings_do_not_reach_the_metrics_artifact(self):
+        """End to end: two checkouts of one query set produce identical metrics."""
+        lf, crlf = Fixture(), Fixture()
+        for fixture, newline in ((lf, self.LF), (crlf, self.CRLF)):
+            rows = module.load_queries(fixture.query_set)
+            with fixture.query_set.open("w", encoding="utf-8", newline="") as file:
+                for row in rows:
+                    file.write(json.dumps(row, ensure_ascii=False) + newline)
+        self.assertNotEqual(lf.query_set.read_bytes(), crlf.query_set.read_bytes())
+        self.assertEqual(
+            lf.evaluate()["metrics_path"].read_bytes(),
+            crlf.evaluate()["metrics_path"].read_bytes(),
+        )
 
 
 class ChunkingSettingsTests(unittest.TestCase):

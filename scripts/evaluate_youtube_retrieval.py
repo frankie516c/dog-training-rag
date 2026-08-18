@@ -22,7 +22,9 @@ DEFAULT_REVIEW_PATH = Path("data/eval/review/retrieval_query_review.md")
 DEFAULT_RESULT_DIR = Path("data/eval/results")
 
 QUERY_SCHEMA_VERSION = "youtube-eval-query-v1"
-METRICS_SCHEMA_VERSION = "youtube-retrieval-metrics-v1"
+# v2 renamed query_set.fingerprint to query_set.content_fingerprint and changed how
+# it is computed. Every other field kept its meaning, so v1 snapshots stay readable.
+METRICS_SCHEMA_VERSION = "youtube-retrieval-metrics-v2"
 
 # This MVP is written against the multilingual-e5 prefix contract only.
 # A bge-m3 adapter is a follow-up change, not an accepted --model-name value.
@@ -643,8 +645,29 @@ def corpus_fingerprint(chunks: Sequence[dict[str, Any]]) -> str:
     return "sha256:" + digest.hexdigest()
 
 
-def file_fingerprint(path: Path) -> str:
-    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+def query_set_fingerprint(queries: Sequence[dict[str, Any]]) -> str:
+    """Hash what the query set says, not the bytes of the file that holds it.
+
+    The previous version hashed the file directly, which made the value depend on
+    the checkout rather than on the content: with core.autocrlf a Windows working
+    copy stores CRLF, so the same query set fingerprinted differently on Windows
+    than on Linux. Line endings are environment, exactly like a run location or a
+    temp directory, and provenance in this artifact is content addressed.
+
+    Canonical form: every query serialized with sorted keys and fixed separators,
+    the queries ordered by query_id. Line endings, key order, indentation and the
+    order of the lines in the file therefore cannot move the value, while any edit
+    to a question, a span or a review field does.
+
+    Span order inside relevant_spans is kept as written: it is array content, and
+    reordering it is an edit to the file like any other.
+    """
+    digest = hashlib.sha256()
+    for query in sorted(queries, key=lambda row: str(row["query_id"])):
+        canonical = json.dumps(query, ensure_ascii=False, separators=(",", ":"), sort_keys=True)
+        digest.update(canonical.encode("utf-8"))
+        digest.update(b"\x00")
+    return "sha256:" + digest.hexdigest()
 
 
 def write_text(content: str, path: Path) -> None:
@@ -1008,7 +1031,11 @@ def run_evaluation(
             "fingerprint": corpus_fingerprint(corpus),
         },
         "query_set": {
-            "fingerprint": file_fingerprint(query_set),
+            # Named apart from corpus.fingerprint on purpose: that one has always
+            # hashed content, this one used to hash the file. A snapshot carrying
+            # the old `fingerprint` key was produced by the byte-based version and
+            # its value is not comparable with this one.
+            "content_fingerprint": query_set_fingerprint(queries),
             "total_queries": len(plans),
             "approved_queries": len(approved),
             "evaluated_queries": len(selected),
