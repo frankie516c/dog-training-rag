@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import os
+import statistics
 import tempfile
 import time
 from dataclasses import dataclass
@@ -42,7 +43,14 @@ REVIEW_SAMPLE_CHARS = 120
 
 # Similarity spread recorded per query for threshold research. Observation only:
 # nothing in this script rejects a query on these numbers yet.
-SCORE_STAT_KEYS = ("top1_score", "corpus_mean_score", "score_gap")
+SCORE_STAT_KEYS = (
+    "top1_score",
+    "corpus_mean_score",
+    "score_gap",
+    "top1_minus_top2",
+    "top1_minus_top5",
+    "top5_std",
+)
 
 # Chunking settings each chunk record carries, written by scripts/chunk_approved_youtube.py.
 # A corpus built before that field existed has none; such a corpus is still evaluable and
@@ -418,22 +426,49 @@ def rank_chunks(
     return rank_scores(similarity_scores(query_vector, corpus_vectors), chunk_ids, top_k)
 
 
-def score_statistics(scores: Sequence[float]) -> dict[str, float]:
-    """Similarity spread over the whole corpus, measured before the top-k cutoff.
+def score_statistics(scores: Sequence[float]) -> dict[str, float | None]:
+    """Similarity spread for one query, measured on the full corpus before the cutoff.
 
-    Observation only: no threshold is applied here. The absolute top1 score moves
-    with the question, so `score_gap` (top1 minus the corpus mean) is recorded as
-    the steadier signal. The gap is computed on raw scores and serialized once, so
-    it can differ from `top1_score - corpus_mean_score` in the last decimal.
+    Observation only: no threshold is applied here. Two shapes are recorded because
+    they disagree about what a confident hit looks like.
+
+    `score_gap` measures top1 against the corpus mean. On 63 queries it separated
+    in-corpus from out-of-corpus questions poorly: the two groups overlap heavily,
+    because the mean is dominated by the many obviously-unrelated chunks and barely
+    moves with the question.
+
+    The margins measure top1 against its own rivals instead. If the corpus answers
+    the question, rank 1 should stand clear of ranks 2..5; if it does not, the top of
+    the ranking is a group of equally mediocre neighbours and every margin collapses.
+    `top5_std` is the same idea without singling out rank 1.
+
+    Margins are taken over the fixed top RANK_CUTOFF, not over --top-k, so a run with
+    a wider top-k stays comparable with one at the default. A corpus too small to fill
+    that many ranks reports null for the affected field rather than a value computed
+    over a shorter list under a name that says five.
     """
     if not scores:
         raise EvaluationError("cannot summarize similarity over an empty corpus")
-    top1 = max(scores)
+    ordered = sorted(scores, reverse=True)
+    top1 = ordered[0]
     mean = sum(scores) / len(scores)
+    top_ranks = ordered[:RANK_CUTOFF]
+
+    def margin(rank: int) -> float | None:
+        """top1 minus the score at `rank`, or None if the corpus has no such rank."""
+        return serialize_score(top1 - ordered[rank - 1]) if len(ordered) >= rank else None
+
     return {
         "top1_score": serialize_score(top1),
         "corpus_mean_score": serialize_score(mean),
         "score_gap": serialize_score(top1 - mean),
+        "top1_minus_top2": margin(2),
+        "top1_minus_top5": margin(RANK_CUTOFF),
+        # Population std: these five scores are the whole set being described, not a
+        # sample drawn from a larger one.
+        "top5_std": (
+            serialize_score(statistics.pstdev(top_ranks)) if len(top_ranks) >= RANK_CUTOFF else None
+        ),
     }
 
 

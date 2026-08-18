@@ -780,6 +780,52 @@ class SimilarityStatisticsTests(unittest.TestCase):
         self.assertEqual(0.03, flat["score_gap"])
         self.assertGreater(peaked["score_gap"], flat["score_gap"])
 
+    def test_rank_margins_are_recorded_next_to_the_corpus_mean_gap(self):
+        row = self._row(self.PEAKED)
+        # scores 0.9, 0.2, 0.15, 0.1, 0.05 | 0.05, 0.05
+        self.assertEqual(0.7, row["top1_minus_top2"])
+        self.assertEqual(0.85, row["top1_minus_top5"])
+        self.assertEqual(0.314006, row["top5_std"])
+
+    def test_a_flat_top_of_the_ranking_collapses_every_margin(self):
+        """The hypothesis under test: no answer in the corpus means no clear rank 1."""
+        peaked, flat = self._row(self.PEAKED), self._row(self.FLAT)
+        self.assertEqual(0.01, flat["top1_minus_top2"])
+        self.assertEqual(0.04, flat["top1_minus_top5"])
+        self.assertEqual(0.014142, flat["top5_std"])
+        for key in ("top1_minus_top2", "top1_minus_top5", "top5_std"):
+            self.assertGreater(peaked[key], flat[key], key)
+        # top1 alone does not separate them: 0.84 is a high-looking score either way.
+        self.assertGreater(flat["top1_score"], 0.8)
+
+    def test_margins_use_the_fixed_cutoff_not_the_requested_top_k(self):
+        """A wider --top-k must not redefine what "top5" means, or runs stop comparing."""
+        fixture = Fixture(queries=[QUERIES[0]])
+        wide = fixture.evaluate(encoder=ScriptedEncoder(weights=self.PEAKED), top_k=7)["payload"]
+        narrow = self._row(self.PEAKED)
+        row = wide["per_query"][0]
+        self.assertEqual(7, len(row["results"]))
+        for key in module.SCORE_STAT_KEYS:
+            self.assertEqual(narrow[key], row[key], key)
+
+    def test_margins_are_measured_on_scores_not_on_tie_break_order(self):
+        """Ties make rank order arbitrary; equal scores must still give a zero margin."""
+        row = self._row({"산책 인사법은?": [0.5] * 7})
+        self.assertEqual(0.0, row["top1_minus_top2"])
+        self.assertEqual(0.0, row["top1_minus_top5"])
+        self.assertEqual(0.0, row["top5_std"])
+        self.assertEqual(0.0, row["score_gap"])
+
+    def test_a_corpus_shorter_than_the_cutoff_reports_null_margins(self):
+        """Report "undefined" rather than a top5 figure computed over three scores."""
+        stats = module.score_statistics([0.9, 0.4, 0.1])
+        self.assertEqual(0.5, stats["top1_minus_top2"])
+        self.assertIsNone(stats["top1_minus_top5"])
+        self.assertIsNone(stats["top5_std"])
+        single = module.score_statistics([0.9])
+        self.assertIsNone(single["top1_minus_top2"])
+        self.assertEqual(0.9, single["top1_score"])
+
     def test_build_metrics_runs_without_the_statistics_argument(self):
         plans, rankings, chunk_by_id, _ = self._inputs()
         metrics, per_query = module.build_metrics(plans, rankings, chunk_by_id)
