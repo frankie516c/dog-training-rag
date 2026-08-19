@@ -36,8 +36,11 @@ DEFAULT_DOC_CHUNKS = Path("data/processed/documents/chunks")
 DEFAULT_OUT_DIR = Path("data/graph")
 PROMPT_DRAFT = Path("prompts/entity_extraction_draft.md")
 
-PROMPT_VERSION = "extraction-prompt-v1"
-TEMPERATURE = 0.0
+PROMPT_VERSION = "extraction-prompt-v2"
+# v2 sends no temperature at all. The parameter is not set to None and not sent as
+# null; it is absent from the request, and the run log says "not_sent" rather than
+# claiming a value the API never saw.
+REASONING_EFFORT = "low"
 MAX_RETRIES = 1  # one retry on unparseable output, then quarantine
 
 # Pinned, not an alias. A name like "*-latest" would silently point somewhere else
@@ -119,6 +122,9 @@ RULES = """## 노드 타입 (이 8개만 사용)
 3. confidence는 high / medium / low. 확신이 없으면 추출하지 않는 것이 원칙이므로
    low는 "추출은 하되 사람이 봐야 함"이라는 뜻으로만 씁니다.
 4. 추출할 것이 없으면 빈 배열을 반환합니다. 채우려고 만들지 마세요.
+5. 훈련 절차·방법을 독립적으로 다루는 문서가 아닌 이상, 범용 격려·태도 발화에서
+   훈련법 엔티티를 추출하지 마세요. 예: '삐지면 안돼요', '다시 하면 돼요'는 훈련법이
+   아닙니다.
 
 ## 출력 형식
 {"entities": [{"name": "", "type": "", "normalized_from": null, "evidence": "", "confidence": ""}],
@@ -179,7 +185,7 @@ class ExtractionError(RuntimeError):
 @dataclass(frozen=True)
 class ClientInfo:
     model: str
-    temperature: float = TEMPERATURE
+    reasoning_effort: str = REASONING_EFFORT
 
 
 class ExtractionClient(Protocol):
@@ -389,7 +395,8 @@ def extract_one(
             "stage1_reason": chunk.get("stage1_reason"),
             "model_version": client.info.model,
             "prompt_version": PROMPT_VERSION,
-            "temperature": client.info.temperature,
+            "reasoning_effort": client.info.reasoning_effort,
+            "temperature": "not_sent",
             "attempts": attempt + 1,
             "entities": payload["entities"],
             "relations": payload["relations"],
@@ -428,8 +435,8 @@ def run(
     log = {
         "model_version": client.info.model,
         "prompt_version": PROMPT_VERSION,
-        "temperature": client.info.temperature,
-        "temperature_requested": TEMPERATURE,
+        "reasoning_effort": client.info.reasoning_effort,
+        "temperature": "not_sent",
         "api_surface": getattr(client, "surface", None),
         "structured_outputs": "json_schema strict",
         "provider_switch_note": PROVIDER_SWITCH_NOTE,
@@ -470,9 +477,9 @@ def load_openai_client(model: str, env_path: Path = Path(".env")) -> ExtractionC
         raise ExtractionError("openai is required (`uv add openai`)") from exc
 
     sdk = OpenAI(api_key=key)
-    state = {"surface": None, "temperature": TEMPERATURE}
+    state = {"surface": None}
 
-    def _responses_call(system: str, prompt: str, temperature: float | None):
+    def _responses_call(system: str, prompt: str):
         kwargs: dict[str, Any] = {
             "model": model,
             "instructions": system,
@@ -485,9 +492,8 @@ def load_openai_client(model: str, env_path: Path = Path(".env")) -> ExtractionC
                     "schema": EXTRACTION_SCHEMA,
                 }
             },
+            "reasoning": {"effort": REASONING_EFFORT},
         }
-        if temperature is not None:
-            kwargs["temperature"] = temperature
         response = sdk.responses.create(**kwargs)
         usage = getattr(response, "usage", None)
         return (getattr(response, "output_text", "") or ""), {
@@ -495,7 +501,7 @@ def load_openai_client(model: str, env_path: Path = Path(".env")) -> ExtractionC
             "output_tokens": getattr(usage, "output_tokens", 0) or 0,
         }
 
-    def _chat_call(system: str, prompt: str, temperature: float | None):
+    def _chat_call(system: str, prompt: str):
         kwargs: dict[str, Any] = {
             "model": model,
             "messages": [
@@ -510,9 +516,8 @@ def load_openai_client(model: str, env_path: Path = Path(".env")) -> ExtractionC
                     "schema": EXTRACTION_SCHEMA,
                 },
             },
+            "reasoning_effort": REASONING_EFFORT,
         }
-        if temperature is not None:
-            kwargs["temperature"] = temperature
         response = sdk.chat.completions.create(**kwargs)
         usage = getattr(response, "usage", None)
         return (response.choices[0].message.content or ""), {
@@ -523,7 +528,7 @@ def load_openai_client(model: str, env_path: Path = Path(".env")) -> ExtractionC
     class OpenAIClient:
         @property
         def info(self) -> ClientInfo:
-            return ClientInfo(model=model, temperature=state["temperature"])
+            return ClientInfo(model=model)
 
         @property
         def surface(self) -> str | None:
@@ -539,21 +544,13 @@ def load_openai_client(model: str, env_path: Path = Path(".env")) -> ExtractionC
                     if state["surface"] not in (None, name):
                         continue
                     try:
-                        out = call(system, prompt, state["temperature"])
+                        out = call(system, prompt)
                     except Exception as exc:
                         text = str(exc)
-                        # Some models accept only their default sampling setting. Drop
-                        # the parameter once, record that it was dropped, and never
-                        # pretend the run was at temperature 0 afterwards.
-                        if "temperature" in text and state["temperature"] is not None:
-                            state["temperature"] = None
-                            try:
-                                out = call(system, prompt, None)
-                            except Exception as inner:
-                                last = inner
-                                continue
-                            state["surface"] = name
-                            return out
+                        # No silent parameter drop here. If the model rejects
+                        # reasoning_effort the run fails loudly, because a record
+                        # labelled "low" that was produced without it is worse than
+                        # no record.
                         if any(code in text for code in RETRY_STATUS):
                             last = exc
                             break  # transient: back off, then retry the same surface
@@ -605,7 +602,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0
         client = load_openai_client(args.model, args.env)
         print(f"stage {args.stage}: 청크 {len(chunks)}개 / model {args.model} / "
-              f"temperature {TEMPERATURE} / {PROMPT_VERSION}")
+              f"reasoning_effort {REASONING_EFFORT} / {PROMPT_VERSION}")
         tag = f"stage{args.stage}{args.suffix}"
         result = run(
             chunks, client,
