@@ -54,7 +54,11 @@ COVERAGE_VALUES = ("answerable", "partial", "missing")
 SCENARIO_1_IDS = ("Q01", "Q04", "Q05")
 Q06_ID = "Q06"
 EXPECTED_REFUSE_IDS = ("Q17", "Q18", "Q19")
-MISSING_DATA_IDS = ("Q03", "Q16", "Q20")
+# The three questions written as known gaps before anyone judged coverage. Section ④
+# still reports on them by name, but the missing_data population is read from the
+# query set rather than from this tuple: coverage review moved ten more questions
+# into it, and a hardcoded list would quietly under-report that.
+ORIGINAL_MISSING_DATA_IDS = ("Q03", "Q16", "Q20")
 
 # Section ② asks whether both halves of the two-hop question show up in the same
 # top-5. Presence is decided by surface keywords, so it is reported as "these words
@@ -237,6 +241,7 @@ def retrieve(
                 "refuse_reason": fixture.get("refuse_reason"),
                 "reason": fixture.get("reason"),
                 "coverage": fixture.get("coverage"),
+                "note": fixture.get("note"),
                 "score_stats": stats,
                 "score_gap": stats["score_gap"],
                 "gate_verdict": verdict,
@@ -298,8 +303,7 @@ def build_report(
     lines.append(
         "견주 실사용 질문 20개를 기존 dense 파이프라인에 그대로 통과시킨 결과입니다. "
         "**gold 청크 라벨이 없는 질문셋이므로 Hit@k·MRR·Recall은 계산하지 않았습니다.** "
-        "이 리포트는 사람이 커버리지를 판정하기 위한 검색 결과 덤프이며, "
-        "각 질문의 `coverage: [ ]` 칸은 비워둔 채로 사람이 채웁니다."
+        "이 리포트는 사람이 커버리지를 판정하기 위한 검색 결과 덤프입니다."
     )
     lines.append("")
     lines.append("| 실행 설정 | 값 |")
@@ -317,6 +321,12 @@ def build_report(
     lines.append(
         "`일치` 열은 fixture의 `expected_outcome`과 gate 판정이 같은 방향인지만 봅니다. "
         "gate가 틀렸다는 뜻도, 기대가 틀렸다는 뜻도 아니고 둘이 갈렸다는 표시입니다."
+    )
+    lines.append("")
+    lines.append(
+        f"> **이 파일은 `scripts/{Path(__file__).name}`이 생성합니다. 직접 편집하지 마세요.** "
+        f"coverage를 비롯한 사람 판정은 `{query_set.as_posix()}`에만 기록하고 이 리포트를 "
+        "다시 생성하면 반영됩니다. 리포트를 수기로 고치면 다음 실행에서 지워집니다."
     )
     lines.append("")
     lines.append("## 질문별 결과")
@@ -358,7 +368,14 @@ def build_report(
         )
         lines.append(f"- gate 판정: **{record['gate_verdict']}**")
         lines.append(f"- expected_outcome({record['expected_outcome']}) 일치 여부: {mark}")
-        lines.append("- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다")
+        if record["coverage"] is None:
+            lines.append(
+                "- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 "
+                f"`{DEFAULT_QUERIES.as_posix()}`의 coverage 필드에 채웁니다"
+            )
+        else:
+            suffix = f" ({record['note']})" if record["note"] else ""
+            lines.append(f"- coverage: **{record['coverage']}**{suffix}")
 
     lines.append("")
     lines.append("## 요약")
@@ -500,34 +517,40 @@ def _summary_lines(
             "score_gap 하나로는 걸러지지 않는다는 뜻입니다."
         )
 
-    # ④ missing_data 3건이 gate 아래인지
+    # ④ missing_data 전체가 gate 아래인지
+    flagged = [record for record in records if record["missing_data"]]
     lines.append("")
-    lines.append("### ④ missing_data:true 3건(Q03·Q16·Q20)이 gate 아래인지")
+    lines.append(
+        f"### ④ missing_data:true {len(flagged)}건이 gate 아래인지 "
+        f"(최초 지정 3건: {'·'.join(ORIGINAL_MISSING_DATA_IDS)})"
+    )
     lines.append("")
-    lines.append("| id | score_gap | 임계값 대비 | gate | 기대와 일치 |")
-    lines.append("|---|---|---|---|---|")
-    for query_id in MISSING_DATA_IDS:
-        record = index.get(query_id)
-        if record is None:
-            lines.append(f"| {query_id} | - | - | (질문셋에 없음) | - |")
-            continue
+    lines.append("| id | 최초 지정 | score_gap | 임계값 대비 | gate | 기대와 일치 |")
+    lines.append("|---|---|---|---|---|---|")
+    for record in flagged:
         delta = record["score_gap"] - GATE_THRESHOLD
+        origin = "○" if record["query_id"] in ORIGINAL_MISSING_DATA_IDS else "커버리지 판정 후 추가"
         lines.append(
-            f"| {query_id} | {record['score_gap']:.4f} | {delta:+.4f} | "
+            f"| {record['query_id']} | {origin} | {record['score_gap']:.4f} | {delta:+.4f} | "
             f"{record['gate_verdict']} | {'✓' if record['gate_matches_expected'] else '✗'} |"
         )
     lines.append("")
-    below = [q for q in MISSING_DATA_IDS if index.get(q, {}).get("gate_verdict") == GATE_REFUSE]
+    below = [r["query_id"] for r in flagged if r["gate_verdict"] == GATE_REFUSE]
+    above = [r["query_id"] for r in flagged if r["gate_verdict"] == GATE_PASS]
+    lines.append(f"- {len(below)}/{len(flagged)}건이 임계값 아래입니다.")
+    original = [r for r in flagged if r["query_id"] in ORIGINAL_MISSING_DATA_IDS]
+    original_below = [r["query_id"] for r in original if r["gate_verdict"] == GATE_REFUSE]
     lines.append(
-        f"- {len(below)}/{len(MISSING_DATA_IDS)}건이 임계값 아래입니다"
-        f"{': ' + ', '.join(below) if below else ''}."
+        f"- 최초 지정 3건만 보면 {len(original_below)}/{len(original)}건이 아래입니다"
+        f"{': ' + ', '.join(original_below) if original_below else ''}."
     )
-    above = [q for q in MISSING_DATA_IDS if index.get(q, {}).get("gate_verdict") == GATE_PASS]
     if above:
         lines.append(
-            f"- {', '.join(above)}는 코퍼스에 답이 없다고 표시된 질문인데도 gate를 통과했습니다. "
+            f"- {', '.join(above)}는 코퍼스에 답이 없다고 판정된 질문인데도 gate를 통과했습니다. "
             "gate가 통과시킨 top-1이 무엇인지는 위 질문별 블록에서 확인하세요."
         )
+
+    lines.extend(_human_verdict_lines(records))
 
     # 전체 일치율
     agreed = [record for record in records if record["gate_matches_expected"]]
@@ -540,10 +563,86 @@ def _summary_lines(
     disagreed = [record["query_id"] for record in records if not record["gate_matches_expected"]]
     if disagreed:
         lines.append(f"- 갈린 질문: {', '.join(disagreed)}")
+    return lines
+
+
+def _human_verdict_lines(records: Sequence[dict[str, Any]]) -> list[str]:
+    """The coverage verdicts a person wrote, read back from the query set.
+
+    Rendered from the same JSONL the labels live in, so this section cannot drift
+    from the fixtures the way a hand-written appendix would.
+    """
+    lines: list[str] = ["", "### ⑤ 사람 커버리지 판정 결과", ""]
+    judged = [record for record in records if record["coverage"] is not None]
+    if not judged:
+        lines.append(
+            "- 아직 아무도 채우지 않았습니다. 위 질문별 블록의 `coverage: [ ]`를 보고 "
+            f"`{DEFAULT_QUERIES.as_posix()}`의 coverage 필드에 기록하세요."
+        )
+        return lines
+
+    lines.append(f"판정 완료 {len(judged)}/{len(records)}건. 값은 질문셋에서 읽어온 것입니다.")
+    lines.append("")
+    lines.append("| coverage | 건수 | 질문 |")
+    lines.append("|---|---|---|")
+    for value in COVERAGE_VALUES:
+        group = [record["query_id"] for record in judged if record["coverage"] == value]
+        if group:
+            lines.append(f"| {value} | {len(group)} | {', '.join(group)} |")
+    provisional = [record for record in judged if record["note"]]
+    if provisional:
+        lines.append("")
+        lines.append(
+            "- 잠정 판정: "
+            + ", ".join(f"{r['query_id']}({r['coverage']})" for r in provisional)
+            + " — 원영상 확인 후 확정합니다."
+        )
+
+    # The disagreement that matters is not how many, but which direction.
+    false_pass = [
+        record
+        for record in judged
+        if record["gate_verdict"] == GATE_PASS and record["expected_outcome"] == "REFUSE"
+    ]
+    false_refuse = [
+        record
+        for record in judged
+        if record["gate_verdict"] == GATE_REFUSE and record["expected_outcome"] == "ANSWER"
+    ]
+    lines.append("")
+    lines.append("| 갈린 방향 | 건수 | 질문 |")
+    lines.append("|---|---|---|")
     lines.append(
-        "- coverage 판정(answerable/partial/missing)은 아직 비어 있습니다. "
-        "사람이 채운 뒤 질문셋의 `coverage` 필드에 반영합니다."
+        f"| gate PASS · 기대 REFUSE (통과시키면 안 될 것을 통과) | {len(false_pass)} | "
+        f"{', '.join(r['query_id'] for r in false_pass) or '-'} |"
     )
+    lines.append(
+        f"| gate REFUSE · 기대 ANSWER (답할 수 있는 것을 막음) | {len(false_refuse)} | "
+        f"{', '.join(r['query_id'] for r in false_refuse) or '-'} |"
+    )
+    lines.append("")
+    if false_pass and not false_refuse:
+        gaps = ", ".join(f"{r['query_id']} {r['score_gap']:.4f}" for r in false_pass)
+        lines.append(
+            f"- 갈린 {len(false_pass)}건이 **전부 한 방향**입니다. score_gap이 임계값을 넘겼지만 "
+            "사람이 보기에 코퍼스에 답이 없는 질문들이고, 반대 방향(답할 수 있는데 막힌 경우)은 "
+            "0건입니다. gate가 지나치게 엄격한 것이 아니라 지나치게 관대하다는 뜻입니다."
+        )
+        lines.append(f"- 해당 질문의 score_gap: {gaps}")
+        medical_scope = [r["query_id"] for r in false_pass if r["refuse_reason"] != "GAP"]
+        if medical_scope:
+            lines.append(
+                f"- 이 중 {', '.join(medical_scope)}는 refuse_reason이 GAP이 아닙니다. "
+                "유사도를 아무리 조정해도 이 축은 gate로 잡히지 않으며, "
+                "`guardrail/seed_lexicon.json` 쪽에서 걸러야 합니다."
+            )
+    elif false_pass or false_refuse:
+        lines.append(
+            f"- 양방향으로 갈렸습니다: 통과시키면 안 될 것 {len(false_pass)}건, "
+            f"막지 말아야 할 것 {len(false_refuse)}건."
+        )
+    else:
+        lines.append("- gate 판정과 사람 판정이 모든 질문에서 같은 방향입니다.")
     return lines
 
 

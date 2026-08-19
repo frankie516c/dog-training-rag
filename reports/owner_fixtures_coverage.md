@@ -1,6 +1,6 @@
 # 견주 픽스처 커버리지 리포트
 
-견주 실사용 질문 20개를 기존 dense 파이프라인에 그대로 통과시킨 결과입니다. **gold 청크 라벨이 없는 질문셋이므로 Hit@k·MRR·Recall은 계산하지 않았습니다.** 이 리포트는 사람이 커버리지를 판정하기 위한 검색 결과 덤프이며, 각 질문의 `coverage: [ ]` 칸은 비워둔 채로 사람이 채웁니다.
+견주 실사용 질문 20개를 기존 dense 파이프라인에 그대로 통과시킨 결과입니다. **gold 청크 라벨이 없는 질문셋이므로 Hit@k·MRR·Recall은 계산하지 않았습니다.** 이 리포트는 사람이 커버리지를 판정하기 위한 검색 결과 덤프입니다.
 
 | 실행 설정 | 값 |
 |---|---|
@@ -13,13 +13,15 @@
 
 `일치` 열은 fixture의 `expected_outcome`과 gate 판정이 같은 방향인지만 봅니다. gate가 틀렸다는 뜻도, 기대가 틀렸다는 뜻도 아니고 둘이 갈렸다는 표시입니다.
 
+> **이 파일은 `scripts/run_owner_fixture_coverage.py`이 생성합니다. 직접 편집하지 마세요.** coverage를 비롯한 사람 판정은 `data/eval/queries/owner_fixtures.jsonl`에만 기록하고 이 리포트를 다시 생성하면 반영됩니다. 리포트를 수기로 고치면 다음 실행에서 지워집니다.
+
 ## 질문별 결과
 
 ### Q01
 
 > 4개월 아기 강아지 하우스 훈련(켄넬 적응) 처음 시작할 때 단계별 순서가 어떻게 되나요?
 
-- 라벨: hop=single · router=VECTOR · expected=ANSWER · guard=NONE · missing_data=false · 시나리오①
+- 라벨: hop=single · router=VECTOR · expected=REFUSE · guard=NONE · missing_data=true · refuse_reason=GAP
 - 픽스처 메모: 켄넬 적응 단일 절차 질문
 
 | 순위 | chunk_id | score | 본문 앞 150자 |
@@ -30,14 +32,14 @@
 
 - score_gap: **0.0251** (top1 0.8465 − 평균 0.8213)
 - gate 판정: **PASS**
-- expected_outcome(ANSWER) 일치 여부: ✓
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- expected_outcome(REFUSE) 일치 여부: ✗
+- coverage: **missing**
 
 ### Q02
 
 > 손 내밀면 발 올려놓는 개인기 훈련 가르치는 유용한 팁 알려주세요.
 
-- 라벨: hop=single · router=VECTOR · expected=ANSWER · guard=NONE · missing_data=false
+- 라벨: hop=single · router=VECTOR · expected=REFUSE · guard=NONE · missing_data=true · refuse_reason=GAP
 - 픽스처 메모: 단일 행동 명령어 매칭
 
 | 순위 | chunk_id | score | 본문 앞 150자 |
@@ -48,8 +50,8 @@
 
 - score_gap: **0.0281** (top1 0.8608 − 평균 0.8328)
 - gate 판정: **PASS**
-- expected_outcome(ANSWER) 일치 여부: ✓
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- expected_outcome(REFUSE) 일치 여부: ✗
+- coverage: **missing** (provisional: 원영상 확인 후 확정)
 
 ### Q03
 
@@ -67,13 +69,13 @@
 - score_gap: **0.0215** (top1 0.8188 − 평균 0.7974)
 - gate 판정: **REFUSE**
 - expected_outcome(REFUSE) 일치 여부: ✓
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- coverage: **missing**
 
 ### Q04
 
 > 클리커 훈련할 때 클리커 소리를 낸 다음 몇 초 안에 보상을 줘야 효과적인가요?
 
-- 라벨: hop=single · router=VECTOR · expected=ANSWER · guard=NONE · missing_data=false
+- 라벨: hop=single · router=VECTOR · expected=REFUSE · guard=NONE · missing_data=true · refuse_reason=GAP
 - 픽스처 메모: 타이밍 및 보상 원칙 단질문
 
 | 순위 | chunk_id | score | 본문 앞 150자 |
@@ -84,8 +86,8 @@
 
 - score_gap: **0.0355** (top1 0.8514 − 평균 0.8159)
 - gate 판정: **PASS**
-- expected_outcome(ANSWER) 일치 여부: ✓
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- expected_outcome(REFUSE) 일치 여부: ✗
+- coverage: **missing**
 
 ### Q05
 
@@ -103,13 +105,13 @@
 - score_gap: **0.0274** (top1 0.8421 − 평균 0.8147)
 - gate 판정: **PASS**
 - expected_outcome(ANSWER) 일치 여부: ✓
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- coverage: **partial**
 
 ### Q06
 
 > 3살 푸들 분리불안이 심해서 켄넬 훈련을 시키려는데, 무턱대고 문을 닫으면 안 되는 금기 조건이나 주의할 점이 있나요?
 
-- 라벨: hop=multi · router=GRAPH · expected=ANSWER · guard=NONE · missing_data=false · 시나리오②
+- 라벨: hop=multi · router=GRAPH · expected=REFUSE · guard=NONE · missing_data=true · refuse_reason=GAP · 시나리오②
 - 픽스처 메모: [분리불안]→[켄넬 훈련]→[금기 조건] 2홉 추론
 
 | 순위 | chunk_id | score | 본문 앞 150자 |
@@ -120,14 +122,14 @@
 
 - score_gap: **0.0186** (top1 0.8550 − 평균 0.8364)
 - gate 판정: **REFUSE**
-- expected_outcome(ANSWER) 일치 여부: ✗
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- expected_outcome(REFUSE) 일치 여부: ✓
+- coverage: **missing**
 
 ### Q07
 
 > 산책 시 외부 사람을 보고 짖는 행동이 심한데, 경계성 짖음과 요구성 짖음에 따라 교정 방법이 어떻게 달라지나요?
 
-- 라벨: hop=multi · router=GRAPH · expected=ANSWER · guard=NONE · missing_data=false
+- 라벨: hop=multi · router=GRAPH · expected=REFUSE · guard=NONE · missing_data=true · refuse_reason=GAP
 - 픽스처 메모: 짖음 원인 분류 노드 거쳐 훈련법 분기
 
 | 순위 | chunk_id | score | 본문 앞 150자 |
@@ -138,14 +140,14 @@
 
 - score_gap: **0.0178** (top1 0.8280 − 평균 0.8102)
 - gate 판정: **REFUSE**
-- expected_outcome(ANSWER) 일치 여부: ✗
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- expected_outcome(REFUSE) 일치 여부: ✓
+- coverage: **missing**
 
 ### Q08
 
 > 다견가정에서 한 마리가 다른 마리의 밥을 빼앗아 먹으며 공격성을 보일 때, 자원방어 예방과 공간 분리를 병행하는 순서가 궁금합니다.
 
-- 라벨: hop=multi · router=GRAPH · expected=ANSWER · guard=NONE · missing_data=false
+- 라벨: hop=multi · router=GRAPH · expected=REFUSE · guard=NONE · missing_data=true · refuse_reason=GAP
 - 픽스처 메모: 자원방어 공격성 + 다견가정 제약 교차
 
 | 순위 | chunk_id | score | 본문 앞 150자 |
@@ -156,8 +158,8 @@
 
 - score_gap: **0.0218** (top1 0.8474 − 평균 0.8256)
 - gate 판정: **REFUSE**
-- expected_outcome(ANSWER) 일치 여부: ✗
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- expected_outcome(REFUSE) 일치 여부: ✓
+- coverage: **missing**
 
 ### Q09
 
@@ -175,13 +177,13 @@
 - score_gap: **0.0243** (top1 0.8367 − 평균 0.8125)
 - gate 판정: **PASS**
 - expected_outcome(ANSWER) 일치 여부: ✓
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- coverage: **partial** (provisional: 원영상 확인 후 확정)
 
 ### Q10
 
 > 외부 소음에 민감해 하울링을 하는 강아지에게 둔감화 훈련을 할 때, 상황을 오히려 악화시키는 잘못된 대처 방식은 무엇인가요?
 
-- 라벨: hop=multi · router=GRAPH · expected=ANSWER · guard=NONE · missing_data=false
+- 라벨: hop=multi · router=GRAPH · expected=REFUSE · guard=NONE · missing_data=true · refuse_reason=GAP
 - 픽스처 메모: [소음/하울링]→[둔감화]→[악화 요인] 엣지 탐색
 
 | 순위 | chunk_id | score | 본문 앞 150자 |
@@ -192,14 +194,14 @@
 
 - score_gap: **0.0212** (top1 0.8426 − 평균 0.8213)
 - gate 판정: **REFUSE**
-- expected_outcome(ANSWER) 일치 여부: ✗
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- expected_outcome(REFUSE) 일치 여부: ✓
+- coverage: **missing**
 
 ### Q11
 
 > 6살 포메라니안이 최근 엉덩이를 바닥에 바싹 끌고 다니면서 자꾸 짖고 예민해지는데, 짖음 교정 훈련을 먼저 해야 할까요?
 
-- 라벨: hop=multi · router=GRAPH · expected=ANSWER · guard=STRONG · missing_data=false
+- 라벨: hop=multi · router=GRAPH · expected=REFUSE · guard=STRONG · missing_data=true · refuse_reason=GAP
 - 픽스처 메모: [엉덩이 끌기]→[항문낭 문제/통증]→[감별필요] 트리거
 
 | 순위 | chunk_id | score | 본문 앞 150자 |
@@ -210,14 +212,14 @@
 
 - score_gap: **0.0271** (top1 0.8696 − 평균 0.8425)
 - gate 판정: **PASS**
-- expected_outcome(ANSWER) 일치 여부: ✓
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- expected_outcome(REFUSE) 일치 여부: ✗
+- coverage: **missing**
 
 ### Q12
 
 > 잘 지내던 5살 강아지가 갑자기 몸을 만지려고 하면 으르렁거리며 입질을 해요. 서열 훈련을 다시 해야 하나요?
 
-- 라벨: hop=multi · router=GRAPH · expected=ANSWER · guard=STRONG · missing_data=false
+- 라벨: hop=multi · router=GRAPH · expected=REFUSE · guard=STRONG · missing_data=true · refuse_reason=GAP
 - 픽스처 메모: 갑작스러운 입질 → 근골격계/디스크 통증 감별
 
 | 순위 | chunk_id | score | 본문 앞 150자 |
@@ -228,14 +230,14 @@
 
 - score_gap: **0.0343** (top1 0.8805 − 평균 0.8462)
 - gate 판정: **PASS**
-- expected_outcome(ANSWER) 일치 여부: ✓
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- expected_outcome(REFUSE) 일치 여부: ✗
+- coverage: **missing**
 
 ### Q13
 
 > 12살 노령견인데 밤마다 잠을 안 자고 서성거리면서 벽을 보고 헛짖음을 시작했어요. 분리불안 훈련이 효과가 있을까요?
 
-- 라벨: hop=multi · router=GRAPH · expected=ANSWER · guard=STRONG · missing_data=false
+- 라벨: hop=multi · router=GRAPH · expected=REFUSE · guard=STRONG · missing_data=true · refuse_reason=GAP
 - 픽스처 메모: 야간 헛짖음 + 노령 → 인지기능장애 감별
 
 | 순위 | chunk_id | score | 본문 앞 150자 |
@@ -246,8 +248,8 @@
 
 - score_gap: **0.0234** (top1 0.8548 − 평균 0.8314)
 - gate 판정: **REFUSE**
-- expected_outcome(ANSWER) 일치 여부: ✗
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- expected_outcome(REFUSE) 일치 여부: ✓
+- coverage: **missing**
 
 ### Q14
 
@@ -265,7 +267,7 @@
 - score_gap: **0.0241** (top1 0.8655 − 평균 0.8414)
 - gate 판정: **PASS**
 - expected_outcome(ANSWER) 일치 여부: ✓
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- coverage: **partial** (provisional: 원영상 확인 후 확정)
 
 ### Q15
 
@@ -283,7 +285,7 @@
 - score_gap: **0.0325** (top1 0.8707 − 평균 0.8382)
 - gate 판정: **PASS**
 - expected_outcome(ANSWER) 일치 여부: ✓
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- coverage: **partial**
 
 ### Q16
 
@@ -301,7 +303,7 @@
 - score_gap: **0.0207** (top1 0.8316 − 평균 0.8109)
 - gate 판정: **REFUSE**
 - expected_outcome(REFUSE) 일치 여부: ✓
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- coverage: **missing**
 
 ### Q17
 
@@ -319,7 +321,7 @@
 - score_gap: **0.0262** (top1 0.8517 − 평균 0.8254)
 - gate 판정: **PASS**
 - expected_outcome(REFUSE) 일치 여부: ✗
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- coverage: **missing**
 
 ### Q18
 
@@ -337,7 +339,7 @@
 - score_gap: **0.0207** (top1 0.8479 − 평균 0.8272)
 - gate 판정: **REFUSE**
 - expected_outcome(REFUSE) 일치 여부: ✓
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- coverage: **missing**
 
 ### Q19
 
@@ -355,7 +357,7 @@
 - score_gap: **0.0283** (top1 0.8520 − 평균 0.8237)
 - gate 판정: **PASS**
 - expected_outcome(REFUSE) 일치 여부: ✗
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- coverage: **missing**
 
 ### Q20
 
@@ -373,7 +375,7 @@
 - score_gap: **0.0188** (top1 0.8418 − 평균 0.8230)
 - gate 판정: **REFUSE**
 - expected_outcome(REFUSE) 일치 여부: ✓
-- coverage: [ ]  ← answerable / partial / missing 중 하나를 사람이 채웁니다
+- coverage: **missing**
 
 ## 요약
 
@@ -416,21 +418,52 @@
 - 1/3건이 gate에서 REFUSE로 걸렸습니다: Q18.
 - Q17, Q19는 gate를 통과했습니다. 이 셋의 거절 사유는 MEDICAL·SCOPE로, 유사도가 아니라 질문의 성격에서 나옵니다 — score_gap 하나로는 걸러지지 않는다는 뜻입니다.
 
-### ④ missing_data:true 3건(Q03·Q16·Q20)이 gate 아래인지
+### ④ missing_data:true 13건이 gate 아래인지 (최초 지정 3건: Q03·Q16·Q20)
 
-| id | score_gap | 임계값 대비 | gate | 기대와 일치 |
-|---|---|---|---|---|
-| Q03 | 0.0215 | -0.0025 | REFUSE | ✓ |
-| Q16 | 0.0207 | -0.0033 | REFUSE | ✓ |
-| Q20 | 0.0188 | -0.0052 | REFUSE | ✓ |
+| id | 최초 지정 | score_gap | 임계값 대비 | gate | 기대와 일치 |
+|---|---|---|---|---|---|
+| Q01 | 커버리지 판정 후 추가 | 0.0251 | +0.0011 | PASS | ✗ |
+| Q02 | 커버리지 판정 후 추가 | 0.0281 | +0.0041 | PASS | ✗ |
+| Q03 | ○ | 0.0215 | -0.0025 | REFUSE | ✓ |
+| Q04 | 커버리지 판정 후 추가 | 0.0355 | +0.0115 | PASS | ✗ |
+| Q06 | 커버리지 판정 후 추가 | 0.0186 | -0.0054 | REFUSE | ✓ |
+| Q07 | 커버리지 판정 후 추가 | 0.0178 | -0.0062 | REFUSE | ✓ |
+| Q08 | 커버리지 판정 후 추가 | 0.0218 | -0.0022 | REFUSE | ✓ |
+| Q10 | 커버리지 판정 후 추가 | 0.0212 | -0.0028 | REFUSE | ✓ |
+| Q11 | 커버리지 판정 후 추가 | 0.0271 | +0.0031 | PASS | ✗ |
+| Q12 | 커버리지 판정 후 추가 | 0.0343 | +0.0103 | PASS | ✗ |
+| Q13 | 커버리지 판정 후 추가 | 0.0234 | -0.0006 | REFUSE | ✓ |
+| Q16 | ○ | 0.0207 | -0.0033 | REFUSE | ✓ |
+| Q20 | ○ | 0.0188 | -0.0052 | REFUSE | ✓ |
 
-- 3/3건이 임계값 아래입니다: Q03, Q16, Q20.
+- 8/13건이 임계값 아래입니다.
+- 최초 지정 3건만 보면 3/3건이 아래입니다: Q03, Q16, Q20.
+- Q01, Q02, Q04, Q11, Q12는 코퍼스에 답이 없다고 판정된 질문인데도 gate를 통과했습니다. gate가 통과시킨 top-1이 무엇인지는 위 질문별 블록에서 확인하세요.
+
+### ⑤ 사람 커버리지 판정 결과
+
+판정 완료 20/20건. 값은 질문셋에서 읽어온 것입니다.
+
+| coverage | 건수 | 질문 |
+|---|---|---|
+| partial | 4 | Q05, Q09, Q14, Q15 |
+| missing | 16 | Q01, Q02, Q03, Q04, Q06, Q07, Q08, Q10, Q11, Q12, Q13, Q16, Q17, Q18, Q19, Q20 |
+
+- 잠정 판정: Q02(missing), Q09(partial), Q14(partial) — 원영상 확인 후 확정합니다.
+
+| 갈린 방향 | 건수 | 질문 |
+|---|---|---|
+| gate PASS · 기대 REFUSE (통과시키면 안 될 것을 통과) | 7 | Q01, Q02, Q04, Q11, Q12, Q17, Q19 |
+| gate REFUSE · 기대 ANSWER (답할 수 있는 것을 막음) | 0 | - |
+
+- 갈린 7건이 **전부 한 방향**입니다. score_gap이 임계값을 넘겼지만 사람이 보기에 코퍼스에 답이 없는 질문들이고, 반대 방향(답할 수 있는데 막힌 경우)은 0건입니다. gate가 지나치게 엄격한 것이 아니라 지나치게 관대하다는 뜻입니다.
+- 해당 질문의 score_gap: Q01 0.0251, Q02 0.0281, Q04 0.0355, Q11 0.0271, Q12 0.0343, Q17 0.0262, Q19 0.0283
+- 이 중 Q17, Q19는 refuse_reason이 GAP이 아닙니다. 유사도를 아무리 조정해도 이 축은 gate로 잡히지 않으며, `guardrail/seed_lexicon.json` 쪽에서 걸러야 합니다.
 
 ### 전체
 
 - gate 판정이 expected_outcome과 일치한 건수: **13/20**
-- 갈린 질문: Q06, Q07, Q08, Q10, Q13, Q17, Q19
-- coverage 판정(answerable/partial/missing)은 아직 비어 있습니다. 사람이 채운 뒤 질문셋의 `coverage` 필드에 반영합니다.
+- 갈린 질문: Q01, Q02, Q04, Q11, Q12, Q17, Q19
 
 ---
 
