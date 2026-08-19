@@ -147,6 +147,13 @@ def load_fixtures(path: Path) -> list[dict[str, Any]]:
             raise CoverageError(
                 f"{path}:{number}: coverage must be null or one of {list(COVERAGE_VALUES)}"
             )
+        # note carries why a coverage verdict is not final yet ("provisional: ...").
+        # Nullable rather than optional: every row has the key, so a reader never has
+        # to tell "no note" apart from "this row predates the field".
+        if "note" not in row:
+            raise CoverageError(f"{path}:{number}: note is required (use null when empty)")
+        if row["note"] is not None and not isinstance(row["note"], str):
+            raise CoverageError(f"{path}:{number}: note must be null or a string")
         # Gold is absent by design. A fixture that grew one is no longer this set.
         if row.get("gold_chunk_fingerprints"):
             raise CoverageError(
