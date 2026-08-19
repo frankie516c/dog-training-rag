@@ -112,6 +112,7 @@ eligible 26청크 전체에 `분리불안` 0건, `켄넬`·`크레이트`·`울�
       **질문 20개 전체의 gap이 이동합니다.** 조달과 무관한 픽스처의 gate 판정도
       함께 뒤집힐 수 있으므로 일부만 다시 보면 안 됩니다.)
 - [ ] 해당 픽스처 coverage / expected_outcome 승격
+- [ ] `docs/demo_scenarios.md`의 순위·gap 표 갱신 (조달 전 숫자는 무효)
 - [ ] 승격 대상 픽스처는 승격 커밋에서 `review_status`를 `PENDING`으로 되돌리고,
       재판정이 끝난 뒤 다시 `APPROVED`로 올린다 (`reviewed_at`도 재판정일로 갱신)
 
