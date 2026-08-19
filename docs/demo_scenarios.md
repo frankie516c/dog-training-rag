@@ -4,7 +4,7 @@
 
 | 시나리오 | 질문 | 출처 | 기록 위치 |
 |---|---|---|---|
-| ① 단일 홉 · 잘 되는 경우 | `q007` | gold 세트 | **이 문서** (아래 사유) |
+| ① 단일 홉 · 잘 되는 경우 | `q007` **(조달 후 유지 확정)** | gold 세트 | **이 문서** (아래 사유) |
 | ① 대기 | `q011` | gold 세트 | **이 문서** |
 | ② 2홉 추론 | `Q06` | owner 픽스처 | `owner_fixtures.jsonl`의 `demo_scenario` |
 | ③ 의료 감별 | `Q15` | owner 픽스처 | `owner_fixtures.jsonl`의 `demo_scenario` |
@@ -27,9 +27,11 @@
 |---|---|
 | query_type | `symptom_to_solution` |
 | 영상 | `9FWfbXwXbP0` |
-| 정답 청크 순위 | **1** (RR 1.0, Recall@5 1.0) |
-| score_gap | **0.0612** (12문항 중 최고) |
+| 정답 청크 순위 | **1** (RR 1.0) — 조달 전후 동일 |
+| score_gap | 0.0612 → **0.0769** |
 | 1-2위 차 | 0.0450 |
+| top1 점수 | 0.8938 (조달로 변하지 않음, Δtop1 +0.0000) |
+| top-5 중 신규 문서 | 2건 (4·5위) |
 | gold span | `q007-s1` 292280–322550ms — 현관 배변과 장난감 이동을 분리불안 신호로 설명하는 구간 |
 
 고른 이유는 두 가지입니다. 12문항에서 gap이 가장 크고 1-2위 차도 0.045라 1위가
@@ -49,9 +51,11 @@
 |---|---|
 | query_type | `concept` |
 | 영상 | `KhNJl8kj7ks` |
-| 정답 청크 순위 | **1** (RR 1.0, Recall@5 1.0) |
-| score_gap | 0.0583 |
-| 1-2위 차 | **0.0477** (12문항 중 최고) |
+| 정답 청크 순위 | **1** (RR 1.0) — 조달 전후 동일 |
+| score_gap | 0.0583 → **0.0823** |
+| 1-2위 차 | **0.0477** |
+| top1 점수 | 0.8662 (Δtop1 +0.0000) |
+| top-5 중 신규 문서 | **0건** |
 | gold span | `q011-s1` 36079–104190ms — 니킥을 혐오 자극으로 규정하고 효과는 있지만 감정을 줄 필요가 없다고 설명. 두 chunk에 걸침 |
 
 1-2위 차는 q007보다 넓습니다. q007이 흔들리면 이쪽으로 바꿉니다. 다만 개념 질문이라
@@ -59,11 +63,35 @@
 
 ## 측정 출처와 유효 기간
 
-위 숫자는 `data/eval/results/retrieval_metrics_dev.json` (v3 코퍼스, 35청크 /
-eligible 26, `intfloat/multilingual-e5-base`, top-5). 순위는 추적 스냅샷
-`dev_v3_e5_gap_metrics.json`과 일치합니다.
+위 숫자는 **조달 후** 측정치입니다: `data/eval/results/combined_v4_e5_metrics.json`
+(영상 26 + 문서 51 = 77청크, fingerprint `sha256:86ec02a300c3a01f7cc…`,
+`intfloat/multilingual-e5-base`, top-5). 러너는
+`scripts/run_combined_retrieval_eval.py`이고, `--no-documents`로 돌리면 조달 전
+영상 전용 baseline을 rank·gap·fingerprint까지 그대로 재현합니다.
 
-**조달로 코퍼스가 바뀌면 이 숫자는 전부 무효입니다.** `score_gap`은 top1에서 코퍼스
-평균을 뺀 값이라 청크가 늘면 평균이 움직이고 12문항 전체의 gap이 함께 이동합니다.
-순위도 새 문서가 경쟁 청크로 들어오면 바뀔 수 있습니다.
-`docs/acquisition_list.md`의 조달 후 체크리스트를 돌린 뒤 이 표를 다시 채우세요.
+조달로 gold 12문항의 **Δtop1은 전부 0.0000**이었습니다. 문서가 어떤 gold 질문에서도
+1위를 밀어내지 못했다는 뜻이고, 위 gap 상승은 코퍼스가 커지며 평균이 내려간 산술
+효과입니다. 순위가 바뀐 것은 q003 하나(3위→4위)뿐이라 Hit@1과 Hit@5는 그대로이고
+MRR@5만 0.7361 → 0.7292로 내려갔습니다.
+
+**시나리오① 유지 확정.** q007은 정답 청크가 1위를 지켰고 top1 점수도 그대로입니다.
+4·5위에 분리불안 문서가 들어왔지만 근거 청크를 밀어내지 못했습니다. q011은 top-5에
+문서가 한 건도 들어오지 않아 더 깨끗하지만, 개념 질문이라 견주 말투와는 거리가 있다는
+판단은 그대로여서 대기로 둡니다.
+
+## dry-run 답변에 대하여
+
+리포트 [`reports/combined_corpus_coverage.md`](../reports/combined_corpus_coverage.md)
+② 절의 q007·q011 답변은 **Claude가 `grounded-answer-ko-v1` 규칙을 따라 수기로 작성한
+dry-run**입니다. 모델 API를 호출해 받은 생성물이 아닙니다. 원본은
+`data/eval/generation/answers_dryrun_scenario.jsonl`이며 각 레코드의 `produced_by`에
+같은 내용이 적혀 있습니다.
+
+**금요일 동결 런에서 실제 생성으로 교체합니다.** 그때까지 이 답변은 "검색된 청크로
+답이 되는지"를 사람이 보기 위한 대용물이지, 생성 품질의 근거가 아닙니다.
+
+## 다시 무효가 되는 조건
+
+`score_gap`은 top1에서 코퍼스 평균을 뺀 값이라 청크가 늘거나 줄면 12문항 전체의 gap이
+함께 움직입니다. 이번 조달에서 실측된 이동폭이 그 증거입니다. 코퍼스를 또 건드리면
+`docs/acquisition_list.md`의 조달 후 체크리스트를 돌리고 이 표를 다시 채우세요.
