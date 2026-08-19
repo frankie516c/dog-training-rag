@@ -7,6 +7,13 @@ Stage 2 추출(77청크)까지 끝났고 Neo4j 적재만 남았습니다. 이 �
 (`Wsl/WSL_E_WSL_OPTIONAL_COMPONENT_REQUIRED`). 관리자 권한과 재부팅이 필요해서
 2026-08-19 세션에서는 여기서 멈췄습니다. 아래 1번이 그 해결입니다.
 
+> **2026-08-20 갱신** — 구성 요소는 이미 설치돼 있고 **재부팅만 남았습니다.**
+> `Win32_OptionalFeature` 조회에서 `Microsoft-Windows-Subsystem-Linux`와
+> `VirtualMachinePlatform`이 둘 다 `InstallState 1 (Enabled)`, CBS
+> `RebootPending`이 `True`입니다. 즉 1번의 관리자 명령은 지난 세션에 이미 먹혔고
+> 재부팅이 안 됐을 뿐입니다. **재부팅부터 하고, 그래도 같은 에러가 나면 그때 1번을
+> 실행하세요.** 4번(드라이버 설치·dry-run)은 끝나 있으니 재부팅 후엔 3번부터입니다.
+
 ## 사전 확인 — 이미 되어 있는 것
 
 | 항목 | 상태 | 위치 |
@@ -15,7 +22,9 @@ Stage 2 추출(77청크)까지 끝났고 Neo4j 적재만 남았습니다. 이 �
 | alias 테이블 (3항목) | **수정 완료** | `data/graph/entity_aliases.json` |
 | 쿼리 방향 수정 | **수정 완료** | `scripts/preview_queries.py`, 아래 5번 Cypher |
 | 로더 | 작성·dry-run 완료, **실 DB 미검증** | `scripts/load_graph_neo4j.py` |
-| `NEO4J_PASSWORD` | `.env`에 있음 | 커밋되지 않음 (gitignore) |
+| `neo4j` 드라이버 | **설치 완료** (6.2.0) | `pyproject.toml` / `uv.lock` |
+| dry-run 재검증 | **완료** — 5번 대조표 4줄 모두 일치 | 2026-08-20 |
+| `NEO4J_PASSWORD` | `.env`에 있음, 8자로 최소 길이 통과 | 커밋되지 않음 (gitignore) |
 
 `data/*`는 gitignore라 **추출물과 alias 테이블은 이 PC에만 있습니다.** 다른 기기에서
 이어받는 경우 두 파일을 먼저 옮겨야 합니다.
