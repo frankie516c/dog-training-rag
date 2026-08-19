@@ -63,6 +63,11 @@ UNBLOCK_TARGETS = {
 # Demo scenario ① and its reserve, both gold queries.
 SCENARIO_IDS = ("q007", "q011")
 
+# Vector failures registered before the graph exists, so the graph can be judged on
+# cases chosen while it could not influence the choice. Each is a question the
+# documents were meant to answer where dense retrieval did not reach them.
+RETRIEVAL_GAP_IDS = ("Q12", "Q13", "Q14", "Q15")
+
 
 class EvalError(RuntimeError):
     """Raised when a corpus, a query set or a setting is unusable."""
@@ -418,6 +423,7 @@ def build_report(
     lines.extend(_decomposition_section(fixtures, base_fixtures))
     lines.extend(_unblock_section(fixtures, base_fixtures))
     lines.extend(_scenario_section(gold, base_gold, dryrun))
+    lines.extend(_retrieval_gap_section(fixtures, base_fixtures))
     lines.extend(_gold_section(payload, base_gold))
     lines.extend(_fixture_table(payload["owner_fixtures"], base_fixtures))
     lines.append("")
@@ -600,9 +606,53 @@ def _scenario_section(
     return lines
 
 
+def _retrieval_gap_section(
+    fixtures: dict[str, dict[str, Any]], base: dict[str, dict[str, Any]]
+) -> list[str]:
+    """The four questions the graph path will have to rescue, registered in advance.
+
+    Registering them now matters: after the graph exists it will be tempting to pick
+    the cases it happens to win. These were chosen while only the vector path had run.
+    """
+    lines = ["", "## ③ retrieval-gap 사전 등록 — 그래프 경로가 구제해야 할 벡터 실패", ""]
+    lines.append(
+        "네 건 모두 **근거 문서는 코퍼스에 있는데 벡터 검색이 닿지 못한** 경우입니다. "
+        "조달로 메우는 구멍이 아니라 검색 경로의 실패이므로, 그래프 완성 후 이 4건으로 "
+        "**하이브리드 vs 벡터**를 비교합니다. 그래프가 만들어지기 전에 골라 둔 목록입니다."
+    )
+    lines.append("")
+    lines.append("| id | coverage | 겨냥 슬롯 문서 top-5 | Δtop1 | 실패 양상 |")
+    lines.append("|---|---|---|---|---|")
+    for query_id in RETRIEVAL_GAP_IDS:
+        row = fixtures.get(query_id)
+        if row is None:
+            continue
+        slot = UNBLOCK_TARGETS.get(query_id, "-")
+        on_slot = [e for e in row["top_k"] if e.get("slot") == slot]
+        old = base.get(query_id, {})
+        d_top1 = (
+            row["top1_score"] - old["score_stats"]["top1_score"]
+            if "score_stats" in old else None
+        )
+        lines.append("| {} | {} | {}/5 | {} | {} |".format(
+            query_id, row["coverage"], len(on_slot),
+            f"{d_top1:+.4f}" if d_top1 is not None else "-",
+            row.get("note") or "-"))
+    lines.append("")
+    lines.append(
+        "- 판정 근거는 gap이 아닙니다. gap은 코퍼스가 커지면서 오른 산술 효과가 섞여 있어 "
+        "이 네 건에서도 전부 상승했습니다 (⓪ 절 참조)."
+    )
+    lines.append(
+        "- Q13의 Δtop1이 0이 아닌 것에 주의하세요. 1위가 올라간 것은 맞지만 올라온 문서가 "
+        "겨냥 슬롯이 아닙니다 — 상승분이 곧 해제가 아니라는 사례입니다."
+    )
+    return lines
+
+
 def _gold_section(payload: dict[str, Any], base: dict[str, dict[str, Any]]) -> list[str]:
     summary = payload["gold_summary"]
-    lines = ["", "## ③ gold 12 rank · gap 이동 요약", ""]
+    lines = ["", "## ④ gold 12 rank · gap 이동 요약", ""]
     lines.append("| id | type | rank 이전 | rank 이후 | RR 이후 | gap 이전 | gap 이후 | 변화 |")
     lines.append("|---|---|---|---|---|---|---|---|")
     moved = []
@@ -631,7 +681,7 @@ def _gold_section(payload: dict[str, Any], base: dict[str, dict[str, Any]]) -> l
 
 
 def _fixture_table(rows: Sequence[dict[str, Any]], base: dict[str, dict[str, Any]]) -> list[str]:
-    lines = ["", "## ④ owner 픽스처 20건 전체", ""]
+    lines = ["", "## ⑤ owner 픽스처 20건 전체", ""]
     lines.append("| id | 기대 | coverage(이전) | gap 이전 | gap 이후 | 변화 | gate | 일치 | 문서 진입 |")
     lines.append("|---|---|---|---|---|---|---|---|---|")
     for row in rows:
