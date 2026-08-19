@@ -40,6 +40,26 @@ PROMPT_VERSION = "extraction-prompt-v1"
 TEMPERATURE = 0.0
 MAX_RETRIES = 1  # one retry on unparseable output, then quarantine
 
+# Pinned, not an alias. A name like "*-latest" would silently point somewhere else
+# next month and every record claiming that name would become unreproducible.
+#
+# Provider moved from Gemini to OpenAI on 2026-08-19. The reason was billing
+# availability, not extraction quality: the Gemini key ran out of quota mid-pilot
+# (10 of 12 chunks quarantined on 429) and the billing setup could not be fixed in
+# time. The two Gemini extractions are kept under *_gemini.jsonl rather than
+# deleted, so the switch can be checked rather than taken on trust.
+DEFAULT_MODEL = "gpt-5.6-terra"
+PROVIDER_SWITCH_NOTE = (
+    "품질이 아니라 결제 가용성 문제로 프로바이더 전환 (Gemini -> OpenAI, 2026-08-19)"
+)
+# The API is asked for JSON rather than left to prose that happens to contain it.
+# Recorded in the run log because it is part of what produced the output: a later
+# comparison against a run without it is not comparing the same thing.
+RESPONSE_MIME_TYPE = "application/json"
+ENV_KEY = "OPENAI_API_KEY"
+RETRY_STATUS = ("429", "503", "500")
+BACKOFF_SECONDS = (2, 8, 20, 45, 90)
+
 NODE_TYPES = ("문제행동", "훈련법", "증상", "질환", "견종", "연령대", "용품", "원칙")
 EDGE_TYPES = ("완화한다", "악화시킨다", "선행조건", "금기", "감별필요")
 CONFIDENCE = ("high", "medium", "low")
@@ -103,6 +123,53 @@ RULES = """## 노드 타입 (이 8개만 사용)
 ## 출력 형식
 {"entities": [{"name": "", "type": "", "normalized_from": null, "evidence": "", "confidence": ""}],
  "relations": [{"source": "", "target": "", "type": "", "evidence": "", "confidence": ""}]}"""
+
+
+def _entity_schema() -> dict[str, Any]:
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["name", "type", "normalized_from", "evidence", "confidence"],
+        "properties": {
+            "name": {"type": "string"},
+            "type": {"type": "string", "enum": list(NODE_TYPES)},
+            # Nullable rather than optional: strict mode requires every property to be
+            # present, and "no original spelling" has to be sayable as null.
+            "normalized_from": {"type": ["string", "null"]},
+            "evidence": {"type": "string"},
+            "confidence": {"type": "string", "enum": list(CONFIDENCE)},
+        },
+    }
+
+
+def _relation_schema() -> dict[str, Any]:
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["source", "target", "type", "evidence", "confidence"],
+        "properties": {
+            "source": {"type": "string"},
+            "target": {"type": "string"},
+            "type": {"type": "string", "enum": list(EDGE_TYPES)},
+            "evidence": {"type": "string"},
+            "confidence": {"type": "string", "enum": list(CONFIDENCE)},
+        },
+    }
+
+
+# The schema constrains shape and vocabulary; it cannot constrain grounding. The
+# hand validator still runs afterwards, because "evidence is a string" is a schema
+# question and "evidence is actually in the chunk" is not.
+EXTRACTION_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["entities", "relations"],
+    "properties": {
+        "entities": {"type": "array", "items": _entity_schema()},
+        "relations": {"type": "array", "items": _relation_schema()},
+    },
+}
+SCHEMA_NAME = "chunk_extraction"
 
 
 class ExtractionError(RuntimeError):
@@ -284,7 +351,17 @@ def extract_one(
     attempts: list[dict[str, Any]] = []
     for attempt in range(MAX_RETRIES + 1):
         started = time.perf_counter()
-        raw, usage = client.complete(SYSTEM_PROMPT, prompt)
+        try:
+            raw, usage = client.complete(SYSTEM_PROMPT, prompt)
+        except ExtractionError as exc:
+            # A provider outage must not discard the chunks already extracted, so it
+            # quarantines this one and the run carries on. The quarantine file is the
+            # work list for a rerun; it distinguishes "the model refused this chunk"
+            # from "the model was unreachable" by keeping the error text.
+            tally.calls += 1
+            tally.seconds += time.perf_counter() - started
+            attempts.append({"attempt": attempt + 1, "error": f"call: {exc}", "raw": ""})
+            continue
         tally.calls += 1
         tally.seconds += time.perf_counter() - started
         tally.input_tokens += int(usage.get("input_tokens", 0))
@@ -352,6 +429,10 @@ def run(
         "model_version": client.info.model,
         "prompt_version": PROMPT_VERSION,
         "temperature": client.info.temperature,
+        "temperature_requested": TEMPERATURE,
+        "api_surface": getattr(client, "surface", None),
+        "structured_outputs": "json_schema strict",
+        "provider_switch_note": PROVIDER_SWITCH_NOTE,
         "chunks": len(chunks),
         "extracted": len(records),
         "quarantined": len(tally.quarantined),
@@ -365,10 +446,136 @@ def run(
     return {"records": records, "log": log, "quarantined": tally.quarantined}
 
 
+def load_openai_client(model: str, env_path: Path = Path(".env")) -> ExtractionClient:
+    """Adapter over the OpenAI SDK. The key is read from .env and never logged.
+
+    Structured Outputs runs in strict mode, so the shape and the vocabulary of the
+    output are enforced by the API rather than hoped for. The hand validator still
+    runs on the result: strict mode cannot check that `evidence` is really a span of
+    the chunk, and that check is the one holding the extraction to the source.
+    """
+    try:
+        from dotenv import dotenv_values
+    except ImportError as exc:  # pragma: no cover - declared dependency
+        raise ExtractionError("python-dotenv is required to read the API key") from exc
+    key = (dotenv_values(env_path) or {}).get(ENV_KEY)
+    if not key:
+        raise ExtractionError(
+            f"{ENV_KEY} not found in {env_path.resolve()}. The key is read from there "
+            "and is never written to any output of this script."
+        )
+    try:
+        from openai import OpenAI
+    except ImportError as exc:
+        raise ExtractionError("openai is required (`uv add openai`)") from exc
+
+    sdk = OpenAI(api_key=key)
+    state = {"surface": None, "temperature": TEMPERATURE}
+
+    def _responses_call(system: str, prompt: str, temperature: float | None):
+        kwargs: dict[str, Any] = {
+            "model": model,
+            "instructions": system,
+            "input": prompt,
+            "text": {
+                "format": {
+                    "type": "json_schema",
+                    "name": SCHEMA_NAME,
+                    "strict": True,
+                    "schema": EXTRACTION_SCHEMA,
+                }
+            },
+        }
+        if temperature is not None:
+            kwargs["temperature"] = temperature
+        response = sdk.responses.create(**kwargs)
+        usage = getattr(response, "usage", None)
+        return (getattr(response, "output_text", "") or ""), {
+            "input_tokens": getattr(usage, "input_tokens", 0) or 0,
+            "output_tokens": getattr(usage, "output_tokens", 0) or 0,
+        }
+
+    def _chat_call(system: str, prompt: str, temperature: float | None):
+        kwargs: dict[str, Any] = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ],
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": SCHEMA_NAME,
+                    "strict": True,
+                    "schema": EXTRACTION_SCHEMA,
+                },
+            },
+        }
+        if temperature is not None:
+            kwargs["temperature"] = temperature
+        response = sdk.chat.completions.create(**kwargs)
+        usage = getattr(response, "usage", None)
+        return (response.choices[0].message.content or ""), {
+            "input_tokens": getattr(usage, "prompt_tokens", 0) or 0,
+            "output_tokens": getattr(usage, "completion_tokens", 0) or 0,
+        }
+
+    class OpenAIClient:
+        @property
+        def info(self) -> ClientInfo:
+            return ClientInfo(model=model, temperature=state["temperature"])
+
+        @property
+        def surface(self) -> str | None:
+            """Which API produced the output. Recorded, not assumed."""
+            return state["surface"]
+
+        def complete(self, system: str, prompt: str) -> tuple[str, dict[str, int]]:
+            last: Exception | None = None
+            for delay in (0, *BACKOFF_SECONDS):
+                if delay:
+                    time.sleep(delay)
+                for name, call in (("responses", _responses_call), ("chat", _chat_call)):
+                    if state["surface"] not in (None, name):
+                        continue
+                    try:
+                        out = call(system, prompt, state["temperature"])
+                    except Exception as exc:
+                        text = str(exc)
+                        # Some models accept only their default sampling setting. Drop
+                        # the parameter once, record that it was dropped, and never
+                        # pretend the run was at temperature 0 afterwards.
+                        if "temperature" in text and state["temperature"] is not None:
+                            state["temperature"] = None
+                            try:
+                                out = call(system, prompt, None)
+                            except Exception as inner:
+                                last = inner
+                                continue
+                            state["surface"] = name
+                            return out
+                        if any(code in text for code in RETRY_STATUS):
+                            last = exc
+                            break  # transient: back off, then retry the same surface
+                        last = exc
+                        continue  # this surface is unusable; try the other one
+                    state["surface"] = name
+                    return out
+            raise ExtractionError(f"model call failed: {str(last)[:400]}")
+
+    return OpenAIClient()
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--stage", type=int, choices=(1, 2), required=True)
-    parser.add_argument("--model", default=None, help="model id recorded on every record")
+    parser.add_argument("--model", default=DEFAULT_MODEL,
+                        help="model id, pinned and recorded on every record")
+    parser.add_argument("--env", type=Path, default=Path(".env"))
+    parser.add_argument("--limit", type=int, default=None,
+                        help="run only the first N chunks; used for the smoke test")
+    parser.add_argument("--suffix", default="",
+                        help="suffix for the output filenames, e.g. _smoke")
     parser.add_argument("--dry-run", action="store_true",
                         help="write the prompts and exit; no model is called")
     parser.add_argument("--video-chunks", type=Path, default=DEFAULT_VIDEO_CHUNKS)
@@ -384,6 +591,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         chunks = (
             resolve_prefixes(everything, STAGE1_CHUNK_IDS) if args.stage == 1 else everything
         )
+        if args.limit:
+            chunks = chunks[: args.limit]
         args.out_dir.mkdir(parents=True, exist_ok=True)
         if args.dry_run:
             path = args.out_dir / f"prompts_stage{args.stage}.md"
@@ -394,13 +603,20 @@ def main(argv: Sequence[str] | None = None) -> int:
                  f"청크 {len(chunks)}개. 모델 호출 없음.\n\n" + body).encode("utf-8"))
             print(f"청크 {len(chunks)}개 프롬프트만 기록: {path}")
             return 0
-        if not args.model:
-            raise ExtractionError("--model is required unless --dry-run is used")
-        raise ExtractionError(
-            f"no extraction client is wired for model {args.model!r}. "
-            "Add the provider adapter before running stage "
-            f"{args.stage}; --dry-run works without one."
+        client = load_openai_client(args.model, args.env)
+        print(f"stage {args.stage}: 청크 {len(chunks)}개 / model {args.model} / "
+              f"temperature {TEMPERATURE} / {PROMPT_VERSION}")
+        tag = f"stage{args.stage}{args.suffix}"
+        result = run(
+            chunks, client,
+            args.out_dir / f"extractions_{tag}.jsonl",
+            args.out_dir / f"quarantine_{tag}.jsonl",
+            args.out_dir / f"run_log_{tag}.json",
         )
+        log = result["log"]
+        print(f"추출 {log['extracted']}/{log['chunks']} · 격리 {log['quarantined']} · "
+              f"재시도 {log['retries']} · 토큰 in {log['input_tokens']} / out {log['output_tokens']}")
+        return 0
     except (OSError, ExtractionError, json.JSONDecodeError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
