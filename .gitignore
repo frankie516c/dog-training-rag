@@ -64,3 +64,7 @@ data/eval/generation/*
 !data/eval/generation/answers_*.jsonl
 # prompts/ 와 bundles/ 는 answers_*.jsonl과 프롬프트 버전만 있으면 그대로 다시
 # 만들어지는 파생물이라 추적하지 않는다.
+
+# 세션마다 뜨는 환경 덤프. 재현 불가능한 산출물이 아니라 매번 다시 뽑을 수 있는
+# 스냅샷이라 추적하지 않는다.
+venv_snapshot_*.txt

@@ -152,6 +152,14 @@ MANIFEST = [
         "blog": "베럴독 (네이버 블로그 yoonsu3454)",
         "author": "조재호 애견훈련소장",
     },
+    {
+        "doc_id": "salgoonews-kennel-steps-12333",
+        "slot": "3",
+        "origin": "manual",
+        "file": "salgoonews_kennel.md",
+        "blog": "살구뉴스",
+        "author": "유영지",
+    },
 ]
 
 
