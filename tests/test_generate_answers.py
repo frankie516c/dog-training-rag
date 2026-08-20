@@ -447,5 +447,139 @@ class ReuseTests(unittest.TestCase):
         )
 
 
+DEMO_PROFILE = {
+    "schema_version": module.PROFILE_SCHEMA_VERSION,
+    "견종": "비숑프리제",
+    "나이": "14개월",
+    "몸무게": "4.8kg",
+    "기존질환": [],
+    "비고": "외출 후 현관 배변, 장난감 이동을 반복해서 보임.",
+}
+
+
+class ProfileBlockTests(unittest.TestCase):
+    """build_prompt's only new surface: an optional <프로필> block before <자료>."""
+
+    def test_no_profile_reproduces_the_pre_profile_prompt_exactly(self):
+        with_no_arg = module.build_prompt(QUESTION, [chunk("chunk-1", 0)], "answer")
+        with_explicit_none = module.build_prompt(QUESTION, [chunk("chunk-1", 0)], "answer", None)
+        self.assertEqual(with_no_arg, with_explicit_none)
+        self.assertNotIn("프로필", with_no_arg)
+
+    def test_a_profile_adds_exactly_one_block_before_the_sources(self):
+        prompt = module.build_prompt(QUESTION, [chunk("chunk-1", 0)], "answer", DEMO_PROFILE)
+        self.assertEqual(1, prompt.count("<프로필>"))
+        self.assertEqual(1, prompt.count("</프로필>"))
+        # The profile block sits immediately before the sources section, not just
+        # somewhere earlier — rule 1's own text also contains the literal "<자료>".
+        self.assertIn("</프로필>\n\n<자료>", prompt)
+        self.assertIn("비숑프리제", prompt)
+        self.assertIn("14개월", prompt)
+
+    def test_the_profile_block_warns_it_is_not_evidence(self):
+        prompt = module.build_prompt(QUESTION, [chunk("chunk-1", 0)], "answer", DEMO_PROFILE)
+        self.assertIn("근거 자료가 아니므로", prompt)
+        self.assertIn("진단처럼 언급하지 마세요", prompt)
+
+    def test_empty_conditions_render_as_none_present(self):
+        prompt = module.build_prompt(QUESTION, [chunk("chunk-1", 0)], "answer", DEMO_PROFILE)
+        self.assertIn("기존 질환: 없음", prompt)
+
+    def test_present_conditions_are_listed(self):
+        profile = dict(DEMO_PROFILE, 기존질환=["슬개골 탈구 2기"])
+        prompt = module.build_prompt(QUESTION, [chunk("chunk-1", 0)], "answer", profile)
+        self.assertIn("기존 질환: 슬개골 탈구 2기", prompt)
+
+    def test_the_hedge_rule_and_the_profile_block_coexist(self):
+        prompt = module.build_prompt(QUESTION, [chunk("chunk-1", 0)], "hedge", DEMO_PROFILE)
+        self.assertIn("근거 약함", prompt)
+        self.assertIn("<프로필>", prompt)
+
+
+class LoadProfileTests(unittest.TestCase):
+    def _write(self, tmp_path, payload):
+        tmp_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+        return tmp_path
+
+    def test_the_shipped_demo_profile_loads(self):
+        profile = module.load_profile(REPO / "data" / "profiles" / "demo_profile_v1.json")
+        for key in module.PROFILE_FIELDS:
+            self.assertIn(key, profile)
+        self.assertIsInstance(profile["기존질환"], list)
+
+    def test_a_missing_file_is_a_generation_error(self):
+        with self.assertRaises(module.GenerationError):
+            module.load_profile(Path(tempfile.mkdtemp()) / "nope.json")
+
+    def test_the_wrong_schema_version_is_rejected(self):
+        path = self._write(
+            Path(tempfile.mkdtemp()) / "p.json", dict(DEMO_PROFILE, schema_version="v0")
+        )
+        with self.assertRaises(module.GenerationError):
+            module.load_profile(path)
+
+    def test_a_missing_field_is_rejected(self):
+        payload = dict(DEMO_PROFILE)
+        del payload["비고"]
+        path = self._write(Path(tempfile.mkdtemp()) / "p.json", payload)
+        with self.assertRaises(module.GenerationError):
+            module.load_profile(path)
+
+    def test_conditions_must_be_a_string_array(self):
+        path = self._write(
+            Path(tempfile.mkdtemp()) / "p.json", dict(DEMO_PROFILE, 기존질환="슬개골 탈구")
+        )
+        with self.assertRaises(module.GenerationError):
+            module.load_profile(path)
+
+
+class ProfileDoesNotTouchRetrievalTests(unittest.TestCase):
+    """The one hard requirement: retrieval/gate output cannot move because of a profile.
+
+    build_prompt is the only function given the profile (see generate()'s single
+    call site); these compare every generate() output field a profile could in
+    principle have leaked into, run with and without one.
+    """
+
+    NON_PROMPT_FIELDS = (
+        "band", "score_gap", "top1_score", "corpus_mean_score", "retrieved",
+        "thresholds", "expected_refusal", "source_schema",
+    )
+
+    def test_retrieval_and_gate_fields_are_identical_with_and_without_a_profile(self):
+        for gap in (0.001, 0.02, 0.05):  # refuse, hedge, answer
+            with self.subTest(gap=gap):
+                without = Fixture().run(gap=gap)["records"][0]
+                withp = Fixture().run(gap=gap, profile=DEMO_PROFILE)["records"][0]
+                mismatches = [
+                    key for key in self.NON_PROMPT_FIELDS if without[key] != withp[key]
+                ]
+                self.assertEqual([], mismatches)
+
+    def test_a_profile_never_reaches_the_refuse_band_prompt_because_none_is_built(self):
+        # refuse never calls build_prompt at all (see generate()); confirm a profile
+        # does not change that — no prompt_path, no model call either way.
+        result = Fixture().run(gap=0.001, profile=DEMO_PROFILE, client=ExplodingClient())
+        record = result["records"][0]
+        self.assertEqual("refuse", record["band"])
+        self.assertIsNone(record["prompt_path"])
+
+    def test_the_profile_only_shows_up_in_the_prompt_text(self):
+        client = FakeClient()
+        Fixture().run(gap=0.05, profile=DEMO_PROFILE, client=client)
+        prompt = client.prompts[0][1]
+        self.assertIn("비숑프리제", prompt)
+
+
+class ProfileCliTests(unittest.TestCase):
+    def test_profile_flag_defaults_to_none(self):
+        parsed = module.build_parser().parse_args([])
+        self.assertIsNone(parsed.profile)
+
+    def test_profile_flag_parses_to_a_path(self):
+        parsed = module.build_parser().parse_args(["--profile", "data/profiles/demo_profile_v1.json"])
+        self.assertEqual(Path("data/profiles/demo_profile_v1.json"), parsed.profile)
+
+
 if __name__ == "__main__":
     unittest.main()

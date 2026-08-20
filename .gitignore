@@ -74,6 +74,12 @@ data/guardrail/*
 !data/guardrail/medical_terms_v2.json
 !data/guardrail/training_whitelist_v1.json
 
+# 데모용 손수 작성 프로필. 수집물이 아니라 데모 시나리오에 맞춰 사람이 값을 정한
+# 고정 픽스처라 추적한다.
+!data/profiles/
+data/profiles/*
+!data/profiles/demo_profile_v1.json
+
 # 세션마다 뜨는 환경 덤프. 재현 불가능한 산출물이 아니라 매번 다시 뽑을 수 있는
 # 스냅샷이라 추적하지 않는다.
 venv_snapshot_*.txt

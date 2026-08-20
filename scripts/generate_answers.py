@@ -91,6 +91,20 @@ HEDGE_RULE = (
     "단정적인 어조를 쓰지 마세요."
 )
 
+# Demo-only, minimal: a single owner profile injected into the generation prompt
+# so the model can phrase an answer in context (breed, age, ...) without treating
+# it as evidence. Never threaded into retrieval, the graph search, hybrid merge or
+# the score_gap gate in run_combined_retrieval_eval.py — build_prompt() is the only
+# place a profile is read.
+PROFILE_SCHEMA_VERSION = "demo-profile-v1"
+PROFILE_FIELDS = ("견종", "나이", "몸무게", "기존질환", "비고")
+
+PROFILE_NOTE = (
+    "아래 프로필은 질문자가 알려준 반려견의 상황 정보입니다. 근거 자료가 아니므로 "
+    "답변의 근거로 쓰지 마세요. 답변 내용은 반드시 <자료>에서만 가져오고, 프로필에 "
+    "적힌 질환명이 있어도 그것을 근거 없이 진단처럼 언급하지 마세요."
+)
+
 
 class GenerationError(RuntimeError):
     """Raised when inputs, settings or the answer client are unusable."""
@@ -234,8 +248,54 @@ def load_query_set(path: Path) -> tuple[list[dict[str, Any]], str]:
     return queries, EVAL_QUERY_SCHEMA
 
 
-def build_prompt(question: str, chunks: Sequence[dict[str, Any]], band: str) -> str:
-    """The generation prompt. Same wording for every band except the hedge rule."""
+def load_profile(path: Path) -> dict[str, Any]:
+    """Read and validate a demo owner profile (see data/profiles/demo_profile_v1.json)."""
+    if not path.is_file():
+        raise GenerationError(f"profile file not found: {path}")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if payload.get("schema_version") != PROFILE_SCHEMA_VERSION:
+        raise GenerationError(f"{path}: schema_version must be {PROFILE_SCHEMA_VERSION!r}")
+    for key in PROFILE_FIELDS:
+        if key not in payload:
+            raise GenerationError(f"{path}: missing field {key!r}")
+    if not isinstance(payload["기존질환"], list) or not all(
+        isinstance(item, str) for item in payload["기존질환"]
+    ):
+        raise GenerationError(f"{path}: 기존질환 must be an array of strings")
+    return payload
+
+
+def format_profile_block(profile: dict[str, Any]) -> str:
+    """The <프로필> block build_prompt inserts ahead of <자료> when a profile is given."""
+    conditions = profile["기존질환"]
+    conditions_text = ", ".join(conditions) if conditions else "없음"
+    return "\n".join(
+        [
+            "<프로필>",
+            PROFILE_NOTE,
+            "",
+            f"견종: {profile['견종']}",
+            f"나이: {profile['나이']}",
+            f"몸무게: {profile['몸무게']}",
+            f"기존 질환: {conditions_text}",
+            f"비고: {profile['비고']}",
+            "</프로필>",
+        ]
+    )
+
+
+def build_prompt(
+    question: str,
+    chunks: Sequence[dict[str, Any]],
+    band: str,
+    profile: dict[str, Any] | None = None,
+) -> str:
+    """The generation prompt. Same wording for every band except the hedge rule.
+
+    profile is None by default: omitting it (or passing None) reproduces the
+    pre-profile prompt byte-for-byte — no profile-shaped gap in the middle of the
+    text, no empty <프로필></프로필> block.
+    """
     rules = list(PROMPT_RULES)
     if band == "hedge":
         rules.append(HEDGE_RULE)
@@ -245,22 +305,25 @@ def build_prompt(question: str, chunks: Sequence[dict[str, Any]], band: str) -> 
         header = f"[{position}] ({chunk['video_id']} #{chunk['chunk_index']}"
         header += f" · {title})" if title else ")"
         sources.append(f"{header}\n{chunk['text']}")
-    return "\n".join(
-        [
-            "아래 <자료>만 근거로 질문에 답하세요.",
-            "",
-            "규칙:",
-            *rules,
-            "",
-            "<자료>",
-            "",
-            "\n\n".join(sources),
-            "",
-            "</자료>",
-            "",
-            f"질문: {question}",
-        ]
-    )
+    lines = [
+        "아래 <자료>만 근거로 질문에 답하세요.",
+        "",
+        "규칙:",
+        *rules,
+        "",
+    ]
+    if profile is not None:
+        lines += [format_profile_block(profile), ""]
+    lines += [
+        "<자료>",
+        "",
+        "\n\n".join(sources),
+        "",
+        "</자료>",
+        "",
+        f"질문: {question}",
+    ]
+    return "\n".join(lines)
 
 
 def answered_records(path: Path) -> list[str]:
@@ -344,6 +407,7 @@ def generate(
     client: AnswerClient | None = None,
     bundle: bool = False,
     force: bool = False,
+    profile: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     validate_thresholds(refuse_below, answer_at_or_above)
     queries, source_schema = load_query_set(queries_path)
@@ -421,7 +485,9 @@ def generate(
             record["answer"] = REFUSAL_TEXT
             record["generated"] = False
         else:
-            prompt = build_prompt(question, [chunk_by_id[cid] for cid, _ in ranked], band)
+            prompt = build_prompt(
+                question, [chunk_by_id[cid] for cid, _ in ranked], band, profile
+            )
             prompts[record["query_id"]] = prompt
             record["answer"] = client.complete(prompt, record)
             record["generated"] = True
@@ -465,6 +531,15 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="overwrite an answers file that already holds backfilled answers",
     )
+    parser.add_argument(
+        "--profile",
+        type=Path,
+        default=None,
+        help=(
+            "path to a demo owner profile JSON (see data/profiles/demo_profile_v1.json). "
+            "Omit (default) for the pre-profile prompt, unchanged."
+        ),
+    )
     return parser
 
 
@@ -472,6 +547,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     mode = "dry-run" if args.dry_run else args.mode
     try:
+        profile = load_profile(args.profile) if args.profile else None
         result = generate(
             args.queries,
             args.chunk_dir,
@@ -483,6 +559,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             args.answer_at_or_above,
             bundle=args.bundle,
             force=args.force,
+            profile=profile,
         )
     except (OSError, GenerationError, retrieval.EvaluationError, json.JSONDecodeError) as exc:
         print(f"error: {exc}", file=sys.stderr)
