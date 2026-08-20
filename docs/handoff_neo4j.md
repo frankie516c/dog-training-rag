@@ -7,6 +7,42 @@ Stage 2 추출(73청크)까지 끝났고 Neo4j 적재만 남았습니다. 이 �
 (`Wsl/WSL_E_WSL_OPTIONAL_COMPONENT_REQUIRED`). 관리자 권한과 재부팅이 필요해서
 2026-08-19 세션에서는 여기서 멈췄습니다. 아래 1번이 그 해결입니다.
 
+## 동결 기준선 (2026-08-20) — 저녁 하이브리드 비교용
+
+> ⚠️ **이 그래프는 재추출로 재현 불가능합니다.** Stage 2는 코퍼스 전체를 매번
+> 다시 추출하고 LLM 결과는 재실행마다 흔들리므로(분리불안 경로가 27→22로 변한
+> 사례 참고), 지금 이 상태를 다시 만들려고 `extract_entities.py --stage 2`를
+> 재실행하면 **다른 그래프가 나옵니다.** 저녁 하이브리드 비교의 기준선은 반드시
+> 아래 동결 파일로 복원해서 씁니다 — 재추출 금지.
+
+**동결 파일** (저장소 밖, `.gitignore`에 안 걸림·커밋 안 함 — `git status`에
+untracked로 계속 보임):
+
+| 파일 | 내용 |
+|---|---|
+| `frozen/frozen_stage2_0820.jsonl` | 이 재적재를 만든 Stage 2 추출 원본 (83건, `data/graph/extractions_stage2.jsonl` 그대로 복사) |
+| `frozen/frozen_entity_aliases_0820.json` | 같은 시점의 alias 테이블 (`data/graph/entity_aliases.json` 복사) — 로더가 이 파일도 입력으로 쓰므로 함께 얼려야 재현이 됩니다 |
+| `frozen/frozen_graph_export_0820.json` | 라이브 Neo4j에서 직접 뽑은 노드 284건·관계 102건 전체 덤프(속성 포함) + 쿼리①②·타입별 집계. 로더 경로를 거치지 않고 그래프를 눈으로 대조하거나 복원할 때 씀 |
+
+**복원 방법 (권장 — 로더 재사용)**
+
+```powershell
+uv run python scripts/load_graph_neo4j.py --wipe `
+  --extractions frozen/frozen_stage2_0820.jsonl `
+  --aliases frozen/frozen_entity_aliases_0820.json
+```
+
+`--wipe`가 기존 그래프를 지우고 동결 시점 그대로 다시 접어 넣습니다. 완료 후
+기대값은 노드 284 · 관계 102 · 쿼리① 22경로 · 쿼리② 19경로 (아래 5번 Cypher로
+검증).
+
+**대안 (로더를 못 믿을 때 — `frozen_graph_export_0820.json`에서 직접 복원)**:
+그 파일의 `nodes`/`relationships` 배열을 순회하며 `(name, type)`로 노드를
+`MERGE`, `(source, type, target)`으로 관계를 `MERGE`하면 됩니다 — 로더의
+`build_graph()`가 하는 것과 같은 규칙입니다. 별도 스크립트는 아직 없습니다.
+
+---
+
 > **2026-08-20 재적재 (살구뉴스 켄넬 STEP 글 추가)** — 슬롯 3에 살구뉴스 켄넬 STEP
 > 글(`salgoonews-kennel-steps-12333`, 자세한 경위는 `docs/acquisition_list.md`의
 > 3-3 항목 참고)을 인제스트(문서 6건·57청크, 통합 코퍼스 26+57=**83청크**)한 뒤,
