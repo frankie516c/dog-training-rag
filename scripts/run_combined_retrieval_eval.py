@@ -15,6 +15,7 @@ rank and the score statistics. Span coverage stays that script's business.
 Usage:
     uv run python scripts/run_combined_retrieval_eval.py
     uv run python scripts/run_combined_retrieval_eval.py --no-documents   # baseline check
+    uv run python scripts/run_combined_retrieval_eval.py --graph-off      # vector-only, hybrid comparison
 """
 
 from __future__ import annotations
@@ -27,12 +28,18 @@ import sys
 from pathlib import Path
 from typing import Any, Sequence
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from load_graph_neo4j import build_graph, load_aliases  # noqa: E402
+
 DEFAULT_VIDEO_CHUNKS = Path("data/processed/youtube/chunks")
 DEFAULT_DOC_CHUNKS = Path("data/processed/documents/chunks")
 DEFAULT_FIXTURES = Path("data/eval/queries/owner_fixtures.jsonl")
 DEFAULT_GOLD = Path("data/eval/queries/youtube_retrieval_queries.jsonl")
 DEFAULT_METRICS = Path("data/eval/results/combined_v4_e5_metrics.json")
 DEFAULT_REPORT = Path("reports/combined_corpus_coverage.md")
+DEFAULT_GRAPH_EXTRACTIONS = Path("data/graph/extractions_stage2.jsonl")
+DEFAULT_GRAPH_ALIASES = Path("data/graph/entity_aliases.json")
 
 DEFAULT_BASELINE_FIXTURES = Path("data/eval/results/owner_fixtures_topk.jsonl")
 DEFAULT_BASELINE_GOLD = Path("data/eval/results/retrieval_metrics_dev.json")
@@ -67,6 +74,10 @@ SCENARIO_IDS = ("q007", "q011")
 # cases chosen while it could not influence the choice. Each is a question the
 # documents were meant to answer where dense retrieval did not reach them.
 RETRIEVAL_GAP_IDS = ("Q12", "Q13", "Q14", "Q15")
+
+# Graph search: match entity names in the question for seeds, walk this many hops.
+GRAPH_MAX_HOPS = 2
+MIN_ENTITY_NAME_CHARS = 2
 
 
 class EvalError(RuntimeError):
@@ -222,6 +233,117 @@ def snippet(text: str, limit: int = SNIPPET_CHARS) -> str:
     return flat[:limit] + ("…" if len(flat) > limit else "")
 
 
+# --------------------------------------------------------------------------- graph
+
+
+def load_graph(extractions_path: Path, aliases_path: Path) -> tuple[dict, dict]:
+    """Fold the stage-2 extraction into (nodes, edges), reusing the loader's own rule.
+
+    This is the same fold `scripts/load_graph_neo4j.py` writes into Neo4j, computed
+    here without a database connection so eval runs stay reproducible offline
+    (`scripts/preview_queries.py` does the same for the demo Cypher queries).
+    """
+    records = _rows(extractions_path)
+    aliases = load_aliases(aliases_path)
+    nodes, edges, _unresolved = build_graph(records, aliases)
+    return nodes, edges
+
+
+def build_adjacency(edges: dict) -> dict[tuple[str, str], list[tuple[tuple[str, str], Any]]]:
+    """Undirected neighbor list: (node key) -> [(other node key, edge key), ...]."""
+    adjacency: dict[tuple[str, str], list[tuple[tuple[str, str], Any]]] = {}
+    for edge_key, edge in edges.items():
+        src, tgt = edge["source"], edge["target"]
+        adjacency.setdefault(src, []).append((tgt, edge_key))
+        adjacency.setdefault(tgt, []).append((src, edge_key))
+    return adjacency
+
+
+def match_seeds(question: str, nodes: dict) -> list[tuple[str, str]]:
+    """Entity nodes whose name or a recorded alias appears in the question text."""
+    seeds = []
+    for key, node in nodes.items():
+        names = [node["name"], *node["aliases"]]
+        if any(len(name) >= MIN_ENTITY_NAME_CHARS and name in question for name in names):
+            seeds.append(key)
+    return sorted(seeds)
+
+
+def graph_walk(
+    seeds: Sequence[tuple[str, str]],
+    adjacency: dict,
+    max_hops: int = GRAPH_MAX_HOPS,
+) -> tuple[dict[tuple[str, str], int], dict[Any, int]]:
+    """Multi-source BFS from the seeds, up to `max_hops` edges out.
+
+    Returns every node and edge touched, each mapped to the hop distance it was
+    first reached at (seeds are hop 0). Traversal is undirected: the relation
+    schema is directional (e.g. 감별필요 always points into a disease), but a graph
+    *search* over it should reach a neighbor regardless of which way the arrow
+    happens to point, or the disease side of a 감별필요 edge is unreachable from
+    its own symptom.
+    """
+    visited_nodes: dict[tuple[str, str], int] = {key: 0 for key in seeds}
+    visited_edges: dict[Any, int] = {}
+    frontier = list(seeds)
+    for hop in range(1, max_hops + 1):
+        next_frontier: list[tuple[str, str]] = []
+        for node_key in frontier:
+            for neighbor_key, edge_key in adjacency.get(node_key, []):
+                if edge_key not in visited_edges:
+                    visited_edges[edge_key] = hop
+                if neighbor_key not in visited_nodes:
+                    visited_nodes[neighbor_key] = hop
+                    next_frontier.append(neighbor_key)
+        frontier = next_frontier
+    return visited_nodes, visited_edges
+
+
+def graph_search(
+    question: str,
+    nodes: dict,
+    edges: dict,
+    adjacency: dict,
+    by_id: dict[str, dict[str, Any]],
+    max_hops: int = GRAPH_MAX_HOPS,
+) -> list[dict[str, Any]]:
+    """Entity-seeded, 2-hop graph search that returns chunks, not paths.
+
+    Every node and edge the walk touches carries `source_chunks` — the chunks the
+    extraction was read off of. The union of those, in the order the walk reached
+    them and with duplicates dropped, is the chunk list a path-shaped result would
+    otherwise have to be flattened into anyway; returning chunks directly keeps the
+    output in the same shape as a vector hit (a corpus chunk dict), so the two can
+    be merged without a translation step.
+    """
+    seeds = match_seeds(question, nodes)
+    if not seeds:
+        return []
+    visited_nodes, visited_edges = graph_walk(seeds, adjacency, max_hops)
+    ordered_nodes = sorted(visited_nodes, key=lambda key: (visited_nodes[key], key))
+    ordered_edges = sorted(visited_edges, key=lambda key: (visited_edges[key], key))
+    chunk_ids: list[str] = []
+    for key in ordered_nodes:
+        chunk_ids.extend(nodes[key]["source_chunks"])
+    for key in ordered_edges:
+        chunk_ids.extend(edges[key]["source_chunks"])
+    deduped = list(dict.fromkeys(chunk_ids))
+    return [by_id[cid] for cid in deduped if cid in by_id]
+
+
+def hybrid_merge(
+    vector_ranked: Sequence[tuple[str, float]], graph_chunks: Sequence[dict[str, Any]]
+) -> list[str]:
+    """Vector top-k first, graph chunks appended after, duplicates dropped.
+
+    No routing (both retrievers always ran) and no score normalization (graph hits
+    carry no score to normalize against) — order is the only thing preserved.
+    """
+    ordered = [chunk_id for chunk_id, _score in vector_ranked]
+    ordered.extend(chunk["chunk_id"] for chunk in graph_chunks)
+    return list(dict.fromkeys(ordered))
+
+
 def run(
     video_dir: Path,
     doc_dir: Path | None,
@@ -229,6 +351,9 @@ def run(
     gold_path: Path,
     device: str,
     encoder: Any | None = None,
+    graph_extractions: Path = DEFAULT_GRAPH_EXTRACTIONS,
+    graph_aliases: Path = DEFAULT_GRAPH_ALIASES,
+    graph_off: bool = False,
 ) -> dict[str, Any]:
     video_all = load_video_chunks(video_dir)
     video = [c for c in video_all if c.get("embedding_eligible")]
@@ -238,6 +363,19 @@ def run(
     corpus = video + documents
     ids = [c["chunk_id"] for c in corpus]
     by_id = {c["chunk_id"]: c for c in corpus}
+
+    if graph_off:
+        graph_nodes: dict = {}
+        graph_edges: dict = {}
+        graph_adjacency: dict = {}
+    else:
+        graph_nodes, graph_edges = load_graph(graph_extractions, graph_aliases)
+        graph_adjacency = build_adjacency(graph_edges)
+
+    def search_graph(question: str) -> list[dict[str, Any]]:
+        if graph_off:
+            return []
+        return graph_search(question, graph_nodes, graph_edges, graph_adjacency, by_id)
 
     fixtures = [r for r in _rows(fixtures_path)]
     gold = [
@@ -262,6 +400,14 @@ def run(
     for row in fixtures:
         ranked, stats = rank_one(str(row["question"]))
         verdict = gate(stats["score_gap"])
+        # Both retrievers always run (no routing on query type); the gate decides
+        # only whether the graph's chunks are admitted as evidence, and it never
+        # sees them — score_gap above is computed from vector similarity alone.
+        graph_chunks = search_graph(str(row["question"]))
+        evidence_ids = (
+            hybrid_merge(ranked, graph_chunks) if verdict == GATE_PASS
+            else [cid for cid, _score in ranked]
+        )
         fixture_rows.append({
             "query_id": row["query_id"],
             "question": row["question"],
@@ -287,6 +433,17 @@ def run(
                 }
                 for rank, (cid, score) in enumerate(ranked, start=1)
             ],
+            "graph_top_k": [
+                {
+                    "chunk_id": chunk["chunk_id"],
+                    "source_kind": chunk["source_kind"],
+                    "where": describe(chunk),
+                    "slot": chunk.get("slot"),
+                    "text": chunk["text"],
+                }
+                for chunk in graph_chunks
+            ],
+            "evidence_chunk_ids": evidence_ids,
         })
 
     gold_rows = []
@@ -294,6 +451,12 @@ def run(
         relevant = set(gold_relevant_chunks(row, video))
         ranked, stats = rank_one(str(row["question"]))
         first = next((r for r, (cid, _) in enumerate(ranked, start=1) if cid in relevant), None)
+        verdict = gate(stats["score_gap"])
+        graph_chunks = search_graph(str(row["question"]))
+        evidence_ids = (
+            hybrid_merge(ranked, graph_chunks) if verdict == GATE_PASS
+            else [cid for cid, _score in ranked]
+        )
         gold_rows.append({
             "query_id": row["query_id"],
             "question": row["question"],
@@ -303,7 +466,7 @@ def run(
             "first_relevant_rank": first,
             "reciprocal_rank": serialize_score(1 / first) if first else 0.0,
             **stats,
-            "gate_verdict": gate(stats["score_gap"]),
+            "gate_verdict": verdict,
             "top_k": [
                 {
                     "rank": rank,
@@ -316,6 +479,17 @@ def run(
                 }
                 for rank, (cid, score) in enumerate(ranked, start=1)
             ],
+            "graph_top_k": [
+                {
+                    "chunk_id": chunk["chunk_id"],
+                    "source_kind": chunk["source_kind"],
+                    "where": describe(chunk),
+                    "is_gold": chunk["chunk_id"] in relevant,
+                    "text": chunk["text"],
+                }
+                for chunk in graph_chunks
+            ],
+            "evidence_chunk_ids": evidence_ids,
         })
 
     hit1 = sum(1 for r in gold_rows if r["first_relevant_rank"] == 1)
@@ -330,6 +504,13 @@ def run(
             "passage_prefix": PASSAGE_PREFIX,
             "tie_break": "ascending chunk_id",
             "device": device,
+            "graph_enabled": not graph_off,
+            "graph_max_hops": GRAPH_MAX_HOPS,
+        },
+        "graph": {
+            "enabled": not graph_off,
+            "nodes": len(graph_nodes),
+            "edges": len(graph_edges),
         },
         "corpus": {
             "video": {
@@ -713,6 +894,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--baseline-gold", type=Path, default=DEFAULT_BASELINE_GOLD)
     parser.add_argument("--dryrun", type=Path, default=DEFAULT_DRYRUN)
     parser.add_argument("--device", default="cpu", choices=("cpu", "cuda"))
+    parser.add_argument("--graph-extractions", type=Path, default=DEFAULT_GRAPH_EXTRACTIONS)
+    parser.add_argument("--graph-aliases", type=Path, default=DEFAULT_GRAPH_ALIASES)
+    parser.add_argument("--graph-off", action="store_true",
+                        help="vector-only run, no graph search — for the vector-vs-hybrid comparison")
     return parser
 
 
@@ -723,6 +908,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             args.video_chunks,
             None if args.no_documents else args.doc_chunks,
             args.fixtures, args.gold, args.device,
+            graph_extractions=args.graph_extractions,
+            graph_aliases=args.graph_aliases,
+            graph_off=args.graph_off,
         )
         dryrun = (
             {r["query_id"]: r for r in _rows(args.dryrun)} if args.dryrun.is_file() else {}
@@ -751,6 +939,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     passed = sum(1 for r in payload["owner_fixtures"] if r["gate_verdict"] == GATE_PASS)
     matched = sum(1 for r in payload["owner_fixtures"] if r["gate_matches_expected"])
     print("owner 20: gate PASS {} / 기대 일치 {}".format(passed, matched))
+    graph = payload["graph"]
+    if graph["enabled"]:
+        print("graph: 노드 {} · 엣지 {} (최대 {}홉)".format(
+            graph["nodes"], graph["edges"], payload["run"]["graph_max_hops"]))
+    else:
+        print("graph: off (--graph-off)")
     print("metrics: {}".format(args.metrics))
     if not args.no_documents:
         print("report: {}".format(args.report))
