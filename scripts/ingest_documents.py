@@ -93,6 +93,17 @@ PROMO_SUBSTRINGS = (
 HASHTAG = re.compile(r"^\s*(#\S+\s*)+$")
 BLOG_SIGNATURE = ("아프리카동물메디컬센터입니다", "서울 강서구에 위치한")
 
+# docs/SOURCES.md > 라이선스·저작권 메모: "robots.txt·ToS로 수집이 금지된 자료,
+# 로그인·유료 구간 자료의 무단 수집"은 공정이용 판단에서 불리해지는 케이스로
+# 명시돼 있다. mypetlife-kennel-training(슬롯 3, `/premium/...`)이 그 정책을
+# 어긴 채로 수집·인제스트까지 되어 사후 제거된 사고 이후, 같은 경로 패턴이
+# 다시 들어오면 인제스트 시점에 즉시 막는다.
+BLOCKED_URL_PATH_SEGMENTS = ("premium", "member", "paid")
+BLOCKED_URL_PATTERN = re.compile(
+    r"/(" + "|".join(BLOCKED_URL_PATH_SEGMENTS) + r")(/|\?|#|$)",
+    re.IGNORECASE,
+)
+
 
 class IngestError(RuntimeError):
     """Raised when an input document or the manifest is unusable."""
@@ -141,14 +152,6 @@ MANIFEST = [
         "blog": "베럴독 (네이버 블로그 yoonsu3454)",
         "author": "조재호 애견훈련소장",
     },
-    {
-        "doc_id": "mypetlife-kennel-training",
-        "slot": "3",
-        "origin": "manual",
-        "file": "mypetlife_kennel.md",
-        "blog": "비마이펫",
-        "author": "비마이펫",
-    },
 ]
 
 
@@ -163,6 +166,23 @@ def load_crawl_pool(root: Path) -> dict[str, dict[str, Any]]:
                 row = json.loads(line)
                 pool[row["doc_id"]] = row
     return pool
+
+
+def check_url_allowed(url: str, doc_id: str) -> None:
+    """Refuse a source URL whose path names a login/paid section.
+
+    Enforces docs/SOURCES.md's "로그인·유료 구간 자료의 무단 수집" exclusion at
+    collection time, rather than relying on a person to notice a paywalled URL
+    during selection — that is exactly how mypetlife-kennel-training got in.
+    """
+    match = BLOCKED_URL_PATTERN.search(url)
+    if match:
+        segment = match.group(1)
+        raise IngestError(
+            f"{doc_id}: source_url contains blocked path segment '/{segment}/' ({url}) — "
+            "docs/SOURCES.md의 '로그인·유료 구간 자료의 무단 수집' 배제 정책에 걸림. "
+            "유료/로그인 구간 콘텐츠는 수집 대상에서 제외할 것."
+        )
 
 
 def read_manual(path: Path) -> dict[str, str]:
@@ -453,6 +473,8 @@ def ingest(
                     title = line[3:].strip()
                     break
             raw_lines = [l for l in raw_lines if not (l.startswith("## ") and l[3:].strip() == title)]
+
+        check_url_allowed(entry["source_url"], entry["doc_id"])
 
         kept, dropped = clean(raw_lines)
         # The title is repeated as the first body line by the crawler; drop the echo.

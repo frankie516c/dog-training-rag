@@ -64,6 +64,26 @@ yt-dlp --skip-download --write-subs --sub-langs "ko" --sub-format "vtt/best" `
 
 즉 **한 사람의 채널만 통째로 떠서 그 말투와 처방을 그대로 재현하는 모델**이 가장 불리한 자리에 섭니다. YouTube ToS도 자막·영상 스크래핑을 명시적으로 금지합니다.
 
+### 로그인·유료 구간 차단 (코드 강제)
+
+2026-08-19에 `mypetlife-kennel-training`(슬롯 3, URL에 `/premium/` 포함)이 위
+배제 정책을 어긴 채로 수집·인제스트·Neo4j 적재까지 되었다가 2026-08-20에
+사후 발견되어 제거된 사고가 있었다. 사람이 선정 단계에서 URL을 눈으로 보고
+거르는 방식은 다시 뚫릴 수 있으므로, 이후로는 `scripts/ingest_documents.py`의
+`check_url_allowed()`가 인제스트 시점에 URL 경로를 검사해 아래 패턴이 있으면
+`IngestError`로 즉시 중단시킨다.
+
+| 차단 경로 패턴 | 예 |
+|---|---|
+| `/premium/` | `mypetlife.co.kr/premium/...` |
+| `/member/` | 회원 전용 구간 |
+| `/paid/` | 유료 구간 |
+
+패턴은 대소문자를 구분하지 않고 경로 세그먼트 단위(`/premium/`, `/premium?...`,
+`/premium#...`, 경로 끝의 `/premium`)로 매칭한다. 새 차단 패턴을 추가할 때는
+`scripts/ingest_documents.py`의 `BLOCKED_URL_PATH_SEGMENTS`와 이 표를 함께
+갱신한다.
+
 따라서 공개·서비스화로 방향이 바뀔 경우:
 
 1. 2층(공공·기관) 비중을 올리고 1층 의존을 낮출 것
