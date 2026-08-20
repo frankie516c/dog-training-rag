@@ -11,13 +11,22 @@ Retrieval is imported from evaluate_youtube_retrieval rather than rewritten, so 
 answer is generated from exactly the ranking the evaluation measured: same model,
 same prefixes, same tie-break.
 
+Graph search and the vector+graph hybrid merge are imported from
+run_combined_retrieval_eval.py (see `combined_eval` below) rather than
+reimplemented — two copies of graph_search/hybrid_merge/gate would drift the
+first time only one got fixed. This is what makes demo scenario③ (Q13,
+docs/demo_scenarios.md) reproducible through this script instead of the one-off
+script that produced it on 2026-08-20 (docs/agenda_0825.md 안건10/11): the same
+gate() call, on the same score_gap, decides the same PASS/REFUSE either way.
+
 The default mode calls the live model (see GENERATION_MODEL below, pinned through
 the 8/25 demo). --dry-run keeps the old prompts-only behaviour so today's runs stay
 comparable to every dry-run result already on disk.
 
 Usage:
-    uv run python scripts/generate_answers.py --queries <path>             # live
-    uv run python scripts/generate_answers.py --queries <path> --dry-run   # prompts only
+    uv run python scripts/generate_answers.py --queries <path>              # live, hybrid
+    uv run python scripts/generate_answers.py --queries <path> --graph-off  # vector-only
+    uv run python scripts/generate_answers.py --queries <path> --dry-run    # prompts only
 """
 
 from __future__ import annotations
@@ -35,7 +44,20 @@ from typing import Any, Protocol, Sequence
 
 DEFAULT_QUERIES = Path("data/eval/queries/out_of_corpus_queries.json")
 DEFAULT_CHUNK_DIR = Path("data/processed/youtube/chunks")
+DEFAULT_DOC_CHUNK_DIR = Path("data/processed/documents/chunks")
 DEFAULT_OUT_DIR = Path("data/eval/generation")
+
+# Graph input defaults to the frozen 2026-08-20 snapshot, not the live
+# data/graph/extractions_stage2.jsonl that run_combined_retrieval_eval.py itself
+# defaults to. A live Neo4j container (or the extraction files it was reloaded
+# from) is not guaranteed to be up, or even unchanged, on demo day; the frozen
+# pair is what docs/handoff_neo4j.md's restore path exists for, and it is what
+# reports/retrieval_gap_hybrid_vs_vector_0820.md's Q13 numbers were measured
+# against. combined_eval.load_graph() takes the path explicitly, so pointing
+# generate_answers.py's defaults here does not touch
+# run_combined_retrieval_eval.py's own CLI defaults at all.
+DEFAULT_GRAPH_EXTRACTIONS = Path("frozen/frozen_stage2_0820.jsonl")
+DEFAULT_GRAPH_ALIASES = Path("frozen/frozen_entity_aliases_0820.json")
 
 GENERATION_SCHEMA_VERSION = "youtube-generation-v1"
 EVAL_QUERY_SCHEMA = "youtube-eval-query-v1"
@@ -188,8 +210,14 @@ def _load_module(name: str) -> Any:
 # BACKOFF_SECONDS, RETRY_STATUS) — see load_openai_answer_client() below.
 # medical_guardrail: reused for classify_output_v2() and, as of 2026-08-20,
 # classify_input_v2() too — see MEDICAL_REFUSAL_TEMPLATE and generate()'s call site.
+# combined_eval (run_combined_retrieval_eval.py): reused for load_document_chunks
+# (the document half of the corpus, absent from evaluate_youtube_retrieval on
+# purpose — see that script's own module docstring), and for load_graph/
+# build_adjacency/graph_search/hybrid_merge/gate/GATE_PASS — see generate()'s
+# graph setup and its per-query loop.
 extraction = _load_module("extract_entities")
 medical_guardrail = _load_module("medical_guardrail")
+combined_eval = _load_module("run_combined_retrieval_eval")
 
 # 2026-08-20: Q17 (a MEDICAL owner-fixture question, docs/agenda_0825.md 안건10)
 # landed in the "answer" band on score_gap alone and reached the model, which
@@ -630,15 +658,37 @@ def generate(
     env_path: Path = Path(".env"),
     medical_terms: Sequence[str] | None = None,
     whitelist_terms: Sequence[str] | None = None,
+    doc_chunk_dir: Path | None = None,
+    graph_extractions: Path | None = None,
+    graph_aliases: Path | None = None,
+    graph_off: bool = False,
 ) -> dict[str, Any]:
+    """
+    doc_chunk_dir / graph_extractions / graph_aliases default to None, not to
+    DEFAULT_DOC_CHUNK_DIR / DEFAULT_GRAPH_EXTRACTIONS / DEFAULT_GRAPH_ALIASES:
+    a direct call (every test in tests/test_generate_answers.py) then gets the
+    old video-only, graph-off behaviour byte for byte, the same hermetic
+    contract medical_terms/whitelist_terms already have below (real lexicons
+    load only for a real CLI client, never for an injected test client). main()
+    is what supplies the real defaults — see build_parser().
+    """
     validate_thresholds(refuse_below, answer_at_or_above)
     queries, source_schema = load_query_set(queries_path)
     expected_refusal = source_schema == OUT_OF_CORPUS_SCHEMA
 
-    chunks = retrieval.load_chunks(chunk_dir)
-    corpus = retrieval.eligible_chunks(chunks)
-    if not corpus:
+    video_chunks = retrieval.load_chunks(chunk_dir)
+    video_corpus = retrieval.eligible_chunks(video_chunks)
+    if not video_corpus:
         raise GenerationError("no embedding_eligible chunk in the corpus")
+    doc_corpus = combined_eval.load_document_chunks(doc_chunk_dir) if doc_chunk_dir is not None else []
+    corpus = video_corpus + doc_corpus
+
+    graph_enabled = not graph_off and graph_extractions is not None and graph_aliases is not None
+    if graph_enabled:
+        graph_nodes, graph_edges = combined_eval.load_graph(graph_extractions, graph_aliases)
+        graph_adjacency = combined_eval.build_adjacency(graph_edges)
+    else:
+        graph_nodes, graph_edges, graph_adjacency = {}, {}, {}
 
     # Answers backfilled by hand cannot be regenerated: they came from a model
     # session that no longer exists. Re-running over them silently would destroy
@@ -702,8 +752,18 @@ def generate(
                 {
                     "rank": position,
                     "chunk_id": chunk_id,
-                    "video_id": chunk_by_id[chunk_id]["video_id"],
-                    "chunk_index": chunk_by_id[chunk_id]["chunk_index"],
+                    # A ranked chunk may be a document chunk once doc_chunk_dir is
+                    # set (run_combined_retrieval_eval.py's load_document_chunks
+                    # enforces that a document chunk never carries "video_id" —
+                    # see that function's docstring), so video_id/chunk_index are
+                    # read the same discriminated way _chunk_header() reads them.
+                    **(
+                        {"video_id": chunk_by_id[chunk_id]["video_id"],
+                         "chunk_index": chunk_by_id[chunk_id]["chunk_index"]}
+                        if "video_id" in chunk_by_id[chunk_id]
+                        else {"doc_id": chunk_by_id[chunk_id]["doc_id"],
+                              "chunk_index": chunk_by_id[chunk_id]["chunk_index"]}
+                    ),
                     "score": retrieval.serialize_score(score),
                 }
                 for position, (chunk_id, score) in enumerate(ranked, start=1)
@@ -712,11 +772,15 @@ def generate(
             "prompt_path": None,
             "usage": None,
             "medical_input_guardrail": None,
+            "graph_gate_verdict": None,
+            "graph_chunks_added": None,
+            "evidence_chunk_ids": None,
             "client": client.info.name,
         }
 
         if band == "refuse":
             # The band exists to stop the call, not to label it after the fact.
+            # No search of any kind runs here — graph_* stays the None set above.
             record["answer"] = REFUSAL_TEXT
             record["generated"] = False
             record["generation_meta"] = None
@@ -762,8 +826,31 @@ def generate(
                 records.append(record)
                 continue
 
+            # Graph search, gated exactly the way run_combined_retrieval_eval.py
+            # gates it (docs/graph_hybrid_retrieval_design.md 결정 3): the gate's
+            # only input is the vector score_gap computed above — graph_search()'s
+            # own chunks never reach gate() — and graph chunks are appended to the
+            # evidence only on GATE_PASS. On REFUSE the evidence stays vector-only,
+            # no matter how many chunks the graph would have found. Reached only
+            # after the medical short-circuit above returns/continues, so a
+            # MEDICAL question never runs graph_search() at all.
+            evidence_ids = [chunk_id for chunk_id, _ in ranked]
+            graph_gate_verdict = None
+            if graph_enabled:
+                graph_gate_verdict = combined_eval.gate(stats["score_gap"])
+                if graph_gate_verdict == combined_eval.GATE_PASS:
+                    graph_chunks = combined_eval.graph_search(
+                        question, graph_nodes, graph_edges, graph_adjacency, chunk_by_id
+                    )
+                    evidence_ids = combined_eval.hybrid_merge(ranked, graph_chunks)
+            record["graph_gate_verdict"] = graph_gate_verdict
+            record["graph_chunks_added"] = [
+                cid for cid in evidence_ids if cid not in {c for c, _ in ranked}
+            ]
+            record["evidence_chunk_ids"] = evidence_ids
+
             prompt = build_prompt(
-                question, [chunk_by_id[cid] for cid, _ in ranked], band, profile
+                question, [chunk_by_id[cid] for cid in evidence_ids], band, profile
             )
             prompts[record["query_id"]] = prompt
             raw_answer = client.complete(prompt, record)
@@ -865,6 +952,22 @@ def build_parser() -> argparse.ArgumentParser:
             "Omit (default) for the pre-profile prompt, unchanged."
         ),
     )
+    parser.add_argument(
+        "--doc-chunk-dir", type=Path, default=DEFAULT_DOC_CHUNK_DIR,
+        help="document half of the combined corpus (run_combined_retrieval_eval.py's "
+             "load_document_chunks); paired with --no-documents below",
+    )
+    parser.add_argument(
+        "--no-documents", action="store_true",
+        help="video-only corpus, no documents — the vector-only side of a hybrid comparison",
+    )
+    parser.add_argument("--graph-extractions", type=Path, default=DEFAULT_GRAPH_EXTRACTIONS)
+    parser.add_argument("--graph-aliases", type=Path, default=DEFAULT_GRAPH_ALIASES)
+    parser.add_argument(
+        "--graph-off", action="store_true",
+        help="vector-only evidence, no graph search — for the vector-vs-hybrid comparison "
+             "(mirrors run_combined_retrieval_eval.py's own --graph-off)",
+    )
     return parser
 
 
@@ -886,8 +989,15 @@ def main(argv: Sequence[str] | None = None) -> int:
             force=args.force,
             profile=profile,
             env_path=args.env,
+            doc_chunk_dir=None if args.no_documents else args.doc_chunk_dir,
+            graph_extractions=args.graph_extractions,
+            graph_aliases=args.graph_aliases,
+            graph_off=args.graph_off,
         )
-    except (OSError, GenerationError, retrieval.EvaluationError, json.JSONDecodeError) as exc:
+    except (
+        OSError, GenerationError, retrieval.EvaluationError,
+        combined_eval.EvalError, json.JSONDecodeError,
+    ) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 

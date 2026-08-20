@@ -16,6 +16,7 @@ sys.modules[SPEC.name] = module
 SPEC.loader.exec_module(module)
 
 retrieval = module.retrieval
+combined_module = module.combined_eval
 
 CORPUS_ORDER = ("chunk-1", "chunk-2", "chunk-3", "chunk-4", "chunk-5")
 TEXTS = {
@@ -872,6 +873,249 @@ class MedicalTermsAutoLoadTests(unittest.TestCase):
         # even try when a client is injected.
         result = Fixture().run(gap=0.05, client=FakeClient())
         self.assertIsNone(result["records"][0]["output_guardrail"])
+
+
+class GenericScriptedEncoder:
+    """Like ScriptedEncoder, but for an arbitrary passage list — needed once the
+    corpus can include document chunks, which ScriptedEncoder's hardcoded
+    CORPUS_ORDER/TEXTS knows nothing about.
+    """
+
+    def __init__(self, passage_texts, weights):
+        self.dimension = len(passage_texts)
+        self._passages = {
+            retrieval.PASSAGE_PREFIX + text: index for index, text in enumerate(passage_texts)
+        }
+        self._weights = list(weights)
+        self.info = retrieval.EncoderInfo(name="fake", dependency_versions={"fake": "1"})
+
+    def encode(self, texts):
+        vectors = []
+        for text in texts:
+            if text in self._passages:
+                vector = [0.0] * self.dimension
+                vector[self._passages[text]] = 1.0
+            elif text.startswith(retrieval.QUERY_PREFIX):
+                vector = list(self._weights)
+            else:  # pragma: no cover - guards fixture drift
+                raise AssertionError(f"unscripted text: {text!r}")
+            vectors.append(vector)
+        return vectors
+
+
+def write_graph_fixture(directory, entries):
+    """A minimal extractions.jsonl + aliases.json pair, in the same shape
+    load_graph_neo4j.build_graph() (and so combined_eval.load_graph()) expects.
+
+    entries: [(entity_name, entity_type, source_chunk_id), ...] — one extraction
+    record per entry, no relations. Enough for match_seeds() to find a literal
+    substring hit and graph_search() to surface that chunk.
+    """
+    extractions_path = directory / "extractions.jsonl"
+    aliases_path = directory / "aliases.json"
+    with extractions_path.open("w", encoding="utf-8", newline="\n") as file:
+        for name, entity_type, chunk_id in entries:
+            record = {
+                "chunk_id": chunk_id,
+                "entities": [{
+                    "name": name, "type": entity_type, "normalized_from": None,
+                    "evidence": name, "confidence": "high",
+                }],
+                "relations": [],
+            }
+            file.write(json.dumps(record, ensure_ascii=False) + "\n")
+    aliases_path.write_text("{}", encoding="utf-8")
+    return extractions_path, aliases_path
+
+
+class GraphReuseTests(unittest.TestCase):
+    """Graph search, hybrid merge and the gate must come from
+    run_combined_retrieval_eval.py, not a second copy — see that module's own
+    graph_search()/hybrid_merge()/gate() and docs/graph_hybrid_retrieval_design.md.
+    """
+
+    def test_combined_eval_is_the_combined_retrieval_module(self):
+        self.assertIs(combined_module, sys.modules["run_combined_retrieval_eval"])
+        for name in ("graph_search", "hybrid_merge", "gate", "load_graph", "build_adjacency"):
+            self.assertTrue(hasattr(combined_module, name), name)
+
+    def test_graph_functions_are_not_redefined_locally(self):
+        source = SCRIPT.read_text(encoding="utf-8")
+        for signature in ("def graph_search(", "def hybrid_merge(", "def gate(",
+                          "def load_graph(", "def build_adjacency("):
+            self.assertNotIn(signature, source)
+        for call in ("combined_eval.graph_search", "combined_eval.hybrid_merge",
+                     "combined_eval.gate", "combined_eval.GATE_PASS"):
+            self.assertIn(call, source)
+
+
+class GraphGateSeparationTests(unittest.TestCase):
+    """Graph evidence is gated on combined_eval.gate(score_gap) — the vector
+    score alone, exactly as run_combined_retrieval_eval.py gates it
+    (docs/graph_hybrid_retrieval_design.md 결정 3) — never on this script's own
+    band thresholds, which a CLI flag can move independently.
+    """
+
+    QUESTION = "산책법이 궁금해요"
+
+    def _fixture(self, seed_chunk="chunk-5"):
+        fixture = Fixture(queries=[Fixture.eval_query("q1", self.QUESTION)])
+        extractions, aliases = write_graph_fixture(
+            fixture.directory, [("산책법", "훈련법", seed_chunk)]
+        )
+        return fixture, extractions, aliases
+
+    def test_graph_evidence_is_added_on_gate_pass(self):
+        fixture, extractions, aliases = self._fixture()
+        result = module.generate(
+            fixture.queries, fixture.chunk_dir, fixture.out_dir,
+            encoder=ScriptedEncoder(weights_for_gap(0.05)), client=FakeClient(),
+            top_k=3, graph_extractions=extractions, graph_aliases=aliases,
+        )
+        record = result["records"][0]
+        self.assertEqual("answer", record["band"])
+        self.assertEqual(combined_module.GATE_PASS, record["graph_gate_verdict"])
+        self.assertEqual(["chunk-5"], record["graph_chunks_added"])
+        self.assertIn("chunk-5", record["evidence_chunk_ids"])
+        # top_k=3 alone would never have reached chunk-5 (ties break ascending id).
+        self.assertNotIn("chunk-5", [row["chunk_id"] for row in record["retrieved"]])
+
+    def test_graph_evidence_is_withheld_when_the_fixed_gate_refuses_in_the_answer_band(self):
+        fixture, extractions, aliases = self._fixture()
+        # answer_at_or_above is overridden well below combined_eval.GATE_THRESHOLD
+        # (0.024, untouched here on purpose): the band says "answer" but the
+        # graph gate — always combined_eval.gate() against the fixed threshold —
+        # still says REFUSE. Evidence must stay vector-only either way.
+        result = module.generate(
+            fixture.queries, fixture.chunk_dir, fixture.out_dir,
+            encoder=ScriptedEncoder(weights_for_gap(0.022)), client=FakeClient(),
+            top_k=3, answer_at_or_above=0.02,
+            graph_extractions=extractions, graph_aliases=aliases,
+        )
+        record = result["records"][0]
+        self.assertEqual("answer", record["band"])
+        self.assertEqual(combined_module.GATE_REFUSE, record["graph_gate_verdict"])
+        self.assertEqual([], record["graph_chunks_added"])
+        self.assertNotIn("chunk-5", record["evidence_chunk_ids"])
+
+    def test_graph_off_suppresses_graph_evidence_even_when_configured(self):
+        fixture, extractions, aliases = self._fixture()
+        result = module.generate(
+            fixture.queries, fixture.chunk_dir, fixture.out_dir,
+            encoder=ScriptedEncoder(weights_for_gap(0.05)), client=FakeClient(),
+            top_k=3, graph_extractions=extractions, graph_aliases=aliases, graph_off=True,
+        )
+        record = result["records"][0]
+        self.assertIsNone(record["graph_gate_verdict"])
+        self.assertEqual([], record["graph_chunks_added"])
+        self.assertNotIn("chunk-5", record["evidence_chunk_ids"])
+
+    def test_no_graph_paths_means_vector_only_evidence_by_default(self):
+        # Every other test in this file runs this way (generate()'s own default):
+        # graph_extractions/graph_aliases default to None, so a direct call never
+        # touches the frozen files and never runs a graph search.
+        record = Fixture().run(gap=0.05)["records"][0]
+        self.assertIsNone(record["graph_gate_verdict"])
+        self.assertEqual(
+            [row["chunk_id"] for row in record["retrieved"]], record["evidence_chunk_ids"]
+        )
+
+    def test_the_refuse_band_carries_no_graph_fields_even_when_graph_is_configured(self):
+        fixture, extractions, aliases = self._fixture()
+        result = module.generate(
+            fixture.queries, fixture.chunk_dir, fixture.out_dir,
+            encoder=ScriptedEncoder(weights_for_gap(0.001)), client=ExplodingClient(),
+            graph_extractions=extractions, graph_aliases=aliases,
+        )
+        record = result["records"][0]
+        self.assertEqual("refuse", record["band"])
+        self.assertIsNone(record["graph_gate_verdict"])
+        self.assertIsNone(record["graph_chunks_added"])
+        self.assertIsNone(record["evidence_chunk_ids"])
+
+
+class GraphMedicalOrderingTests(unittest.TestCase):
+    """The input guardrail runs before graph search: a MEDICAL question never
+    triggers graph_search() at all, even when its text would otherwise match a
+    graph seed literally. Requirement: retrieval-time search has no reason to
+    run for a question the guardrail already routes to a vet referral.
+    """
+
+    TERMS = ["연고"]
+    WHITELIST = ["없음더미"]  # deliberately disjoint from the graph seed below
+
+    def test_a_medical_question_never_runs_graph_search(self):
+        question = "가나다훈련 중에 연고를 발라야 하나요?"
+        fixture = Fixture(queries=[Fixture.eval_query("q1", question)])
+        extractions, aliases = write_graph_fixture(
+            fixture.directory, [("가나다훈련", "훈련법", "chunk-5")]
+        )
+        result = module.generate(
+            fixture.queries, fixture.chunk_dir, fixture.out_dir,
+            encoder=ScriptedEncoder(weights_for_gap(0.05)), client=ExplodingClient(),
+            medical_terms=self.TERMS, whitelist_terms=self.WHITELIST,
+            graph_extractions=extractions, graph_aliases=aliases,
+        )
+        record = result["records"][0]
+        self.assertTrue(record["medical_input_guardrail"]["is_medical"])
+        self.assertIsNone(record["graph_gate_verdict"])
+        self.assertIsNone(record["graph_chunks_added"])
+        self.assertIsNone(record["evidence_chunk_ids"])
+        self.assertEqual(module.MEDICAL_REFUSAL_TEMPLATE.text, record["answer"])
+
+
+class DocumentCorpusIntegrationTests(unittest.TestCase):
+    """doc_chunk_dir joins document chunks into the corpus, reusing
+    combined_eval.load_document_chunks() — generate_answers.py's own retrieval
+    had no document half before this (DEFAULT_CHUNK_DIR is video-only).
+    """
+
+    def test_a_document_chunk_can_win_the_ranking_and_render_a_document_header(self):
+        fixture = Fixture()
+        doc_dir = fixture.directory / "docs"
+        doc_dir.mkdir()
+        doc_text = "분리불안 문서 본문"
+        row = doc_chunk("docchunk-1", 0, doc_id="doc-9", heading_path=("문서",), text=doc_text)
+        with (doc_dir / "doc9.jsonl").open("w", encoding="utf-8", newline="\n") as file:
+            file.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+        passages = [TEXTS[c] for c in CORPUS_ORDER] + [doc_text]
+        encoder = GenericScriptedEncoder(passages, weights=[0.5] * 5 + [0.95])
+
+        result = module.generate(
+            fixture.queries, fixture.chunk_dir, fixture.out_dir,
+            encoder=encoder, client=FakeClient(), top_k=1, doc_chunk_dir=doc_dir,
+        )
+        record = result["records"][0]
+        self.assertEqual(1, len(record["retrieved"]))
+        self.assertEqual("docchunk-1", record["retrieved"][0]["chunk_id"])
+        self.assertEqual("doc-9", record["retrieved"][0]["doc_id"])
+        self.assertNotIn("video_id", record["retrieved"][0])
+
+    def test_doc_chunk_dir_none_means_the_corpus_stays_video_only(self):
+        record = Fixture().run(gap=0.05)["records"][0]
+        self.assertTrue(all("video_id" in row for row in record["retrieved"]))
+
+
+class GraphCliTests(unittest.TestCase):
+    def test_graph_defaults_point_at_the_frozen_snapshot_not_the_live_graph(self):
+        parsed = module.build_parser().parse_args([])
+        self.assertEqual(module.DEFAULT_GRAPH_EXTRACTIONS, parsed.graph_extractions)
+        self.assertEqual(module.DEFAULT_GRAPH_ALIASES, parsed.graph_aliases)
+        self.assertEqual(Path("frozen/frozen_stage2_0820.jsonl"), parsed.graph_extractions)
+        self.assertEqual(Path("frozen/frozen_entity_aliases_0820.json"), parsed.graph_aliases)
+
+    def test_graph_off_flag_defaults_to_false_and_parses(self):
+        self.assertFalse(module.build_parser().parse_args([]).graph_off)
+        self.assertTrue(module.build_parser().parse_args(["--graph-off"]).graph_off)
+
+    def test_doc_chunk_dir_defaults_to_the_document_corpus(self):
+        parsed = module.build_parser().parse_args([])
+        self.assertEqual(module.DEFAULT_DOC_CHUNK_DIR, parsed.doc_chunk_dir)
+        self.assertFalse(parsed.no_documents)
+
+    def test_no_documents_flag_parses(self):
+        self.assertTrue(module.build_parser().parse_args(["--no-documents"]).no_documents)
 
 
 if __name__ == "__main__":
