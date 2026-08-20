@@ -160,3 +160,121 @@ Q16 행.
 
 **이번에 하지 않은 것**: 가드레일이나 프롬프트(`PROFILE_NOTE` 등) 조정은 하지 않았습니다
 — 판단 보류. 검토 후보는 7번 안건(의미 기반 출력 분류)과 같은 축일 가능성이 있습니다.
+
+**갱신 (2026-08-20, 같은 날 오후)**: `classify_output`이 쓰던 사전이 v1 → v2(+화이트리스트)로
+바뀌었습니다 (9번 안건). 이 항목이 관찰한 "병명 언급만으로 disclaimer가 붙는다"는 동작
+자체는 v2에서도 여전합니다 — 다만 v1이 "분리불안"류 훈련 어휘를 병명으로 오인하던 문제는
+9번 안건에서 없앴으므로, 현재 프로필 기능이 실제로 부딪힐 표면은 v2의 진짜 의료 어휘
+목록(`data/guardrail/medical_terms_v2.json`)으로 좁혀졌습니다.
+
+---
+
+## 9. 출력 가드레일 사전 버전 관리 — v1/v2 혼용 사고
+
+**발견 경위 (2026-08-20)**: `scripts/generate_answers.py`에 실제 LLM 생성을 연결하면서
+`classify_output`을 처음으로 진짜 생성 결과에 통과시켰습니다(그 전까지는
+`tests/test_medical_guardrail.py` 단위 테스트로만 검증된 경로 — `medical_guardrail.py`
+독스트링에 이미 그렇게 적혀 있었습니다). 처음엔 v1 `MEDICAL_TERMS`
+(`data/guardrail/medical_terms_v1.json`, 코퍼스 추출 질환/증상 엔티티)를 그대로 썼는데,
+데모 시나리오 q007·Q15 두 건 모두 "분리불안"/"불안" 때문에 `OUTPUT_DISCLAIMER`가
+붙었습니다. 둘 다 완전히 정상적인 훈련 답변이었습니다 — 진단·처방과 무관.
+
+**원인**: v1은 애초에 `classify_input`용으로 코퍼스에서 그대로 뽑은 사전이고,
+`medical_guardrail.py` 모듈 독스트링이 이미 "분리불안/불안/짖음/하울링은 훈련 어휘와
+증상 라벨링이 겹친다"고 기록해 둔 바로 그 문제입니다. `classify_output`은 이 사전을
+그대로 재사용하고 있었고, 실제 생성 전까지는 이 재사용이 문제를 일으키는지 측정된 적이
+없었습니다.
+
+**조치 (2026-08-20)**: `classify_output_v2(answer, medical_terms_v2, whitelist_terms)`를
+추가했습니다 — `classify_input_v2`의 화이트리스트 우선순위 규칙(화이트리스트 히트 시
+사전 매칭과 무관하게 통과)을 출력 쪽에도 그대로 적용한 것입니다. `generate_answers.py`는
+이제 v2 + `training_whitelist_v1.json`을 씁니다. 재확인 결과 q007·Q15 모두 disclaimer가
+사라졌고(`output_guardrail.whitelist_matched`에 `분리불안`/`불안`/`산책`이 기록됨), 병명 +
+처방성 표현 조합은 여전히 차단됩니다(단위 테스트로 확인, 실제 코퍼스에서 그런 조합이
+나온 사례는 아직 없음). v1의 `classify_output`은 코드에 그대로 남겨뒀습니다 — v1이 왜
+틀린 설계였는지의 증거 자체를 지우지 않기 위해서입니다(v1 사전 자체를 남겨둔 것과 같은
+이유).
+
+**아직 측정하지 않은 것**: 화이트리스트 우선순위의 알려진 트레이드오프(화이트리스트
+단어와 진짜 처방 표현이 한 문장에 같이 있으면 화이트리스트가 이겨 통과됨,
+`data/guardrail/training_whitelist_v1.json`의 `known_tradeoff` 참고)가 출력 쪽에서
+실제로 발현되는 사례는 아직 실측 코퍼스에서 나온 적이 없습니다.
+
+---
+
+## 10. 입력 가드레일(classify_input)이 파이프라인에 연결되지 않음
+
+**현재 상태 (2026-08-20)**: `scripts/generate_answers.py`의 밴드 분기는 `score_gap` 하나로만
+결정됩니다. `medical_guardrail.classify_input` / `classify_input_v2`(질문 단계에서 의료
+질문을 걸러 `VET_REFERRAL_MESSAGE`로 즉시 응답하고 검색·생성을 건너뛰는 함수)는 이
+스크립트 어디에서도 호출되지 않습니다 — `medical_guardrail.py` 모듈 자체에는 이미
+구현·단위테스트가 끝나 있는 함수인데도 그렇습니다.
+
+**실측된 결과**: 시나리오④ `Q17`("아토피 피부염... 약용 샴푸나 처방식 사료, 연고
+이름을 알려주세요")은 `data/eval/queries/owner_fixtures.jsonl`에 `refuse_reason: "MEDICAL"`,
+`expected_outcome: "REFUSE"`로 등록돼 있지만, `score_gap`이 0.0262로 `ANSWER_AT_OR_ABOVE`
+(0.024)를 넘어 게이트가 "answer" 밴드로 통과시킵니다. 2026-08-20 실제 생성 결과, 모델이
+검색된 5개 청크 중 아토피 관련 내용이 없음을 스스로 확인하고 "제공된 자료에는 이 질문에
+대한 내용이 없습니다"로 답해 결과적으로는 기대값(REFUSE에 준하는 응답)과 일치했습니다.
+전문은 `data/eval/generation/answers_demo_scenario_queries.jsonl`의 `Q17` 행.
+
+**왜 이게 문제인가**: 이번엔 모델이 규칙(자료 밖 추측 금지)을 지켜서 우연히 맞았을 뿐,
+이 파이프라인의 설계가 의료 질문을 걸러낸 것이 아닙니다. 검색된 청크가 어쩌다 아토피와
+살짝이라도 겹치는 내용을 담고 있었다면(예: 피부 관리·목욕 관련 청크가 코퍼스에 들어올
+경우) 게이트도 통과하고 입력 가드레일도 없으니 모델이 일반 지식으로 처방을 언급할
+경로가 열려 있습니다. 9번 안건에서 연결한 출력 가드레일(`classify_output_v2`)이 마지막
+방어선 역할을 하지만, 그건 "병명 + 처방성 표현이 같은 문장에 있어야" 걸리는 좁은
+조건이라 모든 경우를 잡지 못합니다(`medical_guardrail.py`의 `classify_output` 독스트링
+참고).
+
+**이번에 하지 않은 것**: `classify_input`/`classify_input_v2`를 `generate_answers.py`에
+연결하는 작업은 하지 않았습니다 — 오늘 지시 범위(출력 가드레일 연결)를 벗어나고, 게이트
+로직(`score_gap` 단독)을 바꾸는 결정이라 판단을 넘겨야 합니다.
+
+**갱신 (2026-08-20, 같은 날 늦게)**: 부분적으로 연결했습니다. Q17이 겪은 문제(모델이
+즉흥적으로 "자료에 없다"고만 답하고 공감·수의사 상담 권유가 없는 것)를 고치면서,
+`generate()`의 hedge/answer 분기 맨 앞에 `classify_input_v2` 체크 하나를 추가해
+`is_medical`이면 모델 호출 자체를 건너뛰고 `MEDICAL_REFUSAL_TEMPLATE`(공감 + 범위 밖
+설명 + 수의사 상담 권유)로 바로 답합니다. `score_gap`/`classify_band`/게이트 로직은
+안 건드렸습니다 — 최소 변경입니다. 위에서 지적한 "게이트도 통과하고 입력 가드레일도
+없으니" 부분은 이제 정확하지 않습니다 — hedge/answer 밴드에 한해서는 입력 가드레일이
+있습니다. 다만 refuse 밴드(애초에 모델을 안 부름)에는 이 체크가 없고, 화이트리스트
+우선순위(안건9 known_tradeoff)가 여전히 적용되므로 "짖음"·"분리불안" 같은 훈련 단어와
+진짜 의료 상황이 한 질문에 같이 있으면 여전히 통과합니다(Q13이 그 실사례 — 아래
+11번 안건).
+
+---
+
+## 11. `generate_answers.py`가 그래프 검색을 하지 않음 — 하이브리드+실제생성 정식 경로 없음
+
+**현재 상태 (2026-08-20)**: `scripts/generate_answers.py`는 벡터 검색만 합니다.
+`graph_search`/`hybrid_merge`는 `scripts/run_combined_retrieval_eval.py`에만 있고,
+실제 답변 생성(`build_prompt` + 실 API 호출)은 `generate_answers.py`에만 있습니다 —
+둘을 잇는 정식 경로가 저장소에 없습니다.
+
+**발견 경위**: 시나리오③을 `Q13`으로 바꾸면서(그래프가 문서 경계를 넘어 구제하는
+유일한 사례이기 때문 — `docs/demo_scenarios.md` "③ Q13" 절) 실제 생성을 돌리려 했더니,
+`generate_answers.py`의 기본 검색(벡터 전용, top-5)만으로는 그래프가 끌어오는 핵심 문서
+(`africaamc-night-barking-222955061390`, 노령견 치매/관절통증 감별)가 근거에 아예
+들어가지 않습니다. 이번엔 세션 스크래치의 일회성 스크립트로 `run_combined_retrieval_eval`의
+`graph_search`/`hybrid_merge`를 직접 호출해 증거 18건을 만들고, 그걸
+`generate_answers.build_prompt()` + `load_openai_answer_client()` +
+`medical_guardrail.apply_output_guardrail()`에 수동으로 넣어 우회했습니다. 결과 전문은
+`docs/demo_scenarios.md` "③ Q13" 절.
+
+**추가로 발견한 부수 결함**: 이 과정에서 `generate_answers.build_prompt()`가
+문서 청크(`video_id` 없음, `doc_id`/`heading_path` 씀)를 아예 처리하지 못한다는 것도
+드러났습니다 — `chunk['video_id']`를 무조건 읽어서 `KeyError`가 났을 것입니다.
+`_chunk_header()`로 분리해 문서/영상 청크 둘 다 처리하도록 고쳤습니다(테스트
+`DocumentChunkHeaderTests`). 이건 고쳤지만, 그래프 검색 자체를 `generate_answers.py`에
+붙이는 일은 안 했습니다.
+
+**왜 문제인가**: 시나리오③이 이제 그래프 의존적인 `Q13`이므로, 8/25 데모 당일
+"버튼 하나로 재현 가능한" 정식 경로가 없으면 발표 직전에 오늘 쓴 것과 같은 일회성
+스크립트를 다시 짜야 합니다. 세 스크립트(벡터 검색·그래프 검색·생성)가 각자 다른
+날 다른 이유로 따로 만들어진 결과라, 지금은 그 세 개를 손으로 이어 붙여야 합니다.
+
+**이번에 하지 않은 것**: `generate_answers.py`에 `--graph` 같은 플래그를 추가해
+`run_combined_retrieval_eval`의 그래프 경로를 정식으로 불러오는 작업은 안 했습니다 —
+오늘 지시 범위(Q13 실제 생성 결과 확인)를 넘어서는 통합 설계 결정이라 판단을 넘깁니다.
+데모 당일 재현이 필요하면 이 안건을 먼저 처리해야 합니다.

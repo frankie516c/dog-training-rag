@@ -11,8 +11,13 @@ Retrieval is imported from evaluate_youtube_retrieval rather than rewritten, so 
 answer is generated from exactly the ranking the evaluation measured: same model,
 same prefixes, same tie-break.
 
+The default mode calls the live model (see GENERATION_MODEL below, pinned through
+the 8/25 demo). --dry-run keeps the old prompts-only behaviour so today's runs stay
+comparable to every dry-run result already on disk.
+
 Usage:
-    uv run python scripts/generate_answers.py --queries <path> --dry-run
+    uv run python scripts/generate_answers.py --queries <path>             # live
+    uv run python scripts/generate_answers.py --queries <path> --dry-run   # prompts only
 """
 
 from __future__ import annotations
@@ -21,7 +26,9 @@ import argparse
 import importlib.util
 import json
 import sys
+import time
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Protocol, Sequence
 
@@ -71,7 +78,7 @@ BANDS = ("refuse", "hedge", "answer")
 
 # Bump the version whenever the wording below changes: an answer is only
 # interpretable next to the prompt that produced it.
-PROMPT_VERSION = "grounded-answer-ko-v1"
+PROMPT_VERSION = "grounded-answer-ko-v2"
 
 REFUSAL_TEXT = (
     "제공된 자료에는 이 질문에 답할 내용이 없습니다. "
@@ -83,10 +90,15 @@ PROMPT_RULES = (
     "2. 자료에 답이 없으면 \"제공된 자료에는 이 질문에 대한 내용이 없습니다\"라고 답하고, 추측하지 마세요.",
     "3. 자료 밖의 일반 지식이나 상식으로 빈칸을 채우지 마세요. 그럴듯한 문장을 만드는 것보다 없다고 말하는 것이 낫습니다.",
     "4. 답변에 쓴 자료를 [1]처럼 번호로 표시하세요.",
+    # v2 addition (2026-08-20): a cause-only answer leaves an owner with nothing
+    # to do next. This only asks for what rule 1/3 already allow — material that
+    # is there — so it does not loosen the no-outside-knowledge rules above it.
+    "5. 자료에 다음에 취할 수 있는 구체적인 행동이나 대처법이 나와 있다면 원인 설명과 "
+    "함께 안내하세요. 자료에 없으면 억지로 만들지 말고 원인 설명까지만 답하세요.",
 )
 
 HEDGE_RULE = (
-    "5. 아래 자료는 질문과의 관련성이 낮게 측정되었습니다. 답변 맨 앞에 "
+    "6. 아래 자료는 질문과의 관련성이 낮게 측정되었습니다. 답변 맨 앞에 "
     "\"[근거 약함] 아래 답변은 관련성이 낮은 자료에 기반합니다\"를 그대로 넣고, "
     "단정적인 어조를 쓰지 마세요."
 )
@@ -99,11 +111,32 @@ HEDGE_RULE = (
 PROFILE_SCHEMA_VERSION = "demo-profile-v1"
 PROFILE_FIELDS = ("견종", "나이", "몸무게", "기존질환", "비고")
 
+# v2 (2026-08-20): earlier wording only said "this isn't evidence" and the model
+# had no reason to actually use it — worst case with q007, where the profile's
+# own 비고 restated the question's symptoms almost verbatim, so there was nothing
+# left for the profile to add. Now asks the model to actively tailor the answer to
+# this dog's situation, while keeping the one constraint that matters: grounding
+# still comes only from <자료>, never from the profile.
 PROFILE_NOTE = (
-    "아래 프로필은 질문자가 알려준 반려견의 상황 정보입니다. 근거 자료가 아니므로 "
-    "답변의 근거로 쓰지 마세요. 답변 내용은 반드시 <자료>에서만 가져오고, 프로필에 "
-    "적힌 질환명이 있어도 그것을 근거 없이 진단처럼 언급하지 마세요."
+    "아래 프로필은 질문자가 알려준 반려견의 상황 정보입니다. 답변할 때 이 정보를 "
+    "반영해 이 반려견의 상황에 맞게 조언을 조정하세요. 다만 답변에 쓰는 근거는 반드시 "
+    "<자료>에서만 가져와야 하고, 프로필은 그 근거로 쓸 수 없습니다. 프로필에 적힌 "
+    "질환명이 있어도 그것을 근거 없이 진단처럼 언급하지 마세요."
 )
+
+# Live generation config — pinned through the 8/25 demo, same model id as
+# scripts/extract_entities.py's DEFAULT_MODEL. Not exposed as CLI flags: the point
+# of pinning is that nobody (including a future run of this script) can change
+# them without it showing up as a code diff. reasoning_effort is "medium" here,
+# not extraction's "low" — this stage writes an answer for a person to read, not a
+# JSON record for a validator. temperature is not sent, same as extraction (see
+# extract_entities.py's PROMPT_VERSION comment for why: absent from the request,
+# not sent as null). max_output_tokens is generous because a reasoning model's
+# hidden reasoning tokens can eat into the same budget as the visible answer.
+GENERATION_MODEL = "gpt-5.6-terra"
+GENERATION_REASONING_EFFORT = "medium"
+GENERATION_TEMPERATURE = "not_sent"
+GENERATION_MAX_OUTPUT_TOKENS = 4096
 
 
 class GenerationError(RuntimeError):
@@ -131,6 +164,53 @@ def _load_retrieval() -> Any:
 
 
 retrieval = _load_retrieval()
+
+
+def _load_module(name: str) -> Any:
+    """Import a sibling script by filename, whatever the working directory is.
+
+    Same pattern as _load_retrieval(): the point is to reuse that script's code,
+    not its intent, so a change there is felt here too instead of drifting apart.
+    """
+    if name in sys.modules:
+        return sys.modules[name]
+    path = Path(__file__).resolve().parent / f"{name}.py"
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:  # pragma: no cover - broken checkout
+        raise GenerationError(f"cannot import {name} from {path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+# extraction: reused for its OpenAI auth/retry/dual-surface plumbing (ENV_KEY,
+# BACKOFF_SECONDS, RETRY_STATUS) — see load_openai_answer_client() below.
+# medical_guardrail: reused for classify_output_v2() and, as of 2026-08-20,
+# classify_input_v2() too — see MEDICAL_REFUSAL_TEMPLATE and generate()'s call site.
+extraction = _load_module("extract_entities")
+medical_guardrail = _load_module("medical_guardrail")
+
+# 2026-08-20: Q17 (a MEDICAL owner-fixture question, docs/agenda_0825.md 안건10)
+# landed in the "answer" band on score_gap alone and reached the model, which
+# refused on its own — "제공된 자료에는 이 질문에 대한 내용이 없습니다", the same
+# ungrounded-refusal text any out-of-scope question gets. That is not wrong, but
+# it is not enough for a question a worried owner actually typed: no acknowledgment,
+# no explicit vet referral. This is that better text — reuses
+# medical_guardrail.VET_REFERRAL_MESSAGE (the module's one canonical "can't
+# diagnose, go to a vet" wording, already what classify_input's docstring says
+# every MEDICAL verdict must return) with one line of empathy in front.
+#
+# Wrapped in SystemAuthoredText, not a plain str: VET_REFERRAL_MESSAGE itself
+# contains "병원" (a v2 disease/symptom term) and "처방" (a prescriptive marker),
+# so passed as a plain str this hand-authored safe text would self-trip
+# classify_output_v2 — see medical_guardrail.py's module docstring ("the
+# self-block incident") and reports/output_guardrail_self_block_incident.md.
+# generate()'s call site routes it through apply_output_guardrail() like any
+# other answer; the wrapper, not a branch, is what exempts it.
+MEDICAL_REFUSAL_TEMPLATE = medical_guardrail.SystemAuthoredText(
+    "걱정이 많으시겠어요. " + medical_guardrail.VET_REFERRAL_MESSAGE
+)
 
 
 @dataclass(frozen=True)
@@ -176,19 +256,136 @@ class DryRunClient:
         return None
 
 
-def build_client(mode: str, prompt_dir: Path) -> AnswerClient:
-    """Pick the client for a run. The seam where a real API client will plug in.
+def load_openai_answer_client(env_path: Path = Path(".env")) -> AnswerClient:
+    """The live client. Reuses extract_entities.py's key-reading, retry/backoff and
+    dual-surface (Responses API first, Chat Completions fallback) plumbing —
+    extraction.ENV_KEY, extraction.BACKOFF_SECONDS, extraction.RETRY_STATUS — since
+    that is exactly the "read the key, call the model, retry on 429/503/500"
+    problem extraction already solved. What differs from extraction's client:
 
-    Adding one means writing a class with `info` and `complete` — read the key from
-    the environment, call the model, return its text — and returning it here. No
-    other part of this script needs to change, and the fake used by the tests
-    already proves the seam holds.
+    - no `text.format` / `response_format` json_schema: an answer is prose for a
+      person to read, not a record for a validator.
+    - reasoning effort is GENERATION_REASONING_EFFORT ("medium"), not extraction's
+      "low".
+    - max_output_tokens / max_completion_tokens is capped at
+      GENERATION_MAX_OUTPUT_TOKENS so a long answer cannot silently run unbounded,
+      chosen generously because a reasoning model's hidden reasoning tokens share
+      the same budget as the visible answer.
+
+    Model, reasoning effort, temperature and the token cap are pinned constants
+    (see the comment above GENERATION_MODEL) — this function takes no override
+    arguments for any of them, on purpose.
+    """
+    try:
+        from dotenv import dotenv_values
+    except ImportError as exc:  # pragma: no cover - declared dependency
+        raise GenerationError("python-dotenv is required to read the API key") from exc
+    key = (dotenv_values(env_path) or {}).get(extraction.ENV_KEY)
+    if not key:
+        raise GenerationError(
+            f"{extraction.ENV_KEY} not found in {env_path.resolve()}. The key is read "
+            "from there and is never written to any output of this script."
+        )
+    try:
+        from openai import OpenAI
+    except ImportError as exc:
+        raise GenerationError("openai is required (`uv add openai`)") from exc
+
+    sdk = OpenAI(api_key=key)
+    state: dict[str, str | None] = {"surface": None}
+
+    def _responses_call(prompt: str) -> tuple[str, dict[str, Any]]:
+        response = sdk.responses.create(
+            model=GENERATION_MODEL,
+            input=prompt,
+            reasoning={"effort": GENERATION_REASONING_EFFORT},
+            max_output_tokens=GENERATION_MAX_OUTPUT_TOKENS,
+        )
+        usage = getattr(response, "usage", None)
+        status = getattr(response, "status", None)
+        if status == "completed":
+            finish_reason = "stop"
+        else:
+            # Responses API puts the truncation cause here (e.g. "max_output_tokens")
+            # instead of Chat Completions' flat finish_reason string.
+            incomplete = getattr(response, "incomplete_details", None)
+            finish_reason = getattr(incomplete, "reason", None) or status or "unknown"
+        return (getattr(response, "output_text", "") or ""), {
+            "input_tokens": getattr(usage, "input_tokens", 0) or 0,
+            "output_tokens": getattr(usage, "output_tokens", 0) or 0,
+            "finish_reason": finish_reason,
+        }
+
+    def _chat_call(prompt: str) -> tuple[str, dict[str, Any]]:
+        response = sdk.chat.completions.create(
+            model=GENERATION_MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            reasoning_effort=GENERATION_REASONING_EFFORT,
+            max_completion_tokens=GENERATION_MAX_OUTPUT_TOKENS,
+        )
+        usage = getattr(response, "usage", None)
+        choice = response.choices[0]
+        return (choice.message.content or ""), {
+            "input_tokens": getattr(usage, "prompt_tokens", 0) or 0,
+            "output_tokens": getattr(usage, "completion_tokens", 0) or 0,
+            "finish_reason": getattr(choice, "finish_reason", None) or "unknown",
+        }
+
+    class OpenAIAnswerClient:
+        # Read by generate() via getattr(client, "model_id"/"reasoning_effort", None)
+        # to fill record["generation_meta"] — see generate()'s per-query loop.
+        model_id = GENERATION_MODEL
+        reasoning_effort = GENERATION_REASONING_EFFORT
+
+        @property
+        def info(self) -> ClientInfo:
+            return ClientInfo(name=f"openai:{GENERATION_MODEL}")
+
+        @property
+        def surface(self) -> str | None:
+            """Which API surface produced the output. Recorded, not assumed."""
+            return state["surface"]
+
+        def complete(self, prompt: str, record: dict[str, Any]) -> str | None:
+            last: Exception | None = None
+            for delay in (0, *extraction.BACKOFF_SECONDS):
+                if delay:
+                    time.sleep(delay)
+                for name, call in (("responses", _responses_call), ("chat", _chat_call)):
+                    if state["surface"] not in (None, name):
+                        continue
+                    try:
+                        text, usage = call(prompt)
+                    except Exception as exc:  # noqa: BLE001 - provider errors are not typed
+                        message = str(exc)
+                        if any(code in message for code in extraction.RETRY_STATUS):
+                            last = exc
+                            break  # transient: back off, then retry the same surface
+                        last = exc
+                        continue  # this surface is unusable; try the other one
+                    state["surface"] = name
+                    record["usage"] = usage
+                    return text
+            raise GenerationError(f"model call failed: {str(last)[:400]}")
+
+    return OpenAIAnswerClient()
+
+
+def build_client(mode: str, prompt_dir: Path, env_path: Path = Path(".env")) -> AnswerClient:
+    """Pick the client for a run.
+
+    'openai' (the CLI default) calls GENERATION_MODEL for real; 'dry-run' writes
+    prompts to prompt_dir instead of calling anything, unchanged from before the
+    live client existed, so a --dry-run run today stays comparable to every
+    dry-run result already on disk.
     """
     if mode == "dry-run":
         return DryRunClient(prompt_dir)
+    if mode == "openai":
+        return load_openai_answer_client(env_path)
     raise GenerationError(
-        f"unknown --mode {mode!r}. Only 'dry-run' is implemented: no API client is "
-        "configured in this repo yet. See build_client() for where to add one."
+        f"unknown --mode {mode!r}. Supported: 'openai' (default, calls {GENERATION_MODEL}) "
+        "or 'dry-run' (prompts only, no API call). See build_client() to add another provider."
     )
 
 
@@ -284,6 +481,24 @@ def format_profile_block(profile: dict[str, Any]) -> str:
     )
 
 
+def _chunk_header(position: int, chunk: dict[str, Any]) -> str:
+    """The "[N] (...)" citation header build_prompt puts above each chunk's text.
+
+    Video and document chunks are shaped differently (see
+    run_combined_retrieval_eval.py's load_video_chunks/load_document_chunks,
+    which enforce this as a hard split: a document chunk is not allowed to carry
+    "video_id" at all). "video_id" in chunk is therefore an exact, not a guessed,
+    discriminator — never both true and false for the same real chunk record.
+    """
+    if "video_id" in chunk:
+        title = chunk.get("chapter_title", "")
+        header = f"[{position}] ({chunk['video_id']} #{chunk['chunk_index']}"
+        return header + (f" · {title})" if title else ")")
+    heading = " > ".join(chunk.get("heading_path", []))
+    header = f"[{position}] (문서 · {chunk['doc_id']} #{chunk['chunk_index']}"
+    return header + (f" · {heading})" if heading else ")")
+
+
 def build_prompt(
     question: str,
     chunks: Sequence[dict[str, Any]],
@@ -295,16 +510,20 @@ def build_prompt(
     profile is None by default: omitting it (or passing None) reproduces the
     pre-profile prompt byte-for-byte — no profile-shaped gap in the middle of the
     text, no empty <프로필></프로필> block.
+
+    chunks may be video or document chunks (or a mix) — this script's own
+    retrieval only ever passes video chunks (DEFAULT_CHUNK_DIR), but a caller
+    that sources evidence elsewhere (e.g. run_combined_retrieval_eval.py's
+    graph-augmented hybrid_merge, whose corpus includes documents) can pass
+    those chunks straight through. See _chunk_header().
     """
     rules = list(PROMPT_RULES)
     if band == "hedge":
         rules.append(HEDGE_RULE)
-    sources = []
-    for position, chunk in enumerate(chunks, start=1):
-        title = chunk.get("chapter_title", "")
-        header = f"[{position}] ({chunk['video_id']} #{chunk['chunk_index']}"
-        header += f" · {title})" if title else ")"
-        sources.append(f"{header}\n{chunk['text']}")
+    sources = [
+        f"{_chunk_header(position, chunk)}\n{chunk['text']}"
+        for position, chunk in enumerate(chunks, start=1)
+    ]
     lines = [
         "아래 <자료>만 근거로 질문에 답하세요.",
         "",
@@ -408,6 +627,9 @@ def generate(
     bundle: bool = False,
     force: bool = False,
     profile: dict[str, Any] | None = None,
+    env_path: Path = Path(".env"),
+    medical_terms: Sequence[str] | None = None,
+    whitelist_terms: Sequence[str] | None = None,
 ) -> dict[str, Any]:
     validate_thresholds(refuse_below, answer_at_or_above)
     queries, source_schema = load_query_set(queries_path)
@@ -435,7 +657,18 @@ def generate(
     if encoder is None:
         encoder = retrieval.load_encoder(retrieval.SUPPORTED_MODEL, device)
     if client is None:
-        client = build_client(mode, out_dir / "prompts")
+        client = build_client(mode, out_dir / "prompts", env_path)
+        # medical_terms/whitelist_terms drive classify_output_v2 below (v2, not
+        # v1 — v1's disease/symptom terms overlap ordinary training vocabulary,
+        # see medical_guardrail.py's v2-addition docstring and docs/agenda_0825.md).
+        # Auto-loaded only for the default client construction (a real CLI run) —
+        # a caller that injects its own client (every existing test) also controls
+        # these explicitly, so those tests stay hermetic and never touch
+        # data/guardrail/*.json.
+        if medical_terms is None and mode != "dry-run":
+            medical_terms = medical_guardrail.load_medical_terms_v2()
+        if whitelist_terms is None and mode != "dry-run":
+            whitelist_terms = medical_guardrail.load_training_whitelist()
 
     corpus_vectors = encoder.encode([retrieval.PASSAGE_PREFIX + row["text"] for row in corpus])
     chunk_ids = [row["chunk_id"] for row in corpus]
@@ -477,6 +710,8 @@ def generate(
             ],
             "prompt_version": PROMPT_VERSION,
             "prompt_path": None,
+            "usage": None,
+            "medical_input_guardrail": None,
             "client": client.info.name,
         }
 
@@ -484,13 +719,94 @@ def generate(
             # The band exists to stop the call, not to label it after the fact.
             record["answer"] = REFUSAL_TEXT
             record["generated"] = False
+            record["generation_meta"] = None
+            record["raw_model_answer"] = None
+            record["output_guardrail"] = None
         else:
+            # Medical short-circuit: score_gap alone doesn't know a question is
+            # medical (docs/agenda_0825.md 안건10 — Q17 reached the model this way
+            # and got an ad-hoc "자료에 없습니다" instead of a vet referral). This
+            # is the minimal fix asked for — no new band, no change to score_gap
+            # or classify_band, just one check ahead of the existing model call
+            # inside the branch that already handles hedge/answer.
+            medical_verdict = None
+            if medical_terms is not None and whitelist_terms is not None:
+                medical_verdict = medical_guardrail.classify_input_v2(
+                    question, medical_terms, whitelist_terms
+                )
+                record["medical_input_guardrail"] = {
+                    "is_medical": medical_verdict.is_medical,
+                    "matched_terms": list(medical_verdict.matched_terms),
+                    "whitelist_matched": list(medical_verdict.whitelist_matched),
+                }
+
+            if medical_verdict is not None and medical_verdict.is_medical:
+                # No model call: MEDICAL_REFUSAL_TEMPLATE is fixed, hand-authored
+                # text. Still routed through apply_output_guardrail() like any
+                # other answer — it passes because it is a SystemAuthoredText, not
+                # because this branch skips the check (see that constant's comment).
+                verdict = medical_guardrail.apply_output_guardrail(
+                    MEDICAL_REFUSAL_TEMPLATE, medical_terms, whitelist_terms
+                )
+                record["answer"] = verdict.text
+                record["generated"] = False
+                record["generation_meta"] = None
+                record["raw_model_answer"] = None
+                record["output_guardrail"] = {
+                    "is_blocked": verdict.is_blocked,
+                    "matched_disease_terms": list(verdict.matched_disease_terms),
+                    "matched_prescriptive_markers": list(verdict.matched_prescriptive_markers),
+                    "whitelist_matched": list(verdict.whitelist_matched),
+                    "system_authored": verdict.system_authored,
+                }
+                records.append(record)
+                continue
+
             prompt = build_prompt(
                 question, [chunk_by_id[cid] for cid, _ in ranked], band, profile
             )
             prompts[record["query_id"]] = prompt
-            record["answer"] = client.complete(prompt, record)
+            raw_answer = client.complete(prompt, record)
             record["generated"] = True
+
+            # Only a client that identifies itself (model_id) gets generation_meta —
+            # a fake/dry-run "answer" was not produced by any model, so recording a
+            # model name for it would misattribute it.
+            model_id = getattr(client, "model_id", None)
+            record["generation_meta"] = (
+                {
+                    "model": model_id,
+                    "reasoning_effort": getattr(client, "reasoning_effort", None),
+                    "temperature": GENERATION_TEMPERATURE,
+                    "generated_at": datetime.now(timezone.utc).isoformat(),
+                }
+                if raw_answer is not None and model_id is not None
+                else None
+            )
+
+            # Output-side guardrail: runs on whatever text the client actually
+            # returned, real model or test double alike — raw_answer is always a
+            # plain str here (no client wraps its own output in SystemAuthoredText),
+            # so apply_output_guardrail() always applies the full check. See
+            # medical_guardrail.py's classify_output_v2 docstring for why
+            # disease-term-alone is a disclaimer, disease+prescriptive-marker is a
+            # block, and a whitelist hit (분리불안/불안/... — ordinary training
+            # vocabulary) passes through untouched ahead of either.
+            if raw_answer is not None and medical_terms is not None and whitelist_terms is not None:
+                verdict = medical_guardrail.apply_output_guardrail(raw_answer, medical_terms, whitelist_terms)
+                record["raw_model_answer"] = raw_answer
+                record["answer"] = verdict.text
+                record["output_guardrail"] = {
+                    "is_blocked": verdict.is_blocked,
+                    "matched_disease_terms": list(verdict.matched_disease_terms),
+                    "matched_prescriptive_markers": list(verdict.matched_prescriptive_markers),
+                    "whitelist_matched": list(verdict.whitelist_matched),
+                    "system_authored": verdict.system_authored,
+                }
+            else:
+                record["raw_model_answer"] = None
+                record["answer"] = raw_answer
+                record["output_guardrail"] = None
         records.append(record)
 
     body = "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in records)
@@ -515,8 +831,17 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--queries", type=Path, default=DEFAULT_QUERIES)
     parser.add_argument("--chunk-dir", type=Path, default=DEFAULT_CHUNK_DIR)
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
-    parser.add_argument("--mode", default="dry-run", help="dry-run writes prompts instead of calling a model")
+    parser.add_argument(
+        "--mode",
+        default="openai",
+        help=f"'openai' calls the live model (default, pinned to {GENERATION_MODEL}); "
+             "'dry-run' writes prompts instead of calling a model",
+    )
     parser.add_argument("--dry-run", action="store_true", help="alias for --mode dry-run")
+    parser.add_argument(
+        "--env", type=Path, default=Path(".env"),
+        help="path to the .env file holding OPENAI_API_KEY (live mode only)",
+    )
     parser.add_argument("--top-k", type=int, default=retrieval.DEFAULT_TOP_K)
     parser.add_argument("--device", default=retrieval.DEFAULT_DEVICE, choices=list(retrieval.DEVICE_CHOICES))
     parser.add_argument("--refuse-below", type=float, default=REFUSE_BELOW)
@@ -560,6 +885,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             bundle=args.bundle,
             force=args.force,
             profile=profile,
+            env_path=args.env,
         )
     except (OSError, GenerationError, retrieval.EvaluationError, json.JSONDecodeError) as exc:
         print(f"error: {exc}", file=sys.stderr)
@@ -573,6 +899,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"  {band:<7} {counts[band]:>3}건 ({share:.1%})")
     if mode == "dry-run":
         print(f"프롬프트: {args.out_dir / 'prompts'} (refuse 구간은 호출하지 않으므로 없음)")
+    else:
+        calls = [r for r in result["records"] if r.get("generation_meta")]
+        blocked = [r for r in calls if (r.get("output_guardrail") or {}).get("is_blocked")]
+        in_tok = sum((r["usage"] or {}).get("input_tokens", 0) for r in calls)
+        out_tok = sum((r["usage"] or {}).get("output_tokens", 0) for r in calls)
+        print(f"실제 모델 호출 {len(calls)}건 · 토큰 in {in_tok} / out {out_tok} "
+              f"· 출력 가드레일 차단 {len(blocked)}건")
     if result["bundle_path"]:
         print(f"묶음 파일: {result['bundle_path']}")
     return 0

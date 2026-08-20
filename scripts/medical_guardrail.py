@@ -72,6 +72,43 @@ emergency (e.g. "산책 중에 발작을 일으켜요") will pass under this rul
 v1 is kept, unmodified, alongside v2. It is not a superseded artifact to
 delete — it is the recorded evidence for why sourcing a medical guardrail's
 vocabulary from the corpus's own extraction was the wrong design.
+
+apply_output_guardrail() and SystemAuthoredText — the self-block incident:
+
+scripts/generate_answers.py's MEDICAL_REFUSAL_TEMPLATE ("가까운 동물병원에서
+수의사의 진료를 받으시길 권합니다...") contains "병원" (a medical_terms_v2 entry)
+and "처방" (a PRESCRIPTIVE_MARKERS entry) in the same hand-written sentence —
+exactly the co-occurrence classify_output_v2 exists to catch. Run naively, the
+guardrail written to keep unsafe *model* text out of a reply would have blocked
+its own safe, hand-authored replacement text and shown OUTPUT_BLOCKED_MESSAGE
+instead. First version of the fix (2026-08-20, same day) just skipped the
+function call at that one call site — correct in effect, but the exemption
+lived in generate_answers.py's control flow, not on the text itself. Anything
+later routed down that same "no model call" branch would have silently
+inherited the same bypass, model-generated or not, with nothing forcing a
+re-check.
+
+SystemAuthoredText fixes that: it marks the *value*, not the code path. A
+caller that has hand-written, pre-vetted text wraps it before handing it to
+apply_output_guardrail(); anything unwrapped — a plain str, which is what
+every model client in this file returns — is real generated text and gets the
+full classify_output_v2 check regardless of which branch produced it. A future
+edit that starts putting model output where MEDICAL_REFUSAL_TEMPLATE used to go
+gets checked automatically, because a plain str was never exempt.
+
+v2 addition — classify_output_v2(answer, medical_terms_v2, whitelist_terms):
+
+scripts/generate_answers.py wired classify_output into real generation on
+2026-08-20 using v1's terms and immediately hit v1's own documented flaw:
+"분리불안"/"불안" — ordinary training vocabulary, not a diagnosis — appeared in
+two demo answers and both got OUTPUT_DISCLAIMER appended, unrelated to whether
+the answer was medical. classify_output_v2 applies classify_input_v2's already-
+accepted whitelist-first precedence to the output side instead: a whitelist hit
+passes the text through untouched, same known trade-off as classify_input_v2
+(a real emergency mentioned alongside a whitelist word passes uncaught — see
+the whitelist file's known_tradeoff field). v1's classify_output is kept,
+unmodified, for the same reason v1 itself is kept: recorded evidence, not a
+deleted mistake.
 """
 
 from __future__ import annotations
@@ -138,6 +175,30 @@ class OutputVerdict:
     matched_disease_terms: tuple[str, ...] = field(default_factory=tuple)
     matched_prescriptive_markers: tuple[str, ...] = field(default_factory=tuple)
     text: str = ""
+    # Set only by classify_output_v2, when a whitelist match passed the text
+    # through ahead of (or in spite of) a dictionary match. Empty for classify_output v1.
+    whitelist_matched: tuple[str, ...] = field(default_factory=tuple)
+    # True only when apply_output_guardrail() bypassed matching entirely because
+    # the input was a SystemAuthoredText, not model output. False (the default)
+    # for every classify_output/classify_output_v2 call, including calls made
+    # directly rather than through apply_output_guardrail().
+    system_authored: bool = False
+
+
+@dataclass(frozen=True)
+class SystemAuthoredText:
+    """Marks a string as hand-written by this codebase, not produced by a model.
+
+    apply_output_guardrail() passes this through unmodified and unchecked — see
+    this module's docstring ("apply_output_guardrail() and SystemAuthoredText —
+    the self-block incident") for why a check built for uncontrolled model text
+    can trip on a safe template's own wording (medical_terms_v2's "병원" +
+    PRESCRIPTIVE_MARKERS' "처방", both present in MEDICAL_REFUSAL_TEMPLATE).
+    Wrap only text a person actually wrote and reviewed — never a model's output,
+    even after post-processing.
+    """
+
+    text: str
 
 
 def _load_terms_file(path: Path, missing_hint: str) -> list[str]:
@@ -232,6 +293,62 @@ def classify_output(
     (tests/test_medical_guardrail.py), not scored for a false-positive rate.
     """
     disease_hits = _find_matches(answer, terms)
+    marker_hits = _find_matches(answer, markers)
+    if disease_hits and marker_hits:
+        return OutputVerdict(
+            is_blocked=True,
+            matched_disease_terms=disease_hits,
+            matched_prescriptive_markers=marker_hits,
+            text=OUTPUT_BLOCKED_MESSAGE,
+        )
+    if disease_hits:
+        return OutputVerdict(
+            is_blocked=False,
+            matched_disease_terms=disease_hits,
+            text=answer + OUTPUT_DISCLAIMER,
+        )
+    return OutputVerdict(is_blocked=False, text=answer)
+
+
+def apply_output_guardrail(
+    answer: "str | SystemAuthoredText",
+    medical_terms: Sequence[str],
+    whitelist_terms: Sequence[str],
+    markers: Sequence[str] = PRESCRIPTIVE_MARKERS,
+) -> OutputVerdict:
+    """The call site every caller should use instead of classify_output_v2 directly.
+
+    A SystemAuthoredText passes through untouched — see this module's docstring
+    for the incident this exists to prevent. Anything else (a plain str, which
+    is what every model client returns) gets the full classify_output_v2 check,
+    no matter which code path produced it. This is what makes the exemption safe
+    against a future edit: it is a property of the value handed in, not of the
+    branch that called this function.
+    """
+    if isinstance(answer, SystemAuthoredText):
+        return OutputVerdict(is_blocked=False, text=answer.text, system_authored=True)
+    return classify_output_v2(answer, medical_terms, whitelist_terms, markers)
+
+
+def classify_output_v2(
+    answer: str,
+    medical_terms: Sequence[str],
+    whitelist_terms: Sequence[str],
+    markers: Sequence[str] = PRESCRIPTIVE_MARKERS,
+) -> OutputVerdict:
+    """Whitelist first, v2 dictionary second — same precedence as classify_input_v2.
+
+    A whitelist hit (분리불안/불안/하울링/짖음/배변/산책/사회화, ...) passes the
+    text through unmodified regardless of what else it contains — no disclaimer,
+    no block, even if a v2 term or a prescriptive marker is also present. This is
+    classify_input_v2's already-accepted trade-off (see
+    data/guardrail/training_whitelist_v1.json's known_tradeoff) applied
+    symmetrically here, not a new decision made by this function.
+    """
+    whitelist_hits = _find_matches(answer, whitelist_terms)
+    if whitelist_hits:
+        return OutputVerdict(is_blocked=False, text=answer, whitelist_matched=whitelist_hits)
+    disease_hits = _find_matches(answer, medical_terms)
     marker_hits = _find_matches(answer, markers)
     if disease_hits and marker_hits:
         return OutputVerdict(

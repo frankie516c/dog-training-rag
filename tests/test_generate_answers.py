@@ -244,6 +244,22 @@ class RoutingTests(unittest.TestCase):
         # The chunks the model is answering from must actually be in the prompt.
         self.assertIn(TEXTS["chunk-1"], prompt)
 
+    def test_every_prompt_asks_for_a_next_step_when_the_material_has_one(self):
+        client = FakeClient()
+        Fixture().run(gap=0.05, client=client)
+        prompt = client.prompts[0][1]
+        self.assertIn("다음에 취할 수 있는 구체적인 행동이나 대처법", prompt)
+        self.assertIn("자료에 없으면 억지로 만들지 말고 원인 설명까지만", prompt)
+
+    def test_the_hedge_rule_is_renumbered_after_the_next_step_rule(self):
+        # PROMPT_RULES now runs 1-5; HEDGE_RULE (only appended for hedge) must
+        # read "6." so the numbering stays sequential, not duplicate "5."s.
+        client = FakeClient()
+        Fixture().run(gap=0.02, client=client)  # hedge band
+        hedge_prompt = client.prompts[0][1]
+        self.assertIn("6. 아래 자료는 질문과의 관련성이 낮게 측정되었습니다", hedge_prompt)
+        self.assertNotIn("5. 아래 자료는 질문과의 관련성이 낮게 측정되었습니다", hedge_prompt)
+
 
 class RecordTests(unittest.TestCase):
     def test_the_prompt_version_is_recorded_on_every_record(self):
@@ -251,7 +267,7 @@ class RecordTests(unittest.TestCase):
             with self.subTest(gap=gap):
                 record = Fixture().run(gap=gap)["records"][0]
                 self.assertEqual(module.PROMPT_VERSION, record["prompt_version"])
-                self.assertEqual("grounded-answer-ko-v1", record["prompt_version"])
+                self.assertEqual("grounded-answer-ko-v2", record["prompt_version"])
 
     def test_the_record_carries_what_a_judge_needs(self):
         record = Fixture().run(gap=0.05)["records"][0]
@@ -324,10 +340,11 @@ class DryRunTests(unittest.TestCase):
 
     def test_an_unimplemented_mode_says_where_to_add_a_client(self):
         with self.assertRaises(module.GenerationError) as caught:
-            module.build_client("openai", Path("."))
+            module.build_client("anthropic", Path("."))
         message = str(caught.exception)
         self.assertIn("build_client", message)
         self.assertIn("dry-run", message)
+        self.assertIn("openai", message)
 
 
 class BundleTests(unittest.TestCase):
@@ -457,6 +474,47 @@ DEMO_PROFILE = {
 }
 
 
+def doc_chunk(chunk_id, index, doc_id="doc-1", heading_path=("문서 제목",), text="문서 본문"):
+    return {
+        "schema_version": "document-chunk-v1",
+        "chunk_id": chunk_id,
+        "doc_id": doc_id,
+        "chunk_index": index,
+        "source_url": "https://example.com/doc",
+        "slot": "3",
+        "heading_path": list(heading_path),
+        "text": text,
+        "char_count": len(text),
+        "embedding_eligible": True,
+    }
+
+
+class DocumentChunkHeaderTests(unittest.TestCase):
+    """build_prompt must handle document chunks — no video_id, no chapter_title.
+
+    Needed for demo scenario③ (Q13): the graph-augmented evidence
+    run_combined_retrieval_eval.py's hybrid_merge returns is a mix of video and
+    document chunks, and generate_answers.py's own retrieval never produces a
+    document chunk on its own (DEFAULT_CHUNK_DIR is video-only) — so this path
+    was never exercised until Q13 needed it.
+    """
+
+    def test_a_document_chunk_gets_a_doc_id_header_not_a_video_id_lookup(self):
+        prompt = module.build_prompt(QUESTION, [doc_chunk("docchunk-1", 0)], "answer")
+        self.assertIn("[1] (문서 · doc-1 #0 · 문서 제목)", prompt)
+
+    def test_a_document_chunk_without_a_heading_path_gets_no_trailing_bullet(self):
+        chunk = doc_chunk("docchunk-1", 0, heading_path=())
+        prompt = module.build_prompt(QUESTION, [chunk], "answer")
+        self.assertIn("[1] (문서 · doc-1 #0)", prompt)
+
+    def test_video_and_document_chunks_mix_in_one_prompt(self):
+        chunks = [chunk("chunk-1", 0), doc_chunk("docchunk-1", 1)]
+        prompt = module.build_prompt(QUESTION, chunks, "answer")
+        self.assertIn("[1] (vid1 #0", prompt)
+        self.assertIn("[2] (문서 · doc-1 #1", prompt)
+
+
 class ProfileBlockTests(unittest.TestCase):
     """build_prompt's only new surface: an optional <프로필> block before <자료>."""
 
@@ -476,9 +534,13 @@ class ProfileBlockTests(unittest.TestCase):
         self.assertIn("비숑프리제", prompt)
         self.assertIn("14개월", prompt)
 
-    def test_the_profile_block_warns_it_is_not_evidence(self):
+    def test_the_profile_block_asks_the_model_to_tailor_the_answer(self):
         prompt = module.build_prompt(QUESTION, [chunk("chunk-1", 0)], "answer", DEMO_PROFILE)
-        self.assertIn("근거 자료가 아니므로", prompt)
+        self.assertIn("이 반려견의 상황에 맞게 조언을 조정하세요", prompt)
+
+    def test_the_profile_block_still_forbids_using_the_profile_as_evidence(self):
+        prompt = module.build_prompt(QUESTION, [chunk("chunk-1", 0)], "answer", DEMO_PROFILE)
+        self.assertIn("프로필은 그 근거로 쓸 수 없습니다", prompt)
         self.assertIn("진단처럼 언급하지 마세요", prompt)
 
     def test_empty_conditions_render_as_none_present(self):
@@ -579,6 +641,237 @@ class ProfileCliTests(unittest.TestCase):
     def test_profile_flag_parses_to_a_path(self):
         parsed = module.build_parser().parse_args(["--profile", "data/profiles/demo_profile_v1.json"])
         self.assertEqual(Path("data/profiles/demo_profile_v1.json"), parsed.profile)
+
+
+class LiveModeCliTests(unittest.TestCase):
+    """The default flips to live generation; --dry-run is the opt-out, not the default."""
+
+    def test_mode_defaults_to_openai(self):
+        parsed = module.build_parser().parse_args([])
+        self.assertEqual("openai", parsed.mode)
+
+    def test_dry_run_flag_still_overrides_to_dry_run(self):
+        parsed = module.build_parser().parse_args(["--dry-run"])
+        self.assertTrue(parsed.dry_run)
+
+    def test_env_flag_defaults_to_dotenv(self):
+        parsed = module.build_parser().parse_args([])
+        self.assertEqual(Path(".env"), parsed.env)
+
+    def test_openai_mode_reaches_the_real_client_not_the_unknown_mode_error(self):
+        # No API key is configured in this fixture on purpose: the point is that
+        # build_client("openai", ...) gets past mode dispatch and fails on the key
+        # lookup, not on "unknown --mode" the way build_client("anthropic", ...) does.
+        with self.assertRaises(module.GenerationError) as caught:
+            module.build_client("openai", Path(tempfile.mkdtemp()), Path("no-such-.env"))
+        message = str(caught.exception)
+        self.assertIn("OPENAI_API_KEY", message)
+        self.assertNotIn("unknown --mode", message)
+
+
+class GenerationMetaTests(unittest.TestCase):
+    """model/prompt_version/generated_at land on the record only for a real client."""
+
+    class TaggedFakeClient:
+        """A FakeClient that also identifies itself, the way OpenAIAnswerClient does."""
+
+        model_id = "fake-model-x"
+        reasoning_effort = "low"
+
+        def __init__(self, answer="생성된 답변입니다"):
+            self.info = module.ClientInfo(name="tagged-fake")
+            self._answer = answer
+
+        def complete(self, prompt, record):
+            return self._answer
+
+    def test_a_client_with_model_id_gets_generation_meta(self):
+        record = Fixture().run(gap=0.05, client=self.TaggedFakeClient())["records"][0]
+        meta = record["generation_meta"]
+        self.assertIsNotNone(meta)
+        self.assertEqual("fake-model-x", meta["model"])
+        self.assertEqual("low", meta["reasoning_effort"])
+        self.assertEqual("not_sent", meta["temperature"])
+        self.assertTrue(meta["generated_at"])  # non-empty ISO timestamp
+
+    def test_a_client_without_model_id_gets_no_generation_meta(self):
+        record = Fixture().run(gap=0.05, client=FakeClient())["records"][0]
+        self.assertIsNone(record["generation_meta"])
+
+    def test_the_refuse_band_gets_no_generation_meta_either(self):
+        record = Fixture().run(gap=0.001, client=self.TaggedFakeClient())["records"][0]
+        self.assertIsNone(record["generation_meta"])
+
+    def test_dry_run_gets_no_generation_meta(self):
+        fixture = Fixture()
+        client = module.DryRunClient(fixture.out_dir / "prompts")
+        record = fixture.run(gap=0.05, client=client)["records"][0]
+        self.assertIsNone(record["generation_meta"])
+
+
+class OutputGuardrailWiringTests(unittest.TestCase):
+    """classify_output_v2 actually runs on the generated text now, not just under test."""
+
+    # Minimal, self-contained lexicons — no real data/guardrail file involved.
+    TERMS = ["슬개골 탈구"]
+    WHITELIST = ["분리불안", "산책"]
+
+    def test_disease_term_alone_gets_a_disclaimer_not_a_block(self):
+        client = FakeClient(answer="슬개골 탈구가 있으면 점프를 피하는 게 좋습니다 [1].")
+        record = Fixture().run(
+            gap=0.05, client=client, medical_terms=self.TERMS, whitelist_terms=self.WHITELIST
+        )["records"][0]
+        self.assertIsNotNone(record["output_guardrail"])
+        self.assertFalse(record["output_guardrail"]["is_blocked"])
+        self.assertEqual(["슬개골 탈구"], record["output_guardrail"]["matched_disease_terms"])
+        self.assertEqual([], record["output_guardrail"]["whitelist_matched"])
+        self.assertIn("일반 정보이며 진단이 아닙니다", record["answer"])
+        self.assertEqual("슬개골 탈구가 있으면 점프를 피하는 게 좋습니다 [1].", record["raw_model_answer"])
+
+    def test_disease_plus_prescriptive_marker_is_blocked(self):
+        client = FakeClient(answer="슬개골 탈구에는 소염제를 먹여 보세요.")
+        record = Fixture().run(
+            gap=0.05, client=client, medical_terms=self.TERMS, whitelist_terms=self.WHITELIST
+        )["records"][0]
+        self.assertTrue(record["output_guardrail"]["is_blocked"])
+        self.assertEqual(module.medical_guardrail.OUTPUT_BLOCKED_MESSAGE, record["answer"])
+        self.assertEqual("슬개골 탈구에는 소염제를 먹여 보세요.", record["raw_model_answer"])
+
+    def test_a_whitelist_hit_passes_through_even_with_a_disease_term_present(self):
+        # 2026-08-20 regression: v1 flagged "분리불안" in a plain training answer.
+        # v2 + whitelist must let this through untouched — see docs/agenda_0825.md.
+        client = FakeClient(answer="분리불안과 슬개골 탈구는 관계가 없습니다 [1].")
+        record = Fixture().run(
+            gap=0.05, client=client, medical_terms=self.TERMS, whitelist_terms=self.WHITELIST
+        )["records"][0]
+        self.assertFalse(record["output_guardrail"]["is_blocked"])
+        self.assertEqual("분리불안과 슬개골 탈구는 관계가 없습니다 [1].", record["answer"])
+        self.assertIn("분리불안", record["output_guardrail"]["whitelist_matched"])
+
+    def test_no_medical_terms_means_no_guardrail_pass_at_all(self):
+        # This is what every other test in this file exercises (medical_terms
+        # defaults to None): the answer passes through untouched.
+        client = FakeClient(answer="슬개골 탈구에는 소염제를 먹여 보세요.")
+        record = Fixture().run(gap=0.05, client=client)["records"][0]
+        self.assertIsNone(record["output_guardrail"])
+        self.assertIsNone(record["raw_model_answer"])
+        self.assertEqual("슬개골 탈구에는 소염제를 먹여 보세요.", record["answer"])
+
+    def test_medical_terms_without_whitelist_terms_also_skips_the_guardrail(self):
+        # Both are required together — see generate()'s call-site condition.
+        client = FakeClient(answer="슬개골 탈구에는 소염제를 먹여 보세요.")
+        record = Fixture().run(gap=0.05, client=client, medical_terms=self.TERMS)["records"][0]
+        self.assertIsNone(record["output_guardrail"])
+
+    def test_the_refuse_band_never_reaches_the_guardrail(self):
+        client = FakeClient(answer="슬개골 탈구에는 소염제를 먹여 보세요.")
+        record = Fixture().run(
+            gap=0.001, client=client, medical_terms=self.TERMS, whitelist_terms=self.WHITELIST
+        )["records"][0]
+        self.assertIsNone(record["output_guardrail"])
+        self.assertEqual(module.REFUSAL_TEXT, record["answer"])
+
+
+class MedicalRefusalTemplateTests(unittest.TestCase):
+    """The Q17 fix: a medical question in hedge/answer band never reaches the model.
+
+    Mirrors owner_fixtures.jsonl Q17 ("아토피 피부염... 약용 샴푸나 처방식 사료,
+    연고 이름을 알려주세요") landing in "answer" band on score_gap alone and
+    getting the model's own ad-hoc refusal instead of a vet referral — see
+    docs/agenda_0825.md 안건10.
+    """
+
+    TERMS = ["연고", "접종"]  # a minimal, self-contained v2-style lexicon
+    WHITELIST = ["분리불안", "산책"]
+    MEDICAL_QUESTION = "강아지 피부병에 바를 연고 좀 추천해 주세요."
+
+    def _fixture_with_medical_question(self, **run_kwargs):
+        fixture = Fixture(queries=[Fixture.eval_query("q1", self.MEDICAL_QUESTION)])
+        return fixture.run(
+            gap=0.05, medical_terms=self.TERMS, whitelist_terms=self.WHITELIST, **run_kwargs
+        )
+
+    def test_a_medical_question_never_calls_the_model(self):
+        record = self._fixture_with_medical_question(client=ExplodingClient())["records"][0]
+        self.assertEqual("answer", record["band"])  # would have called the model otherwise
+        self.assertFalse(record["generated"])
+
+    def test_a_medical_question_gets_the_template_not_an_ad_hoc_refusal(self):
+        record = self._fixture_with_medical_question(client=ExplodingClient())["records"][0]
+        self.assertEqual(module.MEDICAL_REFUSAL_TEMPLATE.text, record["answer"])
+        self.assertIn("걱정이 많으시겠어요", record["answer"])
+        self.assertIn("동물병원", record["answer"])
+
+    def test_the_medical_verdict_is_recorded(self):
+        record = self._fixture_with_medical_question(client=ExplodingClient())["records"][0]
+        guardrail = record["medical_input_guardrail"]
+        self.assertTrue(guardrail["is_medical"])
+        self.assertIn("연고", guardrail["matched_terms"])
+
+    def test_no_generation_meta_for_the_template_path(self):
+        record = self._fixture_with_medical_question(client=ExplodingClient())["records"][0]
+        self.assertIsNone(record["generation_meta"])
+        self.assertIsNone(record["raw_model_answer"])
+
+    def test_the_template_path_still_reports_an_unblocked_system_authored_verdict(self):
+        # MEDICAL_REFUSAL_TEMPLATE goes through apply_output_guardrail() same as
+        # any answer — it passes because it's a SystemAuthoredText (system_authored
+        # is True, nothing matched), not because this path skips the check. This
+        # is what makes the exemption safe: it's a property of the wrapped value,
+        # not a branch a future edit could route real model text through unchecked.
+        record = self._fixture_with_medical_question(client=ExplodingClient())["records"][0]
+        guardrail = record["output_guardrail"]
+        self.assertIsNotNone(guardrail)
+        self.assertTrue(guardrail["system_authored"])
+        self.assertFalse(guardrail["is_blocked"])
+        self.assertEqual([], guardrail["matched_disease_terms"])
+        self.assertEqual([], guardrail["matched_prescriptive_markers"])
+
+    def test_a_whitelisted_training_question_still_calls_the_model(self):
+        fixture = Fixture(queries=[Fixture.eval_query("q1", "산책 중 짖는 습관 어떻게 고치나요?")])
+        client = FakeClient()
+        record = fixture.run(
+            gap=0.05, client=client, medical_terms=self.TERMS, whitelist_terms=self.WHITELIST
+        )["records"][0]
+        self.assertTrue(record["generated"])
+        self.assertEqual(1, len(client.prompts))
+        self.assertFalse(record["medical_input_guardrail"]["is_medical"])
+        self.assertIn("산책", record["medical_input_guardrail"]["whitelist_matched"])
+
+    def test_without_both_lexicons_the_short_circuit_never_engages(self):
+        # No medical_terms/whitelist_terms injected (every other test in this
+        # file): a medical-looking question still goes to the model as before.
+        client = FakeClient()
+        record = self._run_without_lexicons(client)
+        self.assertTrue(record["generated"])
+        self.assertIsNone(record["medical_input_guardrail"])
+
+    def _run_without_lexicons(self, client):
+        fixture = Fixture(queries=[Fixture.eval_query("q1", self.MEDICAL_QUESTION)])
+        return fixture.run(gap=0.05, client=client)["records"][0]
+
+    def test_the_refuse_band_is_untouched_by_this_check(self):
+        # band == "refuse" already never calls the model; medical_input_guardrail
+        # stays None there too — this fix only touches the hedge/answer branch.
+        fixture = Fixture(queries=[Fixture.eval_query("q1", self.MEDICAL_QUESTION)])
+        record = fixture.run(
+            gap=0.001, client=ExplodingClient(),
+            medical_terms=self.TERMS, whitelist_terms=self.WHITELIST,
+        )["records"][0]
+        self.assertEqual("refuse", record["band"])
+        self.assertEqual(module.REFUSAL_TEXT, record["answer"])
+        self.assertIsNone(record["medical_input_guardrail"])
+
+
+class MedicalTermsAutoLoadTests(unittest.TestCase):
+    """generate() only auto-loads the real lexicons when it builds its own client."""
+
+    def test_an_injected_client_never_triggers_auto_load(self):
+        # If this reached medical_guardrail.load_medical_terms_v2()/
+        # load_training_whitelist() with a bad path it would raise; it must not
+        # even try when a client is injected.
+        result = Fixture().run(gap=0.05, client=FakeClient())
+        self.assertIsNone(result["records"][0]["output_guardrail"])
 
 
 if __name__ == "__main__":
