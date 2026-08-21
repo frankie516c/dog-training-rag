@@ -23,7 +23,8 @@ from backend.app.domain import (
     SourceRegistryEntry,
 )
 from backend.app.grounded import DraftVerdict, GroundedAnswerer
-from backend.app.response_plans import compose_planned_answer
+from backend.app.plan_phraser import PlanPhraser
+from backend.app.response_plans import select_plan
 from backend.app.retrieval import DEFAULT_TOP_K, SearchResult
 from backend.app.safety import detect_safety_risk
 from backend.app.scope import TrainingScope, card_scope, route_query_scope
@@ -83,6 +84,7 @@ class ChatService:
         *,
         retriever: ChatRetriever,
         grounded: GroundedAnswerer | None = None,
+        phraser: PlanPhraser | None = None,
         scope_matched_minimum: float = PROVISIONAL_SCOPE_MATCHED_MINIMUM,
         candidate_top_k: int = CANDIDATE_TOP_K,
         composer: Callable[[Sequence[EvidenceCard]], str] = compose_evidence_answer,
@@ -90,6 +92,7 @@ class ChatService:
     ) -> None:
         self._retriever = retriever
         self._grounded = grounded
+        self._phraser = phraser
         self._scope_matched_minimum = scope_matched_minimum
         self._candidate_top_k = candidate_top_k
         self._composer = composer
@@ -160,14 +163,26 @@ class ChatService:
         # tell the reader what to do, and it is fixed text, so it cannot drift from the
         # evidence. No plan means no procedural answer — fall through, never improvise.
         if intent is QuestionIntent.HOW_TO:
-            planned = compose_planned_answer(
+            planned = select_plan(
                 [result.card for result in usable], language=request.response_language
             )
             if planned is not None:
-                answer, plan_cards = planned
-                planned_ids = {card.card_id for card in plan_cards}
-                cited = [item for item in usable if item.card.card_id in planned_ids]
+                card, plan = planned
+                cited = [item for item in usable if item.card.card_id == card.card_id]
                 if cited:
+                    answer = plan.render()
+                    # The model may only rephrase what the review already approved, and
+                    # only for this card. Anything it adds is rejected and the reviewed
+                    # wording stands — see backend/app/plan_phrasing.py.
+                    if self._phraser is not None:
+                        result = await self._phraser.phrase(
+                            message=request.message,
+                            response_language=request.response_language,
+                            card=card,
+                            plan=plan,
+                        )
+                        if result.accepted and result.answer:
+                            answer = result.answer
                     return self._answered(request, answer, cited)
 
         if self._grounded is not None and intent in GENERATED_INTENTS:

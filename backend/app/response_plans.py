@@ -156,18 +156,29 @@ def plan_for(card: EvidenceCard, *, language: ContentLanguage) -> ResponsePlan |
     return None
 
 
-def compose_planned_answer(
+def select_plan(
     cards: Sequence[EvidenceCard], *, language: ContentLanguage
-) -> tuple[str, list[EvidenceCard]] | None:
-    """Build a procedural answer from the first card that has a matching plan.
+) -> tuple[EvidenceCard, ResponsePlan] | None:
+    """Return the first card that has a matching plan, with that plan.
 
-    Returns the rendered answer and the cards it is grounded in, so the caller cites
-    exactly what the answer used and nothing else. Returns None when no card has a plan,
-    which is the fail-closed path.
+    The caller cites exactly this card and nothing else. None is the fail-closed path:
+    no plan means no procedural answer.
     """
 
     for card in cards:
         plan = plan_for(card, language=language)
         if plan is not None:
-            return plan.render(), [card]
+            return card, plan
     return None
+
+
+def compose_planned_answer(
+    cards: Sequence[EvidenceCard], *, language: ContentLanguage
+) -> tuple[str, list[EvidenceCard]] | None:
+    """Rendered plan and its card, or None. Kept for callers that only need the text."""
+
+    selected = select_plan(cards, language=language)
+    if selected is None:
+        return None
+    card, plan = selected
+    return plan.render(), [card]

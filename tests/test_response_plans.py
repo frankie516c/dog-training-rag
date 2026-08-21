@@ -277,14 +277,35 @@ def test_answered_citations_match_the_cards_the_plan_used() -> None:
             assert set(response.limitations) <= set(card.limitations)
 
 
-def test_the_application_builds_no_generation_provider() -> None:
-    """Test 7: production must reach no LLM, however the environment is configured."""
+def test_the_application_does_not_wire_the_answerability_judging_path() -> None:
+    """Checkpoint 5K reintroduces a provider, but only as a rephraser.
+
+    The 5I-A path, where the model also decided whether the evidence could answer, stays
+    unwired: three prompt experiments showed a 4B-class model cannot hold that judgement
+    and the wording at once.
+    """
 
     import inspect
 
     from backend.app import main
 
     source = inspect.getsource(main)
-    assert "OpenAICompatibleGenerationProvider" not in source
     assert "GroundedAnswerer" not in source
     assert "grounded=" not in source
+    assert "phraser=_create_plan_phraser(settings)" in source
+
+
+def test_no_provider_configured_still_answers_from_the_reviewed_plan() -> None:
+    """An unconfigured provider costs prose, not correctness."""
+
+    from backend.app.config import Settings
+    from backend.app.main import _create_plan_phraser
+
+    settings = Settings(generation_base_url=None, generation_model=None)
+    assert _create_plan_phraser(settings) is None
+
+    response, _ = answer_for("배변 실수를 나중에 발견했어요", TrainingScope.HOUSETRAINING)
+    assert response.status is ChatStatus.ANSWERED
+    plan = plan_for(cards_in(TrainingScope.HOUSETRAINING)[0], language=ContentLanguage.KOREAN)
+    assert plan is not None
+    assert response.answer == plan.render()
