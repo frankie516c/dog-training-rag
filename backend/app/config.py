@@ -34,6 +34,23 @@ class Settings(BaseSettings):
         default=None,
         validation_alias=AliasChoices("GENERATION_MODEL", "DOG_TRAINING_RAG_GENERATION_MODEL"),
     )
+    # Sent verbatim to the OpenAI-compatible endpoint. "none" keeps a reasoning model from
+    # spending its budget on thinking tokens for what is a rephrasing task.
+    generation_reasoning_effort: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices(
+            "GENERATION_REASONING_EFFORT", "DOG_TRAINING_RAG_GENERATION_REASONING_EFFORT"
+        ),
+    )
+    # A 9B model split across CPU and GPU answers in ~13s here, so the default allows for
+    # a slow first call rather than turning it into a fallback.
+    generation_timeout_seconds: float = Field(
+        default=60.0,
+        gt=0.0,
+        validation_alias=AliasChoices(
+            "GENERATION_TIMEOUT_SECONDS", "DOG_TRAINING_RAG_GENERATION_TIMEOUT_SECONDS"
+        ),
+    )
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
 
     model_config = SettingsConfigDict(

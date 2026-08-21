@@ -127,14 +127,24 @@ class OpenAICompatibleGenerationProvider:
         self._api_key = api_key.strip() if api_key and api_key.strip() else None
         self._timeout_seconds = timeout_seconds
 
-    async def complete(self, messages: list[dict[str, str]]) -> str:
+    async def complete(
+        self, messages: list[dict[str, str]], *, options: dict[str, object] | None = None
+    ) -> str:
         """Return the raw assistant content for a caller-built message list.
 
         Unlike `generate()` this applies no normalization, because the grounded path
-        expects a structured payload and must parse it itself.
+        expects a structured payload and must parse it itself. `options` is merged into
+        the request body so a caller can pin sampling or disable reasoning tokens; the
+        endpoint is OpenAI-compatible, so unknown keys are the caller's responsibility.
         """
 
-        body = await self._post({"model": self._model, "messages": messages, "stream": False})
+        payload: dict[str, object] = {
+            "model": self._model,
+            "messages": messages,
+            "stream": False,
+        }
+        payload.update(options or {})
+        body = await self._post(payload)
         content = (body["choices"][0]["message"] or {}).get("content")
         if not isinstance(content, str) or not content.strip():
             raise GenerationError("generation provider returned an empty completion")
