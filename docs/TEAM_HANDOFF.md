@@ -28,11 +28,12 @@
   함수 단위로 분리해 가져가야 합니다.
 - **`generate_answers.py` 전체** — 프롬프트 빌드, 생성 호출, 밴드 분류, CLI와
   결과 저장이 하나의 대형 실험 스크립트에 혼재되어 있습니다.
-- **`score_gap` gate를 운영 정책으로 사용하는 것** — `docs/agenda_0825.md`,
-  `docs/graph_hybrid_retrieval_design.md`에 기록된 대로, 코퍼스가 83청크로 커지면서
-  owner 픽스처 20건이 전부 PASS 판정을 받았고 그중 8건만 실제로 top1 점수가
-  올라서였습니다. 나머지 12건은 코퍼스 평균이 낮아지며 gap만 산술적으로 커진
-  결과입니다. 이 게이트는 데모·평가용 신호이지 운영 계약이 아닙니다.
+- **`score_gap` gate를 운영 정책으로 사용하는 것** — `reports/combined_corpus_coverage.md`에
+  기록된 대로, 코퍼스가 83청크로 확장된 현재 owner 픽스처 20건 중 19건은 PASS,
+  1건(Q10)은 REFUSE입니다. Q10은 기대값도 REFUSE라 이 결과가 평가 실패를 뜻하지는
+  않습니다. 전체 20건 중 실제 top1 점수가 상승한 것은 8건이며, 나머지 12건은 top1
+  상승 없이 코퍼스 평균이 낮아지며 gap만 산술적으로 커진 결과입니다. 따라서
+  `score_gap`은 운영 정책이 아니라 데모·평가용 신호로만 사용합니다.
 - **embedded Qdrant 구현을 팀 런타임으로 사용하는 것** — 팀 저장소는 **pgvector**를
   사용할 예정입니다. `feature/dog-training-rag`의 Qdrant 기반 검색 구현
   (`backend/app/retrieval.py`)은 이 결정과 맞지 않으므로 팀 최종 런타임의

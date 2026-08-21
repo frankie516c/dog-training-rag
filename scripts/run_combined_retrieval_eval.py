@@ -601,7 +601,7 @@ def build_report(
         "코퍼스가 막 바뀐 상태에서 임계값까지 같이 움직이면 두 효과가 한 측정에 섞입니다."
         .format(GATE_THRESHOLD))
 
-    lines.extend(_decomposition_section(fixtures, base_fixtures))
+    lines.extend(_decomposition_section(fixtures, base_fixtures, corpus))
     lines.extend(_unblock_section(fixtures, base_fixtures))
     lines.extend(_scenario_section(gold, base_gold, dryrun))
     lines.extend(_retrieval_gap_section(fixtures, base_fixtures))
@@ -618,7 +618,8 @@ def build_report(
 
 
 def _decomposition_section(
-    fixtures: dict[str, dict[str, Any]], base: dict[str, dict[str, Any]]
+    fixtures: dict[str, dict[str, Any]], base: dict[str, dict[str, Any]],
+    corpus: dict[str, Any],
 ) -> list[str]:
     """Split the gap movement into "the corpus answers better" and "the mean fell".
 
@@ -657,11 +658,15 @@ def _decomposition_section(
         "생겼다는 뜻이 아닙니다.".format(
             len(moved), ", ".join("{} {:+.4f}".format(q, d) for q, d, _, _ in moved),
             len(still)))
+    total = len(fixtures)
+    pass_n = sum(1 for r in fixtures.values() if r["gate_verdict"] == GATE_PASS)
+    refuse_n = total - pass_n
     lines.append(
-        "- **그래서 gate 임계값 0.024는 이 코퍼스에서 더 이상 판별하지 못합니다.** "
-        "20건 전부 PASS입니다. 임계값은 26청크 코퍼스에서 잡은 값이고 지금은 77청크입니다. "
-        "재보정은 8/25 안건이므로 이번에는 손대지 않았고, 이 리포트의 gate 열은 "
-        "'판정'이 아니라 '임계값이 무너진 증거'로 읽어야 합니다.")
+        "- **현재 {}청크에서 owner 픽스처 {}건 중 {}건은 PASS, {}건은 REFUSE입니다.** "
+        "임계값 {}는 26청크 코퍼스에서 잡은 값이고, 코퍼스 평균 변화가 score_gap에 "
+        "영향을 줄 수 있으므로, 이 gate는 운영 정책이 아닌 데모·평가용 신호로만 "
+        "사용해야 합니다.".format(
+            corpus["combined"]["chunks"], total, pass_n, refuse_n, GATE_THRESHOLD))
     lines.append(
         "- 판별력이 남아 있는 신호는 Δtop1입니다. 조달이 겨냥한 질문과 그렇지 않은 질문이 "
         "이 열에서는 갈립니다.")
