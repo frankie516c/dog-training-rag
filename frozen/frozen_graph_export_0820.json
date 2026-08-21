@@ -1,0 +1,5994 @@
+{
+  "frozen_at": "2026-08-20",
+  "source": "neo4j-graphrag container, database neo4j, post-salgoonews reload",
+  "frozen_extractions_file": "frozen/frozen_stage2_0820.jsonl",
+  "frozen_aliases_file": "frozen/frozen_entity_aliases_0820.json",
+  "totals": {
+    "nodes": 284,
+    "edges": 102,
+    "query1_paths": 22,
+    "query2_paths": 19
+  },
+  "node_types": [
+    {
+      "type": "증상",
+      "count": 86
+    },
+    {
+      "type": "훈련법",
+      "count": 62
+    },
+    {
+      "type": "문제행동",
+      "count": 51
+    },
+    {
+      "type": "용품",
+      "count": 21
+    },
+    {
+      "type": "질환",
+      "count": 21
+    },
+    {
+      "type": "견종",
+      "count": 19
+    },
+    {
+      "type": "원칙",
+      "count": 18
+    },
+    {
+      "type": "연령대",
+      "count": 6
+    }
+  ],
+  "edge_types": [
+    {
+      "relation": "감별필요",
+      "count": 60
+    },
+    {
+      "relation": "완화한다",
+      "count": 28
+    },
+    {
+      "relation": "선행조건",
+      "count": 9
+    },
+    {
+      "relation": "악화시킨다",
+      "count": 4
+    },
+    {
+      "relation": "금기",
+      "count": 1
+    }
+  ],
+  "nodes": [
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:0",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-caa8012eed7daca69984fd805164cf32ddbaebf8753217e13b9a6ca2e91907f9",
+          "docchunk-a099d33f26ed0216f0a0479a6401d61952204ec04f50b926a603a86e5f148e4c",
+          "docchunk-5fbd497052d884174eb47e5c4e91eb64299e6777dd8f201b72cd6b6bb18b51e7",
+          "docchunk-dd78d4db87b8adb54f8101173a98c62b9bc3ca59b6ff4f25741d00cf80596cf6"
+        ],
+        "chunk_count": 4,
+        "aliases": [],
+        "name": "소형견",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:1",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-caa8012eed7daca69984fd805164cf32ddbaebf8753217e13b9a6ca2e91907f9"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "뒷다리 무릎관절이 빠지고 들어갔다 함",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:2",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "뒷다리에서 딱딱 소리가 남",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:3",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "뒷다리를 갑자기 듦",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:4",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "점프 및 높은 곳에 올라가지 못하게 관리",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:5",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "점프 및 높은 곳에 올라감",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:6",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6",
+          "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd",
+          "docchunk-039fed74173d7b681185534d88895d3d57f4e24adf20310d50d89e46ac25bc59",
+          "docchunk-5fbd497052d884174eb47e5c4e91eb64299e6777dd8f201b72cd6b6bb18b51e7",
+          "docchunk-dd78d4db87b8adb54f8101173a98c62b9bc3ca59b6ff4f25741d00cf80596cf6"
+        ],
+        "chunk_count": 5,
+        "aliases": [],
+        "name": "말티즈",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:7",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6",
+          "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd",
+          "docchunk-039fed74173d7b681185534d88895d3d57f4e24adf20310d50d89e46ac25bc59",
+          "docchunk-5fbd497052d884174eb47e5c4e91eb64299e6777dd8f201b72cd6b6bb18b51e7",
+          "docchunk-dd78d4db87b8adb54f8101173a98c62b9bc3ca59b6ff4f25741d00cf80596cf6"
+        ],
+        "chunk_count": 5,
+        "aliases": [],
+        "name": "푸들",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:8",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6",
+          "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd",
+          "docchunk-5fbd497052d884174eb47e5c4e91eb64299e6777dd8f201b72cd6b6bb18b51e7",
+          "docchunk-dd78d4db87b8adb54f8101173a98c62b9bc3ca59b6ff4f25741d00cf80596cf6"
+        ],
+        "chunk_count": 4,
+        "aliases": [],
+        "name": "포메라니안",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:9",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6",
+          "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd"
+        ],
+        "chunk_count": 2,
+        "aliases": [],
+        "name": "치와와",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:10",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "요크셔테리어",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:11",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6",
+          "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd"
+        ],
+        "chunk_count": 2,
+        "aliases": [],
+        "name": "스피츠",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:12",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6",
+          "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd",
+          "docchunk-039fed74173d7b681185534d88895d3d57f4e24adf20310d50d89e46ac25bc59"
+        ],
+        "chunk_count": 3,
+        "aliases": [],
+        "name": "시츄",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:13",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-a099d33f26ed0216f0a0479a6401d61952204ec04f50b926a603a86e5f148e4c"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "수직 운동",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:14",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-a099d33f26ed0216f0a0479a6401d61952204ec04f50b926a603a86e5f148e4c"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "수평 운동",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:15",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-a099d33f26ed0216f0a0479a6401d61952204ec04f50b926a603a86e5f148e4c"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "수영",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:16",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-a099d33f26ed0216f0a0479a6401d61952204ec04f50b926a603a86e5f148e4c"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "관절 부담",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:17",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-a099d33f26ed0216f0a0479a6401d61952204ec04f50b926a603a86e5f148e4c"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "다리 절음",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:18",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "뒷다리 만지는 것에 대한 거부감",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:19",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "공격성",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:20",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "다리까지 입히는 옷",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:21",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "뒷다리가 틀어짐",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:22",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "혼내지 않기",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:23",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "천천히 만져주기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:24",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2f800c9b596e93fd293857cdf6cd0295ca4f8796e8c47b4ad6d905d0d0f178fa"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "떼쓰기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:25",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-188901e23f7041bd0b86637d7af9a34f397de3b8b2ba47ff31320846138dc0d2"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "이상행동",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:26",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-188901e23f7041bd0b86637d7af9a34f397de3b8b2ba47ff31320846138dc0d2"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "과잉 집착",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:27",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-188901e23f7041bd0b86637d7af9a34f397de3b8b2ba47ff31320846138dc0d2"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "극심한 스트레스",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:28",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-188901e23f7041bd0b86637d7af9a34f397de3b8b2ba47ff31320846138dc0d2"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "불안장애",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:29",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-188901e23f7041bd0b86637d7af9a34f397de3b8b2ba47ff31320846138dc0d2"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "긴장",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:30",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-188901e23f7041bd0b86637d7af9a34f397de3b8b2ba47ff31320846138dc0d2"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "공포",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:31",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-188901e23f7041bd0b86637d7af9a34f397de3b8b2ba47ff31320846138dc0d2"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "안정적인 애착관계 정립",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:32",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-188901e23f7041bd0b86637d7af9a34f397de3b8b2ba47ff31320846138dc0d2"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "보호자 의존",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:33",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "생후 2개월~4개월",
+        "type": "연령대"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:34",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "과보호",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:35",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "비숑프리제",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:36",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "말티푸",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:37",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "코카스파니엘",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:38",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "비글",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:39",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "시바견",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:40",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-919402fbfa48101c5502496768c1ab1a58a547ec0da92b88e5b9b66761a794d9"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "독립심을키우는 강아지 훈련"
+        ],
+        "name": "독립심 기르기 훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:41",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-919402fbfa48101c5502496768c1ab1a58a547ec0da92b88e5b9b66761a794d9"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "애착관계를 안정적으로 만들어나가야"
+        ],
+        "name": "안정적인 애착관계 형성",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:42",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-919402fbfa48101c5502496768c1ab1a58a547ec0da92b88e5b9b66761a794d9"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "어릴때부터"
+        ],
+        "name": "어린 연령대",
+        "type": "연령대"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:43",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-919402fbfa48101c5502496768c1ab1a58a547ec0da92b88e5b9b66761a794d9"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "낑낑거림",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:44",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-919402fbfa48101c5502496768c1ab1a58a547ec0da92b88e5b9b66761a794d9"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "짖음",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:45",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-919402fbfa48101c5502496768c1ab1a58a547ec0da92b88e5b9b66761a794d9"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "하울링",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:46",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
+          "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa"
+        ],
+        "chunk_count": 2,
+        "aliases": [],
+        "name": "대소변 실수",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:47",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "소변 마킹",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:48",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "물건 물어뜯기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:49",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "전두엽 기능장애",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:50",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
+          "docchunk-37cf02b107b0523cf0691bc43f5632364b5c609ec6ea5a000843cefeac52b233"
+        ],
+        "chunk_count": 2,
+        "aliases": [
+          "분리불안 훈련"
+        ],
+        "name": "분리불안",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:51",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "물건을 물어뜯는 행동",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:52",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "이식증",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:53",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "강박증",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:54",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa",
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ],
+        "chunk_count": 2,
+        "aliases": [],
+        "name": "불안장애",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:55",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "우울증",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:56",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "짖음",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:57",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "물건을 망가트리는 행동",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:58",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "발 핥기",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:59",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "생식기 핥기",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:60",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "발톱 물어뜯기",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:61",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "털 뽑기",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:62",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "계속 같은 위치를 맴돈다던가, 꼬리잡기나 빙긍빙글 돌기"
+        ],
+        "name": "상동행동",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:63",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "과도한 침흘림",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:64",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "강박"
+        ],
+        "name": "강박장애",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:65",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "집에 보호자와 같이 있을때 하루종일 쫗아다니면서 떨어지지 않으려고 하고"
+        ],
+        "name": "보호자 뒤따라다니기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:66",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "지나친 집착",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:67",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "밥이나 간식들도 안먹는다던가"
+        ],
+        "name": "식사 및 간식 거부",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:68",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "대소변을 참는 행동"
+        ],
+        "name": "대소변 참기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:69",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "구석진곳에서 나오지 않는 행동"
+        ],
+        "name": "은신",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:70",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "외출시 산책을 나가주세요"
+        ],
+        "name": "외출 전 산책",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:71",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "켄넬훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:72",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-44f50e951d01466d24d8cc73d8c749c1c81f19f7223d4e73261900d48a6c1a8d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "집착",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:73",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-44f50e951d01466d24d8cc73d8c749c1c81f19f7223d4e73261900d48a6c1a8d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "방황",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:74",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-44f50e951d01466d24d8cc73d8c749c1c81f19f7223d4e73261900d48a6c1a8d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "켄넬",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:75",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-44f50e951d01466d24d8cc73d8c749c1c81f19f7223d4e73261900d48a6c1a8d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "보호자 냄새가 나는 옷이나 수건",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:76",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-44f50e951d01466d24d8cc73d8c749c1c81f19f7223d4e73261900d48a6c1a8d"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "잠깐씩만 집을 비우는것을 반복"
+        ],
+        "name": "점진적 혼자 있기 훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:77",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "노즈워크",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:78",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "노즈워크 담요",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:79",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "장난감",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:80",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "기다려훈련"
+        ],
+        "name": "기다려 훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:81",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "보호자님의 뒤만 쫗아다니고"
+        ],
+        "name": "보호자를 따라다님",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:82",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "보호자와 떨어지지 않으려 함",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:83",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-37cf02b107b0523cf0691bc43f5632364b5c609ec6ea5a000843cefeac52b233"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "방문훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:84",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-33a5803d57f47c2febd95ac372869344bb9661b7aa911b121693efd20418bc52",
+          "docchunk-dcf2c52487976f13e9464e4d7377c60d78bd47fb7fd7fde162c3e0c6aec38a7d"
+        ],
+        "chunk_count": 2,
+        "aliases": [
+          "강아지 켄넬(이동장) 훈련"
+        ],
+        "name": "켄넬 훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:85",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-33a5803d57f47c2febd95ac372869344bb9661b7aa911b121693efd20418bc52",
+          "docchunk-37de749b2cfb629e80ee8cc4e3e94f6f4c3e15109f7a24080c5e31010283f139",
+          "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6",
+          "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98",
+          "docchunk-7ae0214aa5b45a3d3314d6f4c7f353aacafb8b336231e734be55b8210f05bd66"
+        ],
+        "chunk_count": 5,
+        "aliases": [
+          "켄넬",
+          "켄넬(이동장)"
+        ],
+        "name": "이동장",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:86",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-33a5803d57f47c2febd95ac372869344bb9661b7aa911b121693efd20418bc52"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "이동장 출입 거부",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:87",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-33a5803d57f47c2febd95ac372869344bb9661b7aa911b121693efd20418bc52"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "이동장을 익숙한 공간으로 만들기",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:88",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-dcf2c52487976f13e9464e4d7377c60d78bd47fb7fd7fde162c3e0c6aec38a7d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "이동장 들어가기 거부",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:89",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-ba2b4b0060fc9ca559ab7ad95621d890913c45f2e4934a8b55ecc8ec0319144e",
+          "docchunk-3ba8bc3871a208cd8804bbf97f8506aae53c81ff3ea74efca4cbf93d475f0194",
+          "docchunk-710fb14b0022832669bf308448e80c43ee9253c0b50a92c20089ba1fc10283e8"
+        ],
+        "chunk_count": 3,
+        "aliases": [],
+        "name": "크레이트 적응 훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:90",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-ba2b4b0060fc9ca559ab7ad95621d890913c45f2e4934a8b55ecc8ec0319144e",
+          "docchunk-3ba8bc3871a208cd8804bbf97f8506aae53c81ff3ea74efca4cbf93d475f0194",
+          "docchunk-710fb14b0022832669bf308448e80c43ee9253c0b50a92c20089ba1fc10283e8"
+        ],
+        "chunk_count": 3,
+        "aliases": [],
+        "name": "크레이트",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:91",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-ba2b4b0060fc9ca559ab7ad95621d890913c45f2e4934a8b55ecc8ec0319144e"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "플라스틱 크레이트",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:92",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-3ba8bc3871a208cd8804bbf97f8506aae53c81ff3ea74efca4cbf93d475f0194"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "크레이트 크기에 맞는 선택",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:93",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-710fb14b0022832669bf308448e80c43ee9253c0b50a92c20089ba1fc10283e8"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "감금",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:94",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-50191eee95a0d93872307e080c1db7ccdc5e01c7641109d6f23ff890f1dd8fa0"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "켄넬(이동장) 훈련"
+        ],
+        "name": "크레이트 훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:95",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-50191eee95a0d93872307e080c1db7ccdc5e01c7641109d6f23ff890f1dd8fa0"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "이동장 거부감",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:96",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-50191eee95a0d93872307e080c1db7ccdc5e01c7641109d6f23ff890f1dd8fa0"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "평소 사용하던 방석이나 담요 넣기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:97",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-50191eee95a0d93872307e080c1db7ccdc5e01c7641109d6f23ff890f1dd8fa0"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "방석",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:98",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-50191eee95a0d93872307e080c1db7ccdc5e01c7641109d6f23ff890f1dd8fa0"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "간식으로 이동장 안 유인하기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:99",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-50191eee95a0d93872307e080c1db7ccdc5e01c7641109d6f23ff890f1dd8fa0"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "간식",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:100",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-50191eee95a0d93872307e080c1db7ccdc5e01c7641109d6f23ff890f1dd8fa0"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "크레이트에 대한 '좋은 기억'을 심어줘야 합니다"
+        ],
+        "name": "긍정적 기억 형성",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:101",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-37de749b2cfb629e80ee8cc4e3e94f6f4c3e15109f7a24080c5e31010283f139"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "이동장에 대한 두려움",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:102",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-37de749b2cfb629e80ee8cc4e3e94f6f4c3e15109f7a24080c5e31010283f139"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "간식 보상",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:103",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-37de749b2cfb629e80ee8cc4e3e94f6f4c3e15109f7a24080c5e31010283f139"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "반복 훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:104",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6",
+          "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98",
+          "docchunk-7ae0214aa5b45a3d3314d6f4c7f353aacafb8b336231e734be55b8210f05bd66"
+        ],
+        "chunk_count": 3,
+        "aliases": [],
+        "name": "이동장 훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:105",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "점진적 지속시간 증가",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:106",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "보상 훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:107",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "이동장 안에서 식사하기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:108",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "사료로 이동장 안에 유도하기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:109",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "이동장 문 닫는 시간 점진적으로 늘리기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:110",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "놀람",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:111",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "짧은 문 닫기 시간",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:112",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-7ae0214aa5b45a3d3314d6f4c7f353aacafb8b336231e734be55b8210f05bd66"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "예측가능한 일정",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:113",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀 긁기",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:114",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀 털기",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:115",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "피부병",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:116",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "알레르기",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:117",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "면역력 저하",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:118",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5",
+          "docchunk-2fdb51c2a2d59216cc2089b681e933f40b4fed19492a46c640992a95ef134dc5",
+          "docchunk-6f441628c88a426ff3928abb83a228836f4c35aee37d4be8b1cf8942ad44dae9",
+          "docchunk-cd3fe544467f751443535e021df396851489c8f12d99888e89b48b2094665836",
+          "docchunk-6db5a45a837c622999c8818412b8e8c9ff8134b7acf0c46f3180f5259fbf9eb4",
+          "docchunk-039fed74173d7b681185534d88895d3d57f4e24adf20310d50d89e46ac25bc59",
+          "docchunk-5a1d8e23a90982b0bb30dc8cf08de4bb746ffed2e61970de65dc3f46e056892e",
+          "docchunk-5859fa6cb53f5fa9ccaad9953b96fb0a516d92c1155721ad4051c8a7f89fcca2",
+          "docchunk-aa9a1491f3634a160de1d5ad0bd5ccd1a3cc7563a6aeca64d23531e01b4dd5ba",
+          "docchunk-34ec5e46f4ab67633657aaf0cf52e7c664347cb515f084b88da16131ade35082"
+        ],
+        "chunk_count": 10,
+        "aliases": [],
+        "name": "외이염",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:119",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "고름",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:120",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "악취",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:121",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "가려움",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:122",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2fdb51c2a2d59216cc2089b681e933f40b4fed19492a46c640992a95ef134dc5",
+          "docchunk-34ec5e46f4ab67633657aaf0cf52e7c664347cb515f084b88da16131ade35082"
+        ],
+        "chunk_count": 2,
+        "aliases": [],
+        "name": "중이염",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:123",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2fdb51c2a2d59216cc2089b681e933f40b4fed19492a46c640992a95ef134dc5",
+          "docchunk-34ec5e46f4ab67633657aaf0cf52e7c664347cb515f084b88da16131ade35082"
+        ],
+        "chunk_count": 2,
+        "aliases": [],
+        "name": "내이염",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:124",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2fdb51c2a2d59216cc2089b681e933f40b4fed19492a46c640992a95ef134dc5"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "안면 마비",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:125",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2fdb51c2a2d59216cc2089b681e933f40b4fed19492a46c640992a95ef134dc5"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "난청",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:126",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2fdb51c2a2d59216cc2089b681e933f40b4fed19492a46c640992a95ef134dc5"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "빙빙 도는 행동",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:127",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-6f441628c88a426ff3928abb83a228836f4c35aee37d4be8b1cf8942ad44dae9"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "가려움증",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:128",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-6f441628c88a426ff3928abb83a228836f4c35aee37d4be8b1cf8942ad44dae9"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀 청소와 관리",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:129",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-096cc0b53d1525e752e1ea5dd29e3ae8ac52f8ee1350193a468bdc2097148f41"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀 진드기",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:130",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-096cc0b53d1525e752e1ea5dd29e3ae8ac52f8ee1350193a468bdc2097148f41"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "염증",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:131",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-6db5a45a837c622999c8818412b8e8c9ff8134b7acf0c46f3180f5259fbf9eb4"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀 감염",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:132",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-039fed74173d7b681185534d88895d3d57f4e24adf20310d50d89e46ac25bc59"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "알레르기 반응",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:133",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-039fed74173d7b681185534d88895d3d57f4e24adf20310d50d89e46ac25bc59"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀 염증",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:134",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-039fed74173d7b681185534d88895d3d57f4e24adf20310d50d89e46ac25bc59"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "코카 스파니엘",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:135",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-039fed74173d7b681185534d88895d3d57f4e24adf20310d50d89e46ac25bc59"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "슈나우저",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:136",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5a1d8e23a90982b0bb30dc8cf08de4bb746ffed2e61970de65dc3f46e056892e"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀를 자주 긁거나 머리를 비비는 행동",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:137",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5a1d8e23a90982b0bb30dc8cf08de4bb746ffed2e61970de65dc3f46e056892e"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀 통증 또는 민감 반응",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:138",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5a1d8e23a90982b0bb30dc8cf08de4bb746ffed2e61970de65dc3f46e056892e"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀지 증가 및 악취",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:139",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5a1d8e23a90982b0bb30dc8cf08de4bb746ffed2e61970de65dc3f46e056892e"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "갈색 또는 검은색 귀지",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:140",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5a1d8e23a90982b0bb30dc8cf08de4bb746ffed2e61970de65dc3f46e056892e"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀 피부 발적 및 고름",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:141",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5859fa6cb53f5fa9ccaad9953b96fb0a516d92c1155721ad4051c8a7f89fcca2"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "올바른 관리",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:142",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c145ac75486f996b281a1cc73460afb9ce44ff77948a55047c68592b942f394b"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀 청소",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:143",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c145ac75486f996b281a1cc73460afb9ce44ff77948a55047c68592b942f394b"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀 자극",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:144",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c145ac75486f996b281a1cc73460afb9ce44ff77948a55047c68592b942f394b"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "전용 귀 세정제",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:145",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c145ac75486f996b281a1cc73460afb9ce44ff77948a55047c68592b942f394b"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "부드러운 솜",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:146",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c145ac75486f996b281a1cc73460afb9ce44ff77948a55047c68592b942f394b"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀속 깊숙이 넣지 않기",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:147",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-3c2efb65e7ddd82232b471e0d54627050af2d559ddd50acd50ced593a4131f6d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귓털이 많은 견종",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:148",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-3c2efb65e7ddd82232b471e0d54627050af2d559ddd50acd50ced593a4131f6d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귓털 제거",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:149",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-3c2efb65e7ddd82232b471e0d54627050af2d559ddd50acd50ced593a4131f6d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "습기",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:150",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-3c2efb65e7ddd82232b471e0d54627050af2d559ddd50acd50ced593a4131f6d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀 주변 털 짧게 유지",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:151",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-3c2efb65e7ddd82232b471e0d54627050af2d559ddd50acd50ced593a4131f6d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "통풍",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:152",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-3c2efb65e7ddd82232b471e0d54627050af2d559ddd50acd50ced593a4131f6d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귓속 털 뽑기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:153",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-144a3c10446b9918e1a6fceaf869ec5170ce73dc1c0df674a4f4bf6ab1a2ac65"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀에 물이 들어감",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:154",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-144a3c10446b9918e1a6fceaf869ec5170ce73dc1c0df674a4f4bf6ab1a2ac65"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귀 건조",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:155",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-144a3c10446b9918e1a6fceaf869ec5170ce73dc1c0df674a4f4bf6ab1a2ac65"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "드라이기",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:156",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-aa9a1491f3634a160de1d5ad0bd5ccd1a3cc7563a6aeca64d23531e01b4dd5ba"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "귓속 이물질",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:157",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-aa9a1491f3634a160de1d5ad0bd5ccd1a3cc7563a6aeca64d23531e01b4dd5ba"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "기생충 예방접종",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:158",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-aa9a1491f3634a160de1d5ad0bd5ccd1a3cc7563a6aeca64d23531e01b4dd5ba"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "음식 알레르기",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:159",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-34ec5e46f4ab67633657aaf0cf52e7c664347cb515f084b88da16131ade35082"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "만성 외이염",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:160",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-34ec5e46f4ab67633657aaf0cf52e7c664347cb515f084b88da16131ade35082"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "청력 상실",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:161",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-34ec5e46f4ab67633657aaf0cf52e7c664347cb515f084b88da16131ade35082"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "신경 증상",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:162",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5fbd497052d884174eb47e5c4e91eb64299e6777dd8f201b72cd6b6bb18b51e7",
+          "docchunk-fbde6fdc407c702150a81419b34e5b5c4cee3647e7eb4c383305e4019ba2d0fb"
+        ],
+        "chunk_count": 2,
+        "aliases": [
+          "다리를 들고 걷거나"
+        ],
+        "name": "다리 들기",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:163",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5fbd497052d884174eb47e5c4e91eb64299e6777dd8f201b72cd6b6bb18b51e7",
+          "docchunk-70175c6b19abb30489603690916f9209266e8e308abde7de6f215ab198a2be94",
+          "docchunk-59c3017ccc220d45c3b14a8b9bd971ea41e10f87d52295479956b76948bf81ec"
+        ],
+        "chunk_count": 3,
+        "aliases": [
+          "절뚝거리는 모습"
+        ],
+        "name": "절뚝거림",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:164",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5fbd497052d884174eb47e5c4e91eb64299e6777dd8f201b72cd6b6bb18b51e7",
+          "docchunk-70175c6b19abb30489603690916f9209266e8e308abde7de6f215ab198a2be94",
+          "docchunk-8a3f78998ec2dc0068778d76fb3ce88860d37df2f0acee59f1a6ac011bac25f1"
+        ],
+        "chunk_count": 3,
+        "aliases": [],
+        "name": "관절염",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:165",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-5fbd497052d884174eb47e5c4e91eb64299e6777dd8f201b72cd6b6bb18b51e7"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "운동 장애",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:166",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-8a4a527053d6e6ee23d906c074e02104d5631886e00332a0756f60b2589dd9b4"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "미끄러운 바닥에서 반복적으로 뛰는 습관"
+        ],
+        "name": "미끄러운 바닥에서 반복적으로 뛰기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:167",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-8a4a527053d6e6ee23d906c074e02104d5631886e00332a0756f60b2589dd9b4"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "높은 곳에서 점프하다가"
+        ],
+        "name": "높은 곳에서 점프하기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:168",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-8a4a527053d6e6ee23d906c074e02104d5631886e00332a0756f60b2589dd9b4"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "생활 환경 관리",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:169",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2131a61bd4fd61fec88d580e3312431b6182c208ee5d9f5965946ea75ab9fa09"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "무릎뼈가 손으로 눌렀을 때만 빠졌다가 제자리로 돌아옴",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:170",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2131a61bd4fd61fec88d580e3312431b6182c208ee5d9f5965946ea75ab9fa09"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "다리를 드는 행동",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:171",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-70175c6b19abb30489603690916f9209266e8e308abde7de6f215ab198a2be94"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "슬개골 탈구 반복",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:172",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-70175c6b19abb30489603690916f9209266e8e308abde7de6f215ab198a2be94"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "산책 중 갑자기 멈춤",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:173",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-59c3017ccc220d45c3b14a8b9bd971ea41e10f87d52295479956b76948bf81ec"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "다리를 들고 다님",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:174",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-59c3017ccc220d45c3b14a8b9bd971ea41e10f87d52295479956b76948bf81ec",
+          "docchunk-2a6104ae06d867a69373f0727ca85b8671e393c506fb76a255c276d79da8b94a"
+        ],
+        "chunk_count": 2,
+        "aliases": [],
+        "name": "관절 변형",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:175",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-4369dfe314d224174f11afbb2e6d77d316ae4029a0347d84d998ee025e47210d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "무릎뼈 탈구 고정",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:176",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-4369dfe314d224174f11afbb2e6d77d316ae4029a0347d84d998ee025e47210d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "뒷다리 사용 불가",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:177",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-4369dfe314d224174f11afbb2e6d77d316ae4029a0347d84d998ee025e47210d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "보행 곤란",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:178",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-4369dfe314d224174f11afbb2e6d77d316ae4029a0347d84d998ee025e47210d"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "움직임 제한",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:179",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-fbde6fdc407c702150a81419b34e5b5c4cee3647e7eb4c383305e4019ba2d0fb"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "체중 조절",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:180",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-fbde6fdc407c702150a81419b34e5b5c4cee3647e7eb4c383305e4019ba2d0fb"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "관절 보조제",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:181",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-fbde6fdc407c702150a81419b34e5b5c4cee3647e7eb4c383305e4019ba2d0fb"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "카펫",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:182",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-fbde6fdc407c702150a81419b34e5b5c4cee3647e7eb4c383305e4019ba2d0fb"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "매트",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:183",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2a6104ae06d867a69373f0727ca85b8671e393c506fb76a255c276d79da8b94a"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "재활치료",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:184",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2a6104ae06d867a69373f0727ca85b8671e393c506fb76a255c276d79da8b94a"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "물리치료 프로그램",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:185",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2a6104ae06d867a69373f0727ca85b8671e393c506fb76a255c276d79da8b94a"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "활동량 조절",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:186",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2a6104ae06d867a69373f0727ca85b8671e393c506fb76a255c276d79da8b94a"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "안전한 환경 마련",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:187",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-2a6104ae06d867a69373f0727ca85b8671e393c506fb76a255c276d79da8b94a"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "관절 부담 줄이기",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:188",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-8a3f78998ec2dc0068778d76fb3ce88860d37df2f0acee59f1a6ac011bac25f1"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "다리를 드는 행동",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:189",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-8a3f78998ec2dc0068778d76fb3ce88860d37df2f0acee59f1a6ac011bac25f1"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "순간적인 절뚝거림",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:190",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-8a3f78998ec2dc0068778d76fb3ce88860d37df2f0acee59f1a6ac011bac25f1"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "십자인대 파열",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:228",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "사람 과잉 친화",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:229",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "호출 불응",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:230",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "이빨가리"
+        ],
+        "name": "이빨갈이",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:231",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "5개월령",
+        "type": "연령대"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:232",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "7개월령",
+        "type": "연령대"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:233",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-22e38bb46d7ec534e15b2d6fbdbc0be670fccd33291c126e2b7ba2ccb7f6f7be"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "사람에게 과도하게 접촉하게 방치하기",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:234",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "강아지가 올 때까지 기다리기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:235",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "한 손으로만 만지기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:236",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "강아지가 스스로 보호자에게 돌아가게 하기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:237",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-571c324a19329f97d7016de730b0283df74251cf74e5d69c6aaf7a3c0392d297"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "집계"
+        ],
+        "name": "집개",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:238",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
+          "docchunk-37cf02b107b0523cf0691bc43f5632364b5c609ec6ea5a000843cefeac52b233"
+        ],
+        "chunk_count": 2,
+        "aliases": [
+          "분리불이"
+        ],
+        "name": "분리불안",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:239",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "현관에 배변하기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:240",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "장난감을 거실로 가져오기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:241",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "간식 바닥에 놓기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:242",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "C컵"
+        ],
+        "name": "C자 유도",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:243",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "줄매는 연습"
+        ],
+        "name": "목줄 착용 연습",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:244",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "가슴추"
+        ],
+        "name": "가슴줄",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:245",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "chunk-a947b4aaf9d03885d164275edcc69cbe90fcb5dfafcc2b2c0cfbeb024dd1f4f7"
+        ],
+        "chunk_count": 2,
+        "aliases": [],
+        "name": "목줄",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:246",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "가슴줄이 익숙해지는 거"
+        ],
+        "name": "가슴줄 적응",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:247",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "입막의 연습"
+        ],
+        "name": "입마개 적응 훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:248",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "손도 못 대게 하는 경우"
+        ],
+        "name": "접촉 거부",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:249",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "chunk-808eb3891543dafe5465c9e6e44a64537b43b3caaad27a09eed8791aa1bf1845"
+        ],
+        "chunk_count": 2,
+        "aliases": [
+          "물고"
+        ],
+        "name": "입질",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:250",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "접촉 줄이기",
+        "type": "원칙"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:251",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390"
+        ],
+        "chunk_count": 2,
+        "aliases": [
+          "강아지가 노령인 경우"
+        ],
+        "name": "노령견",
+        "type": "연령대"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:252",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "달려들어요 / 점프하면"
+        ],
+        "name": "사람에게 점프하며 달려들기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:253",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "니킥"
+        ],
+        "name": "혐오 자극",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:254",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "간식 보상으로 앉기 훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:255",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "옆으로 돌리기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:256",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-269aebcd2f643beb9357da507639bebae40c0d84e6a7ed4d2cebbdbd1edebfbf"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "식탁 화장대 같은데 두 발로 서서 물건을 물어와요"
+        ],
+        "name": "테이블 위 물건 물기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:257",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-269aebcd2f643beb9357da507639bebae40c0d84e6a7ed4d2cebbdbd1edebfbf"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "그거를 몇 번 삼킨 적도 있고"
+        ],
+        "name": "이물 섭취",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:258",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-269aebcd2f643beb9357da507639bebae40c0d84e6a7ed4d2cebbdbd1edebfbf"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "스탠더드 푸들",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:259",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-269aebcd2f643beb9357da507639bebae40c0d84e6a7ed4d2cebbdbd1edebfbf"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "골든 리트리버",
+        "type": "견종"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:260",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "식탁 같은데 올라가는 건"
+        ],
+        "name": "식탁 위에 올라가기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:261",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "하우스 트레이닝",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:262",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "간식 유혹 참기 훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:263",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "만지면서 칭찬하기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:264",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-0ac6db2065a26dc34d21a3d288a901029cfd971097db27944cae49d2e546a989",
+          "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8"
+        ],
+        "chunk_count": 2,
+        "aliases": [],
+        "name": "점프",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:289",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-0ac6db2065a26dc34d21a3d288a901029cfd971097db27944cae49d2e546a989"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "무반응",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:290",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-97db9179eb4efbbe2441b327ffe32855b0aa0dec8c44a290fe8004a289c27ab8",
+          "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b"
+        ],
+        "chunk_count": 2,
+        "aliases": [],
+        "name": "예민함",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:291",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "간식을 찾지 못함",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:292",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "냄새를 깊게 안 맞는다"
+        ],
+        "name": "냄새를 깊게 맡지 않음",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:293",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "집중력 저하",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:294",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b",
+          "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
+          "docchunk-9958494444922313fa0dc001ebbac024c418df1cf65bbe6bffc3c5ac6377f1f2",
+          "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6"
+        ],
+        "chunk_count": 4,
+        "aliases": [
+          "불안이하거나",
+          "불안한 감정"
+        ],
+        "name": "불안",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:295",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "배변 전 자리 잡기 없음",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:296",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "피부 민감도 증가",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:297",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "생식기 민감",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:298",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "꼬리 기저부 가려움",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:299",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "꼬리를 잡으려고 뺑글뺑글뺑글 도는"
+        ],
+        "name": "꼬리 쫓기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:300",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "꼬리 물기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:301",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-808eb3891543dafe5465c9e6e44a64537b43b3caaad27a09eed8791aa1bf1845"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "둔감아리, 둔 감짝"
+        ],
+        "name": "둔감화 훈련",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:302",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-808eb3891543dafe5465c9e6e44a64537b43b3caaad27a09eed8791aa1bf1845"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "예민한 행동",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:303",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-026e3bf5cca934f7c335beb363feebf52bf2830b63c5ce8a12371037fbed0f52",
+          "docchunk-188901e23f7041bd0b86637d7af9a34f397de3b8b2ba47ff31320846138dc0d2"
+        ],
+        "chunk_count": 2,
+        "aliases": [],
+        "name": "두려움",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:304",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-026e3bf5cca934f7c335beb363feebf52bf2830b63c5ce8a12371037fbed0f52"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "간식 제공 후 비접촉",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:305",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-594754ffd84e22b02ab3559e17b8155140cc00a266378b81e60a55a0346eee0a"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "피부 민감도",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:306",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "산책을 싫어해서"
+        ],
+        "name": "산책 거부",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:307",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "그쪽으로 다시 가려고"
+        ],
+        "name": "귀가 시도",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:308",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-b024a7eaae215d7f6532aeed7485bcaa81821c441e5468e7b24d9316ea83f99c"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "돌아오는 산책",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:309",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-a947b4aaf9d03885d164275edcc69cbe90fcb5dfafcc2b2c0cfbeb024dd1f4f7"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "하네스",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:310",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "chunk-a947b4aaf9d03885d164275edcc69cbe90fcb5dfafcc2b2c0cfbeb024dd1f4f7",
+          "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6",
+          "docchunk-a099d33f26ed0216f0a0479a6401d61952204ec04f50b926a603a86e5f148e4c",
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5",
+          "docchunk-59c3017ccc220d45c3b14a8b9bd971ea41e10f87d52295479956b76948bf81ec",
+          "docchunk-2a6104ae06d867a69373f0727ca85b8671e393c506fb76a255c276d79da8b94a"
+        ],
+        "chunk_count": 6,
+        "aliases": [
+          "고통스러울",
+          "아파하지 않는지"
+        ],
+        "name": "통증",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:311",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9958494444922313fa0dc001ebbac024c418df1cf65bbe6bffc3c5ac6377f1f2",
+          "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6",
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390",
+          "docchunk-3ee1358c7514b68f8c38c4a55388d758f0be64acaf27fe255201e410714606c1"
+        ],
+        "chunk_count": 4,
+        "aliases": [
+          "밤새 짖기",
+          "밤에 짖는 강아지 강아지 밤새 짖는"
+        ],
+        "name": "밤에 짖기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:312",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9958494444922313fa0dc001ebbac024c418df1cf65bbe6bffc3c5ac6377f1f2"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "외로움",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:313",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9958494444922313fa0dc001ebbac024c418df1cf65bbe6bffc3c5ac6377f1f2",
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902",
+          "docchunk-caa8012eed7daca69984fd805164cf32ddbaebf8753217e13b9a6ca2e91907f9",
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6",
+          "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d",
+          "docchunk-ba2b4b0060fc9ca559ab7ad95621d890913c45f2e4934a8b55ecc8ec0319144e",
+          "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6"
+        ],
+        "chunk_count": 7,
+        "aliases": [
+          "어릴때부터"
+        ],
+        "name": "어린 강아지",
+        "type": "연령대"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:314",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-9958494444922313fa0dc001ebbac024c418df1cf65bbe6bffc3c5ac6377f1f2"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "내버려 두기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:315",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "밤에 짖는 행위"
+        ],
+        "name": "밤에 짖음",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:316",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "내버려두는 것"
+        ],
+        "name": "내버려두기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:317",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "상태를 보러가면"
+        ],
+        "name": "보호자 확인",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:318",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "낮에 산책 등으로 제대로 운동을 시키고"
+        ],
+        "name": "낮 산책 및 운동",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:319",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "케이지",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:320",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902",
+          "docchunk-50191eee95a0d93872307e080c1db7ccdc5e01c7641109d6f23ff890f1dd8fa0"
+        ],
+        "chunk_count": 2,
+        "aliases": [],
+        "name": "담요",
+        "type": "용품"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:321",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "설사",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:322",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "구토",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:323",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "다리 물어뜯기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:324",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "심하게 핥기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902",
+          "docchunk-2f800c9b596e93fd293857cdf6cd0295ca4f8796e8c47b4ad6d905d0d0f178fa",
+          "docchunk-188901e23f7041bd0b86637d7af9a34f397de3b8b2ba47ff31320846138dc0d2",
+          "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd",
+          "docchunk-919402fbfa48101c5502496768c1ab1a58a547ec0da92b88e5b9b66761a794d9",
+          "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170",
+          "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6",
+          "docchunk-44f50e951d01466d24d8cc73d8c749c1c81f19f7223d4e73261900d48a6c1a8d",
+          "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06"
+        ],
+        "chunk_count": 10,
+        "aliases": [
+          "분리불안증"
+        ],
+        "name": "분리불안",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:326",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "충분히 놀아주기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:327",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "산책 시간을 길게 잡기"
+        ],
+        "name": "산책 시간 늘리기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:328",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "자기 전에 충분히 놀아주기",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:329",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "질병"
+        ],
+        "name": "질환",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:330",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "만지면 싫어하는 부분"
+        ],
+        "name": "접촉 회피",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:331",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "식욕은 평소와 같은지"
+        ],
+        "name": "식욕 변화",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:332",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "관절 통증",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:333",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390",
+          "docchunk-3ee1358c7514b68f8c38c4a55388d758f0be64acaf27fe255201e410714606c1"
+        ],
+        "chunk_count": 2,
+        "aliases": [],
+        "name": "치매",
+        "type": "질환"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:334",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "정체 없이 어슬렁어슬렁하며 돌아다니고"
+        ],
+        "name": "배회",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:335",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "크게 원을 그리며 도는 행동"
+        ],
+        "name": "원형 보행",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:336",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "멍하니 벽을 보거나 모서리로 가는 행동"
+        ],
+        "name": "벽 응시",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:337",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "밤낮 역전",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:338",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "눈이 나빠져"
+        ],
+        "name": "시각 저하",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:339",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "귀가 나빠져"
+        ],
+        "name": "청각 저하",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:340",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390",
+          "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
+          "docchunk-44f50e951d01466d24d8cc73d8c749c1c81f19f7223d4e73261900d48a6c1a8d"
+        ],
+        "chunk_count": 3,
+        "aliases": [],
+        "name": "불안감",
+        "type": "증상"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:341",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390"
+        ],
+        "chunk_count": 1,
+        "aliases": [
+          "우는"
+        ],
+        "name": "울기",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:342",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-3ee1358c7514b68f8c38c4a55388d758f0be64acaf27fe255201e410714606c1"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "밤울음",
+        "type": "문제행동"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:343",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-3ee1358c7514b68f8c38c4a55388d758f0be64acaf27fe255201e410714606c1"
+        ],
+        "chunk_count": 1,
+        "aliases": [],
+        "name": "충분한 산책",
+        "type": "훈련법"
+      }
+    },
+    {
+      "id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "labels": [
+        "Entity"
+      ],
+      "props": {
+        "source_chunks": [
+          "docchunk-caa8012eed7daca69984fd805164cf32ddbaebf8753217e13b9a6ca2e91907f9",
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6",
+          "docchunk-a099d33f26ed0216f0a0479a6401d61952204ec04f50b926a603a86e5f148e4c",
+          "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d",
+          "docchunk-5fbd497052d884174eb47e5c4e91eb64299e6777dd8f201b72cd6b6bb18b51e7",
+          "docchunk-3b99a4240fbc87866136f8e0e204e940096fb36f9792bfbc31038c7c262b5341",
+          "docchunk-1bec3aa0870ff4f494b919a7c47d3aa7da9cd59bc4e4eeaa78404259efa29749",
+          "docchunk-dd78d4db87b8adb54f8101173a98c62b9bc3ca59b6ff4f25741d00cf80596cf6",
+          "docchunk-8a4a527053d6e6ee23d906c074e02104d5631886e00332a0756f60b2589dd9b4",
+          "docchunk-2131a61bd4fd61fec88d580e3312431b6182c208ee5d9f5965946ea75ab9fa09",
+          "docchunk-70175c6b19abb30489603690916f9209266e8e308abde7de6f215ab198a2be94",
+          "docchunk-59c3017ccc220d45c3b14a8b9bd971ea41e10f87d52295479956b76948bf81ec",
+          "docchunk-4369dfe314d224174f11afbb2e6d77d316ae4029a0347d84d998ee025e47210d",
+          "docchunk-fbde6fdc407c702150a81419b34e5b5c4cee3647e7eb4c383305e4019ba2d0fb",
+          "docchunk-2a6104ae06d867a69373f0727ca85b8671e393c506fb76a255c276d79da8b94a",
+          "docchunk-8a3f78998ec2dc0068778d76fb3ce88860d37df2f0acee59f1a6ac011bac25f1"
+        ],
+        "chunk_count": 16,
+        "aliases": [
+          "슬개골 탈구"
+        ],
+        "name": "슬개골탈구",
+        "type": "질환"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:314",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:311",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-9958494444922313fa0dc001ebbac024c418df1cf65bbe6bffc3c5ac6377f1f2"
+        ]
+      },
+      "source_name": "내버려 두기",
+      "source_type": "훈련법",
+      "target_name": "밤에 짖기",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:316",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:315",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ]
+      },
+      "source_name": "내버려두기",
+      "source_type": "훈련법",
+      "target_name": "밤에 짖음",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:317",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:315",
+      "type": "악화시킨다",
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ]
+      },
+      "source_name": "보호자 확인",
+      "source_type": "훈련법",
+      "target_name": "밤에 짖음",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:318",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:315",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ]
+      },
+      "source_name": "낮 산책 및 운동",
+      "source_type": "훈련법",
+      "target_name": "밤에 짖음",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:315",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ]
+      },
+      "source_name": "밤에 짖음",
+      "source_type": "문제행동",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:321",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ]
+      },
+      "source_name": "설사",
+      "source_type": "증상",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:322",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ]
+      },
+      "source_name": "구토",
+      "source_type": "증상",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:323",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ]
+      },
+      "source_name": "다리 물어뜯기",
+      "source_type": "문제행동",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:324",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-57cf92fb79a8f259b967f41b687b56adf17867c678ced3831d5f5605f3ae5902"
+        ]
+      },
+      "source_name": "심하게 핥기",
+      "source_type": "문제행동",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:326",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:311",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6"
+        ]
+      },
+      "source_name": "충분히 놀아주기",
+      "source_type": "훈련법",
+      "target_name": "밤에 짖기",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:327",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:311",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6"
+        ]
+      },
+      "source_name": "산책 시간 늘리기",
+      "source_type": "훈련법",
+      "target_name": "밤에 짖기",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:328",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:311",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6"
+        ]
+      },
+      "source_name": "자기 전에 충분히 놀아주기",
+      "source_type": "훈련법",
+      "target_name": "밤에 짖기",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:311",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:329",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6"
+        ]
+      },
+      "source_name": "밤에 짖기",
+      "source_type": "문제행동",
+      "target_name": "질환",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:311",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:333",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390"
+        ]
+      },
+      "source_name": "밤에 짖기",
+      "source_type": "문제행동",
+      "target_name": "치매",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:334",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:333",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390"
+        ]
+      },
+      "source_name": "배회",
+      "source_type": "증상",
+      "target_name": "치매",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:335",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:333",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390"
+        ]
+      },
+      "source_name": "원형 보행",
+      "source_type": "증상",
+      "target_name": "치매",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:336",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:333",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390"
+        ]
+      },
+      "source_name": "벽 응시",
+      "source_type": "증상",
+      "target_name": "치매",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:337",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:333",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-c2e164c2fb1b5b2062dd8f3a793db941c2e28d138f43cabdffe5a18680d57390"
+        ]
+      },
+      "source_name": "밤낮 역전",
+      "source_type": "증상",
+      "target_name": "치매",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:342",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:333",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-3ee1358c7514b68f8c38c4a55388d758f0be64acaf27fe255201e410714606c1"
+        ]
+      },
+      "source_name": "밤울음",
+      "source_type": "문제행동",
+      "target_name": "치매",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:343",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:311",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-3ee1358c7514b68f8c38c4a55388d758f0be64acaf27fe255201e410714606c1"
+        ]
+      },
+      "source_name": "충분한 산책",
+      "source_type": "훈련법",
+      "target_name": "밤에 짖기",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:2",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6"
+        ]
+      },
+      "source_name": "뒷다리에서 딱딱 소리가 남",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:3",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6"
+        ]
+      },
+      "source_name": "뒷다리를 갑자기 듦",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:4",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:5",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-7a802d06fa7d226c89d8d2b1ee646a067d444b7cf1dfc80e02b5ff3b7b150cf6"
+        ]
+      },
+      "source_name": "점프 및 높은 곳에 올라가지 못하게 관리",
+      "source_type": "훈련법",
+      "target_name": "점프 및 높은 곳에 올라감",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:14",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:16",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-a099d33f26ed0216f0a0479a6401d61952204ec04f50b926a603a86e5f148e4c"
+        ]
+      },
+      "source_name": "수평 운동",
+      "source_type": "훈련법",
+      "target_name": "관절 부담",
+      "target_type": "증상"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:13",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:16",
+      "type": "악화시킨다",
+      "props": {
+        "source_chunks": [
+          "docchunk-a099d33f26ed0216f0a0479a6401d61952204ec04f50b926a603a86e5f148e4c"
+        ]
+      },
+      "source_name": "수직 운동",
+      "source_type": "훈련법",
+      "target_name": "관절 부담",
+      "target_type": "증상"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:17",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-a099d33f26ed0216f0a0479a6401d61952204ec04f50b926a603a86e5f148e4c"
+        ]
+      },
+      "source_name": "다리 절음",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:310",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-a099d33f26ed0216f0a0479a6401d61952204ec04f50b926a603a86e5f148e4c",
+          "docchunk-59c3017ccc220d45c3b14a8b9bd971ea41e10f87d52295479956b76948bf81ec"
+        ]
+      },
+      "source_name": "통증",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:20",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:21",
+      "type": "악화시킨다",
+      "props": {
+        "source_chunks": [
+          "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d"
+        ]
+      },
+      "source_name": "다리까지 입히는 옷",
+      "source_type": "용품",
+      "target_name": "뒷다리가 틀어짐",
+      "target_type": "증상"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:18",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d"
+        ]
+      },
+      "source_name": "뒷다리 만지는 것에 대한 거부감",
+      "source_type": "문제행동",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:19",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d"
+        ]
+      },
+      "source_name": "공격성",
+      "source_type": "문제행동",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:22",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:19",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d"
+        ]
+      },
+      "source_name": "혼내지 않기",
+      "source_type": "원칙",
+      "target_name": "공격성",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:23",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:19",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d"
+        ]
+      },
+      "source_name": "천천히 만져주기",
+      "source_type": "훈련법",
+      "target_name": "공격성",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:25",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-188901e23f7041bd0b86637d7af9a34f397de3b8b2ba47ff31320846138dc0d2"
+        ]
+      },
+      "source_name": "이상행동",
+      "source_type": "문제행동",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:31",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:32",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-188901e23f7041bd0b86637d7af9a34f397de3b8b2ba47ff31320846138dc0d2"
+        ]
+      },
+      "source_name": "안정적인 애착관계 정립",
+      "source_type": "훈련법",
+      "target_name": "보호자 의존",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:42",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:40",
+      "type": "선행조건",
+      "props": {
+        "source_chunks": [
+          "docchunk-919402fbfa48101c5502496768c1ab1a58a547ec0da92b88e5b9b66761a794d9"
+        ]
+      },
+      "source_name": "어린 연령대",
+      "source_type": "연령대",
+      "target_name": "독립심 기르기 훈련",
+      "target_type": "훈련법"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:40",
+      "type": "선행조건",
+      "props": {
+        "source_chunks": [
+          "docchunk-919402fbfa48101c5502496768c1ab1a58a547ec0da92b88e5b9b66761a794d9"
+        ]
+      },
+      "source_name": "분리불안",
+      "source_type": "질환",
+      "target_name": "독립심 기르기 훈련",
+      "target_type": "훈련법"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:43",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-919402fbfa48101c5502496768c1ab1a58a547ec0da92b88e5b9b66761a794d9"
+        ]
+      },
+      "source_name": "낑낑거림",
+      "source_type": "증상",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:44",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-919402fbfa48101c5502496768c1ab1a58a547ec0da92b88e5b9b66761a794d9"
+        ]
+      },
+      "source_name": "짖음",
+      "source_type": "증상",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:45",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-919402fbfa48101c5502496768c1ab1a58a547ec0da92b88e5b9b66761a794d9"
+        ]
+      },
+      "source_name": "하울링",
+      "source_type": "증상",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:46",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56"
+        ]
+      },
+      "source_name": "대소변 실수",
+      "source_type": "문제행동",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:47",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56"
+        ]
+      },
+      "source_name": "소변 마킹",
+      "source_type": "문제행동",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:48",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56"
+        ]
+      },
+      "source_name": "물건 물어뜯기",
+      "source_type": "문제행동",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:51",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:52",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa"
+        ]
+      },
+      "source_name": "물건을 물어뜯는 행동",
+      "source_type": "문제행동",
+      "target_name": "이식증",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:58",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ]
+      },
+      "source_name": "발 핥기",
+      "source_type": "증상",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:59",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ]
+      },
+      "source_name": "생식기 핥기",
+      "source_type": "증상",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:60",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ]
+      },
+      "source_name": "발톱 물어뜯기",
+      "source_type": "증상",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:61",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ]
+      },
+      "source_name": "털 뽑기",
+      "source_type": "증상",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:62",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ]
+      },
+      "source_name": "상동행동",
+      "source_type": "증상",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:63",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        ]
+      },
+      "source_name": "과도한 침흘림",
+      "source_type": "증상",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:66",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6"
+        ]
+      },
+      "source_name": "지나친 집착",
+      "source_type": "문제행동",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:70",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:294",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6"
+        ]
+      },
+      "source_name": "외출 전 산책",
+      "source_type": "훈련법",
+      "target_name": "불안",
+      "target_type": "증상"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:76",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:325",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-44f50e951d01466d24d8cc73d8c749c1c81f19f7223d4e73261900d48a6c1a8d"
+        ]
+      },
+      "source_name": "점진적 혼자 있기 훈련",
+      "source_type": "훈련법",
+      "target_name": "분리불안",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:80",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:81",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06"
+        ]
+      },
+      "source_name": "기다려 훈련",
+      "source_type": "훈련법",
+      "target_name": "보호자를 따라다님",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:80",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:82",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06"
+        ]
+      },
+      "source_name": "기다려 훈련",
+      "source_type": "훈련법",
+      "target_name": "보호자와 떨어지지 않으려 함",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:87",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:84",
+      "type": "선행조건",
+      "props": {
+        "source_chunks": [
+          "docchunk-33a5803d57f47c2febd95ac372869344bb9661b7aa911b121693efd20418bc52"
+        ]
+      },
+      "source_name": "이동장을 익숙한 공간으로 만들기",
+      "source_type": "원칙",
+      "target_name": "켄넬 훈련",
+      "target_type": "훈련법"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:87",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:86",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-33a5803d57f47c2febd95ac372869344bb9661b7aa911b121693efd20418bc52"
+        ]
+      },
+      "source_name": "이동장을 익숙한 공간으로 만들기",
+      "source_type": "원칙",
+      "target_name": "이동장 출입 거부",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:84",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:88",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-dcf2c52487976f13e9464e4d7377c60d78bd47fb7fd7fde162c3e0c6aec38a7d"
+        ]
+      },
+      "source_name": "켄넬 훈련",
+      "source_type": "훈련법",
+      "target_name": "이동장 들어가기 거부",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:313",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:89",
+      "type": "선행조건",
+      "props": {
+        "source_chunks": [
+          "docchunk-ba2b4b0060fc9ca559ab7ad95621d890913c45f2e4934a8b55ecc8ec0319144e"
+        ]
+      },
+      "source_name": "어린 강아지",
+      "source_type": "연령대",
+      "target_name": "크레이트 적응 훈련",
+      "target_type": "훈련법"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:90",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:89",
+      "type": "선행조건",
+      "props": {
+        "source_chunks": [
+          "docchunk-710fb14b0022832669bf308448e80c43ee9253c0b50a92c20089ba1fc10283e8"
+        ]
+      },
+      "source_name": "크레이트",
+      "source_type": "용품",
+      "target_name": "크레이트 적응 훈련",
+      "target_type": "훈련법"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:96",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:95",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-50191eee95a0d93872307e080c1db7ccdc5e01c7641109d6f23ff890f1dd8fa0"
+        ]
+      },
+      "source_name": "평소 사용하던 방석이나 담요 넣기",
+      "source_type": "훈련법",
+      "target_name": "이동장 거부감",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:102",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:101",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-37de749b2cfb629e80ee8cc4e3e94f6f4c3e15109f7a24080c5e31010283f139"
+        ]
+      },
+      "source_name": "간식 보상",
+      "source_type": "훈련법",
+      "target_name": "이동장에 대한 두려움",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:103",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:101",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-37de749b2cfb629e80ee8cc4e3e94f6f4c3e15109f7a24080c5e31010283f139"
+        ]
+      },
+      "source_name": "반복 훈련",
+      "source_type": "훈련법",
+      "target_name": "이동장에 대한 두려움",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:111",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:109",
+      "type": "선행조건",
+      "props": {
+        "source_chunks": [
+          "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98"
+        ]
+      },
+      "source_name": "짧은 문 닫기 시간",
+      "source_type": "원칙",
+      "target_name": "이동장 문 닫는 시간 점진적으로 늘리기",
+      "target_type": "훈련법"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:109",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:110",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98"
+        ]
+      },
+      "source_name": "이동장 문 닫는 시간 점진적으로 늘리기",
+      "source_type": "훈련법",
+      "target_name": "놀람",
+      "target_type": "증상"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:112",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:104",
+      "type": "선행조건",
+      "props": {
+        "source_chunks": [
+          "docchunk-7ae0214aa5b45a3d3314d6f4c7f353aacafb8b336231e734be55b8210f05bd66"
+        ]
+      },
+      "source_name": "예측가능한 일정",
+      "source_type": "원칙",
+      "target_name": "이동장 훈련",
+      "target_type": "훈련법"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:113",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:115",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ]
+      },
+      "source_name": "귀 긁기",
+      "source_type": "증상",
+      "target_name": "피부병",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:113",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:116",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ]
+      },
+      "source_name": "귀 긁기",
+      "source_type": "증상",
+      "target_name": "알레르기",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:114",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:115",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ]
+      },
+      "source_name": "귀 털기",
+      "source_type": "증상",
+      "target_name": "피부병",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:114",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:116",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ]
+      },
+      "source_name": "귀 털기",
+      "source_type": "증상",
+      "target_name": "알레르기",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:119",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:118",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ]
+      },
+      "source_name": "고름",
+      "source_type": "증상",
+      "target_name": "외이염",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:120",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:118",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ]
+      },
+      "source_name": "악취",
+      "source_type": "증상",
+      "target_name": "외이염",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:121",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:118",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ]
+      },
+      "source_name": "가려움",
+      "source_type": "증상",
+      "target_name": "외이염",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:310",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:118",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-9e2c36db73a4efaa162fcd4b5bbf031e92368e46247a1adb57a81817751492c5"
+        ]
+      },
+      "source_name": "통증",
+      "source_type": "증상",
+      "target_name": "외이염",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:127",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:118",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-6f441628c88a426ff3928abb83a228836f4c35aee37d4be8b1cf8942ad44dae9"
+        ]
+      },
+      "source_name": "가려움증",
+      "source_type": "증상",
+      "target_name": "외이염",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:136",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:118",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-5a1d8e23a90982b0bb30dc8cf08de4bb746ffed2e61970de65dc3f46e056892e"
+        ]
+      },
+      "source_name": "귀를 자주 긁거나 머리를 비비는 행동",
+      "source_type": "증상",
+      "target_name": "외이염",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:137",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:118",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-5a1d8e23a90982b0bb30dc8cf08de4bb746ffed2e61970de65dc3f46e056892e"
+        ]
+      },
+      "source_name": "귀 통증 또는 민감 반응",
+      "source_type": "증상",
+      "target_name": "외이염",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:138",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:118",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-5a1d8e23a90982b0bb30dc8cf08de4bb746ffed2e61970de65dc3f46e056892e"
+        ]
+      },
+      "source_name": "귀지 증가 및 악취",
+      "source_type": "증상",
+      "target_name": "외이염",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:139",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:118",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-5a1d8e23a90982b0bb30dc8cf08de4bb746ffed2e61970de65dc3f46e056892e"
+        ]
+      },
+      "source_name": "갈색 또는 검은색 귀지",
+      "source_type": "증상",
+      "target_name": "외이염",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:140",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:118",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-5a1d8e23a90982b0bb30dc8cf08de4bb746ffed2e61970de65dc3f46e056892e"
+        ]
+      },
+      "source_name": "귀 피부 발적 및 고름",
+      "source_type": "증상",
+      "target_name": "외이염",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:146",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:142",
+      "type": "선행조건",
+      "props": {
+        "source_chunks": [
+          "docchunk-c145ac75486f996b281a1cc73460afb9ce44ff77948a55047c68592b942f394b"
+        ]
+      },
+      "source_name": "귀속 깊숙이 넣지 않기",
+      "source_type": "원칙",
+      "target_name": "귀 청소",
+      "target_type": "훈련법"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:146",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:143",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-c145ac75486f996b281a1cc73460afb9ce44ff77948a55047c68592b942f394b"
+        ]
+      },
+      "source_name": "귀속 깊숙이 넣지 않기",
+      "source_type": "원칙",
+      "target_name": "귀 자극",
+      "target_type": "증상"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:148",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:149",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "docchunk-3c2efb65e7ddd82232b471e0d54627050af2d559ddd50acd50ced593a4131f6d"
+        ]
+      },
+      "source_name": "귓털 제거",
+      "source_type": "훈련법",
+      "target_name": "습기",
+      "target_type": "증상"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:150",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:151",
+      "type": "선행조건",
+      "props": {
+        "source_chunks": [
+          "docchunk-3c2efb65e7ddd82232b471e0d54627050af2d559ddd50acd50ced593a4131f6d"
+        ]
+      },
+      "source_name": "귀 주변 털 짧게 유지",
+      "source_type": "훈련법",
+      "target_name": "통풍",
+      "target_type": "원칙"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:162",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-5fbd497052d884174eb47e5c4e91eb64299e6777dd8f201b72cd6b6bb18b51e7"
+        ]
+      },
+      "source_name": "다리 들기",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:163",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-5fbd497052d884174eb47e5c4e91eb64299e6777dd8f201b72cd6b6bb18b51e7",
+          "docchunk-70175c6b19abb30489603690916f9209266e8e308abde7de6f215ab198a2be94",
+          "docchunk-59c3017ccc220d45c3b14a8b9bd971ea41e10f87d52295479956b76948bf81ec"
+        ]
+      },
+      "source_name": "절뚝거림",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:169",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-2131a61bd4fd61fec88d580e3312431b6182c208ee5d9f5965946ea75ab9fa09"
+        ]
+      },
+      "source_name": "무릎뼈가 손으로 눌렀을 때만 빠졌다가 제자리로 돌아옴",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:170",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-2131a61bd4fd61fec88d580e3312431b6182c208ee5d9f5965946ea75ab9fa09"
+        ]
+      },
+      "source_name": "다리를 드는 행동",
+      "source_type": "문제행동",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:172",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-70175c6b19abb30489603690916f9209266e8e308abde7de6f215ab198a2be94"
+        ]
+      },
+      "source_name": "산책 중 갑자기 멈춤",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:173",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-59c3017ccc220d45c3b14a8b9bd971ea41e10f87d52295479956b76948bf81ec"
+        ]
+      },
+      "source_name": "다리를 들고 다님",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:174",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-59c3017ccc220d45c3b14a8b9bd971ea41e10f87d52295479956b76948bf81ec"
+        ]
+      },
+      "source_name": "관절 변형",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:175",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-4369dfe314d224174f11afbb2e6d77d316ae4029a0347d84d998ee025e47210d"
+        ]
+      },
+      "source_name": "무릎뼈 탈구 고정",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:176",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-4369dfe314d224174f11afbb2e6d77d316ae4029a0347d84d998ee025e47210d"
+        ]
+      },
+      "source_name": "뒷다리 사용 불가",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:177",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-4369dfe314d224174f11afbb2e6d77d316ae4029a0347d84d998ee025e47210d"
+        ]
+      },
+      "source_name": "보행 곤란",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:178",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-4369dfe314d224174f11afbb2e6d77d316ae4029a0347d84d998ee025e47210d"
+        ]
+      },
+      "source_name": "움직임 제한",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:188",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-8a3f78998ec2dc0068778d76fb3ce88860d37df2f0acee59f1a6ac011bac25f1"
+        ]
+      },
+      "source_name": "다리를 드는 행동",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:189",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:344",
+      "type": "감별필요",
+      "props": {
+        "source_chunks": [
+          "docchunk-8a3f78998ec2dc0068778d76fb3ce88860d37df2f0acee59f1a6ac011bac25f1"
+        ]
+      },
+      "source_name": "순간적인 절뚝거림",
+      "source_type": "증상",
+      "target_name": "슬개골탈구",
+      "target_type": "질환"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:250",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:249",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6"
+        ]
+      },
+      "source_name": "접촉 줄이기",
+      "source_type": "원칙",
+      "target_name": "입질",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:254",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:252",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747"
+        ]
+      },
+      "source_name": "간식 보상으로 앉기 훈련",
+      "source_type": "훈련법",
+      "target_name": "사람에게 점프하며 달려들기",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:255",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:252",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747"
+        ]
+      },
+      "source_name": "옆으로 돌리기",
+      "source_type": "훈련법",
+      "target_name": "사람에게 점프하며 달려들기",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:261",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:260",
+      "type": "완화한다",
+      "props": {
+        "source_chunks": [
+          "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452"
+        ]
+      },
+      "source_name": "하우스 트레이닝",
+      "source_type": "훈련법",
+      "target_name": "식탁 위에 올라가기",
+      "target_type": "문제행동"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:263",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:262",
+      "type": "금기",
+      "props": {
+        "source_chunks": [
+          "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd"
+        ]
+      },
+      "source_name": "만지면서 칭찬하기",
+      "source_type": "훈련법",
+      "target_name": "간식 유혹 참기 훈련",
+      "target_type": "훈련법"
+    },
+    {
+      "source_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:309",
+      "target_id": "4:dfe821b1-d511-414b-804d-70cbe3505a1f:310",
+      "type": "악화시킨다",
+      "props": {
+        "source_chunks": [
+          "chunk-a947b4aaf9d03885d164275edcc69cbe90fcb5dfafcc2b2c0cfbeb024dd1f4f7"
+        ]
+      },
+      "source_name": "하네스",
+      "source_type": "용품",
+      "target_name": "통증",
+      "target_type": "증상"
+    }
+  ]
+}
