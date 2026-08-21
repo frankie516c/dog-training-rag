@@ -1,0 +1,3153 @@
+{
+  "schema_version": "youtube-retrieval-metrics-v1",
+  "run": {
+    "split": "synthetic",
+    "top_k": 5,
+    "model_name": "intfloat/multilingual-e5-base",
+    "query_prefix": "query: ",
+    "passage_prefix": "passage: ",
+    "score_decimals": 6,
+    "tie_break": "ascending chunk_id",
+    "dependency_versions": {
+      "sentence-transformers": "5.7.0",
+      "tokenizers": "0.22.2",
+      "torch": "2.13.0",
+      "transformers": "5.15.0"
+    }
+  },
+  "corpus": {
+    "video_ids": [
+      "9FWfbXwXbP0",
+      "KhNJl8kj7ks",
+      "Ry3NnrbVjAM"
+    ],
+    "videos": 3,
+    "total_chunks": 35,
+    "eligible_chunks": 26,
+    "fingerprint": "sha256:dea817b8c6b27537df85ebe7a3de28142c67fcbf71502235ec5a4d7fa1cf76cf"
+  },
+  "query_set": {
+    "fingerprint": "sha256:9fa1826c40956051210d3195a7f7bcc86dd47a7642c1499695c2a45f4b206eac",
+    "total_queries": 51,
+    "approved_queries": 51,
+    "evaluated_queries": 51,
+    "split_counts": {
+      "synthetic": 51
+    },
+    "type_counts": {
+      "direct_lookup": 19,
+      "paraphrase": 16,
+      "symptom_to_solution": 16
+    }
+  },
+  "metrics": {
+    "hit@1": {
+      "successful_queries": 25,
+      "total_queries": 51,
+      "ratio": 0.490196
+    },
+    "hit@3": {
+      "successful_queries": 36,
+      "total_queries": 51,
+      "ratio": 0.705882
+    },
+    "hit@5": {
+      "successful_queries": 40,
+      "total_queries": 51,
+      "ratio": 0.784314
+    },
+    "mrr@5": {
+      "reciprocal_rank_sum": 31.016667,
+      "total_queries": 51,
+      "macro_average": 0.60817
+    },
+    "recall@5": {
+      "macro_average": 0.784314,
+      "total_queries": 51
+    },
+    "macro_span_recall@5": {
+      "macro_average": 0.784314,
+      "total_queries": 51
+    },
+    "span_coverage@5": {
+      "covered_spans": 40,
+      "total_gold_spans": 51,
+      "ratio": 0.784314
+    }
+  },
+  "per_query": [
+    {
+      "query_id": "s001",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": null,
+      "reciprocal_rank": 0.0,
+      "recall@5": 0.0,
+      "span_recall@5": 0.0,
+      "covered_spans": 0,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 9,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.8334,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.83307,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 2,
+          "chapter_title": "(보호자 말고 다른) 사람만 좋아하는 강아지",
+          "score": 0.83118,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 2,
+          "chapter_title": "강아지가 사람에게 점프하며 달려들어요",
+          "score": 0.829458,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.826829,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s002",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": null,
+      "reciprocal_rank": 0.0,
+      "recall@5": 0.0,
+      "span_recall@5": 0.0,
+      "covered_spans": 0,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.870504,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.859024,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-22e38bb46d7ec534e15b2d6fbdbc0be670fccd33291c126e2b7ba2ccb7f6f7be",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 4,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.853885,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.848743,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.848394,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s003",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 5,
+      "reciprocal_rank": 0.2,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.852295,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.84501,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-571c324a19329f97d7016de730b0283df74251cf74e5d69c6aaf7a3c0392d297",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 6,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.843518,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-22e38bb46d7ec534e15b2d6fbdbc0be670fccd33291c126e2b7ba2ccb7f6f7be",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 4,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.84013,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-026e3bf5cca934f7c335beb363feebf52bf2830b63c5ce8a12371037fbed0f52",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 6,
+          "chapter_title": "피부 민감도 높은 강아지 둔감화 훈련하기",
+          "score": 0.837956,
+          "relevant": true
+        }
+      ]
+    },
+    {
+      "query_id": "s004",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.848857,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 8,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.822171,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-b024a7eaae215d7f6532aeed7485bcaa81821c441e5468e7b24d9316ea83f99c",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 9,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.81942,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.818347,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 2,
+          "chapter_title": "(보호자 말고 다른) 사람만 좋아하는 강아지",
+          "score": 0.812405,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s005",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.875452,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.852151,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.851621,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-22e38bb46d7ec534e15b2d6fbdbc0be670fccd33291c126e2b7ba2ccb7f6f7be",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 4,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.846248,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.845363,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s006",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.86055,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.85631,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.854171,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.851954,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 2,
+          "chapter_title": "(보호자 말고 다른) 사람만 좋아하는 강아지",
+          "score": 0.849544,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s007",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.838881,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 2,
+          "chapter_title": "(보호자 말고 다른) 사람만 좋아하는 강아지",
+          "score": 0.827287,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.818683,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.815811,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-571c324a19329f97d7016de730b0283df74251cf74e5d69c6aaf7a3c0392d297",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 6,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.812842,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s008",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 3,
+      "reciprocal_rank": 0.333333,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.824819,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.818122,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 2,
+          "chapter_title": "(보호자 말고 다른) 사람만 좋아하는 강아지",
+          "score": 0.818033,
+          "relevant": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.81364,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 4,
+          "chapter_title": "강아지가 식탁 위 음식을 몰래 먹는 이유",
+          "score": 0.812028,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s009",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 3,
+      "reciprocal_rank": 0.333333,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.85947,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.857316,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 2,
+          "chapter_title": "(보호자 말고 다른) 사람만 좋아하는 강아지",
+          "score": 0.853335,
+          "relevant": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-22e38bb46d7ec534e15b2d6fbdbc0be670fccd33291c126e2b7ba2ccb7f6f7be",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 4,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.848833,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-97db9179eb4efbbe2441b327ffe32855b0aa0dec8c44a290fe8004a289c27ab8",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 2,
+          "chapter_title": "예민한 성격이라며 약 처방 받은 강아지",
+          "score": 0.847867,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s010",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": null,
+      "reciprocal_rank": 0.0,
+      "recall@5": 0.0,
+      "span_recall@5": 0.0,
+      "covered_spans": 0,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.822988,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.818183,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-22e38bb46d7ec534e15b2d6fbdbc0be670fccd33291c126e2b7ba2ccb7f6f7be",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 4,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.814755,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.814668,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.810385,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s011",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.867001,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.856015,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.849132,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.848586,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.848552,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s012",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": null,
+      "reciprocal_rank": 0.0,
+      "recall@5": 0.0,
+      "span_recall@5": 0.0,
+      "covered_spans": 0,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.867692,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.864534,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.863862,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.862271,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 4,
+          "chapter_title": "강아지가 식탁 위 음식을 몰래 먹는 이유",
+          "score": 0.858622,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s013",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.832352,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 9,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.827977,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-269aebcd2f643beb9357da507639bebae40c0d84e6a7ed4d2cebbdbd1edebfbf",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 3,
+          "chapter_title": "테이블 위에 있는 물건을 건드려요",
+          "score": 0.824547,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 2,
+          "chapter_title": "강아지가 사람에게 점프하며 달려들어요",
+          "score": 0.824519,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.820475,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s014",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.856762,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 9,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.845919,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-a947b4aaf9d03885d164275edcc69cbe90fcb5dfafcc2b2c0cfbeb024dd1f4f7",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 10,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.83986,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 3,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.835771,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.834371,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s015",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 9,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.864322,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.859416,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.8456,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.844947,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.843132,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s016",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": null,
+      "reciprocal_rank": 0.0,
+      "recall@5": 0.0,
+      "span_recall@5": 0.0,
+      "covered_spans": 0,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 2,
+          "chapter_title": "(보호자 말고 다른) 사람만 좋아하는 강아지",
+          "score": 0.834372,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.830595,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.8238,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.821868,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.818938,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s017",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": null,
+      "reciprocal_rank": 0.0,
+      "recall@5": 0.0,
+      "span_recall@5": 0.0,
+      "covered_spans": 0,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.804587,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.803528,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.797009,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-269aebcd2f643beb9357da507639bebae40c0d84e6a7ed4d2cebbdbd1edebfbf",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 3,
+          "chapter_title": "테이블 위에 있는 물건을 건드려요",
+          "score": 0.796981,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.796628,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s018",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-571c324a19329f97d7016de730b0283df74251cf74e5d69c6aaf7a3c0392d297",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 6,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.8278,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.825343,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 7,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.813936,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.813792,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 2,
+          "chapter_title": "(보호자 말고 다른) 사람만 좋아하는 강아지",
+          "score": 0.813654,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s019",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": null,
+      "reciprocal_rank": 0.0,
+      "recall@5": 0.0,
+      "span_recall@5": 0.0,
+      "covered_spans": 0,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.842957,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-808eb3891543dafe5465c9e6e44a64537b43b3caaad27a09eed8791aa1bf1845",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 5,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.841639,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.840115,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 2,
+          "chapter_title": "(보호자 말고 다른) 사람만 좋아하는 강아지",
+          "score": 0.835042,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.833184,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s020",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-a947b4aaf9d03885d164275edcc69cbe90fcb5dfafcc2b2c0cfbeb024dd1f4f7",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 10,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.847566,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.829764,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.82722,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.827198,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 2,
+          "chapter_title": "(보호자 말고 다른) 사람만 좋아하는 강아지",
+          "score": 0.823834,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s021",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 5,
+      "reciprocal_rank": 0.2,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.833984,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 9,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.824231,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.815961,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-571c324a19329f97d7016de730b0283df74251cf74e5d69c6aaf7a3c0392d297",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 6,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.815936,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-a947b4aaf9d03885d164275edcc69cbe90fcb5dfafcc2b2c0cfbeb024dd1f4f7",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 10,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.813814,
+          "relevant": true
+        }
+      ]
+    },
+    {
+      "query_id": "s022",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 4,
+      "reciprocal_rank": 0.25,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 8,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.85358,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.848913,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-b024a7eaae215d7f6532aeed7485bcaa81821c441e5468e7b24d9316ea83f99c",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 9,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.847,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-a947b4aaf9d03885d164275edcc69cbe90fcb5dfafcc2b2c0cfbeb024dd1f4f7",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 10,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.845259,
+          "relevant": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.842276,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s023",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-269aebcd2f643beb9357da507639bebae40c0d84e6a7ed4d2cebbdbd1edebfbf",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 3,
+          "chapter_title": "테이블 위에 있는 물건을 건드려요",
+          "score": 0.816191,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 3,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.81288,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.812546,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.812071,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.809037,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s024",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 3,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.86672,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.8491,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.841712,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.83442,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.832341,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s025",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": null,
+      "reciprocal_rank": 0.0,
+      "recall@5": 0.0,
+      "span_recall@5": 0.0,
+      "covered_spans": 0,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.852293,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.852119,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.848228,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.846685,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 7,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.845681,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s026",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-22e38bb46d7ec534e15b2d6fbdbc0be670fccd33291c126e2b7ba2ccb7f6f7be",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 4,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.861595,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.831912,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.825734,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-808eb3891543dafe5465c9e6e44a64537b43b3caaad27a09eed8791aa1bf1845",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 5,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.825072,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.82117,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s027",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": null,
+      "reciprocal_rank": 0.0,
+      "recall@5": 0.0,
+      "span_recall@5": 0.0,
+      "covered_spans": 0,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.848003,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.847337,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.845858,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 8,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.845829,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.845585,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s028",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.875845,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-22e38bb46d7ec534e15b2d6fbdbc0be670fccd33291c126e2b7ba2ccb7f6f7be",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 4,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.869449,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.868977,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.866584,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.860165,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s029",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "KhNJl8kj7ks",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.845121,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.83368,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.830464,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.826359,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 4,
+          "chapter_title": "강아지가 식탁 위 음식을 몰래 먹는 이유",
+          "score": 0.825408,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s030",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "KhNJl8kj7ks",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.8528,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 4,
+          "chapter_title": "강아지가 식탁 위 음식을 몰래 먹는 이유",
+          "score": 0.840424,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 3,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.834747,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.827624,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.825015,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s031",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "KhNJl8kj7ks",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.874,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 4,
+          "chapter_title": "강아지가 식탁 위 음식을 몰래 먹는 이유",
+          "score": 0.862635,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.851218,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.849308,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.847026,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s032",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 8,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.845563,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-b024a7eaae215d7f6532aeed7485bcaa81821c441e5468e7b24d9316ea83f99c",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 9,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.836891,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.82,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 4,
+          "chapter_title": "강아지가 식탁 위 음식을 몰래 먹는 이유",
+          "score": 0.805824,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.803,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s033",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 8,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.856979,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-b024a7eaae215d7f6532aeed7485bcaa81821c441e5468e7b24d9316ea83f99c",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 9,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.855051,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.849975,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.829658,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.82925,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s034",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-b024a7eaae215d7f6532aeed7485bcaa81821c441e5468e7b24d9316ea83f99c",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 9,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.855219,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.849075,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 8,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.844857,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.835392,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.828942,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s035",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "KhNJl8kj7ks",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": null,
+      "reciprocal_rank": 0.0,
+      "recall@5": 0.0,
+      "span_recall@5": 0.0,
+      "covered_spans": 0,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.852601,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.848282,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-22e38bb46d7ec534e15b2d6fbdbc0be670fccd33291c126e2b7ba2ccb7f6f7be",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 4,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.845968,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.839955,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.839646,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s036",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.832426,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.825633,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 7,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.823068,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.816848,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 2,
+          "chapter_title": "(보호자 말고 다른) 사람만 좋아하는 강아지",
+          "score": 0.815928,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s037",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.856237,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.853101,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.851324,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 7,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.845225,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 2,
+          "chapter_title": "(보호자 말고 다른) 사람만 좋아하는 강아지",
+          "score": 0.842257,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s038",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 5,
+      "reciprocal_rank": 0.2,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 7,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.826729,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.819567,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.819398,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 2,
+          "chapter_title": "(보호자 말고 다른) 사람만 좋아하는 강아지",
+          "score": 0.81916,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.818555,
+          "relevant": true
+        }
+      ]
+    },
+    {
+      "query_id": "s039",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "KhNJl8kj7ks",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-269aebcd2f643beb9357da507639bebae40c0d84e6a7ed4d2cebbdbd1edebfbf",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 3,
+          "chapter_title": "테이블 위에 있는 물건을 건드려요",
+          "score": 0.854995,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.804516,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 3,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.80016,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-b024a7eaae215d7f6532aeed7485bcaa81821c441e5468e7b24d9316ea83f99c",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 9,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.798925,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.798738,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s040",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "KhNJl8kj7ks",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-269aebcd2f643beb9357da507639bebae40c0d84e6a7ed4d2cebbdbd1edebfbf",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 3,
+          "chapter_title": "테이블 위에 있는 물건을 건드려요",
+          "score": 0.828343,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.812723,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-571c324a19329f97d7016de730b0283df74251cf74e5d69c6aaf7a3c0392d297",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 6,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.808185,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 8,
+          "chapter_title": "집개의 특징을 가진 강아지 목줄 훈련하기",
+          "score": 0.798585,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 8,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.797322,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s041",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "KhNJl8kj7ks",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": null,
+      "reciprocal_rank": 0.0,
+      "recall@5": 0.0,
+      "span_recall@5": 0.0,
+      "covered_spans": 0,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 4,
+          "chapter_title": "강아지가 식탁 위 음식을 몰래 먹는 이유",
+          "score": 0.846611,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.84386,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.840789,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-571c324a19329f97d7016de730b0283df74251cf74e5d69c6aaf7a3c0392d297",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 6,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.83405,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.831331,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s042",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 8,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.855298,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.833224,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-b024a7eaae215d7f6532aeed7485bcaa81821c441e5468e7b24d9316ea83f99c",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 9,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.831083,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.821415,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 7,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.819676,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s043",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 8,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.825466,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 7,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.821068,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.815184,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.813571,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.812253,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s044",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "Ry3NnrbVjAM",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 8,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.850238,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 7,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.848954,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.832217,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-0ac6db2065a26dc34d21a3d288a901029cfd971097db27944cae49d2e546a989",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 6,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.830329,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.829707,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s045",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "KhNJl8kj7ks",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.84698,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.829746,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.825028,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.824701,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.821016,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s046",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "KhNJl8kj7ks",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 2,
+          "chapter_title": "강아지가 사람에게 점프하며 달려들어요",
+          "score": 0.819757,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-808eb3891543dafe5465c9e6e44a64537b43b3caaad27a09eed8791aa1bf1845",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 5,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.800571,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.791819,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.789779,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-97db9179eb4efbbe2441b327ffe32855b0aa0dec8c44a290fe8004a289c27ab8",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 2,
+          "chapter_title": "예민한 성격이라며 약 처방 받은 강아지",
+          "score": 0.789243,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s047",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "KhNJl8kj7ks",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 8,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.832111,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 2,
+          "chapter_title": "강아지가 사람에게 점프하며 달려들어요",
+          "score": 0.830599,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-594754ffd84e22b02ab3559e17b8155140cc00a266378b81e60a55a0346eee0a",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 7,
+          "chapter_title": "피부 민감도 높은 강아지 둔감화 훈련하기",
+          "score": 0.825698,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.82413,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 5,
+          "chapter_title": "강아지에게 밥상머리 교육하는 법",
+          "score": 0.823274,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s048",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "KhNJl8kj7ks",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 2,
+          "chapter_title": "강아지가 사람에게 점프하며 달려들어요",
+          "score": 0.846943,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 5,
+          "chapter_title": "사회성을 배울 수 있는 산책 인사법",
+          "score": 0.842119,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.83821,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 11,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.837844,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 7,
+          "chapter_title": "강아지 훈련하다 삐지면 안돼요",
+          "score": 0.837131,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s049",
+      "split": "synthetic",
+      "query_type": "direct_lookup",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 7,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.836635,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.817394,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-269aebcd2f643beb9357da507639bebae40c0d84e6a7ed4d2cebbdbd1edebfbf",
+          "video_id": "KhNJl8kj7ks",
+          "chunk_index": 3,
+          "chapter_title": "테이블 위에 있는 물건을 건드려요",
+          "score": 0.809884,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.808932,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-571c324a19329f97d7016de730b0283df74251cf74e5d69c6aaf7a3c0392d297",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 6,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.808806,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s050",
+      "split": "synthetic",
+      "query_type": "paraphrase",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 7,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.82276,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 8,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.821474,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-594754ffd84e22b02ab3559e17b8155140cc00a266378b81e60a55a0346eee0a",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 7,
+          "chapter_title": "피부 민감도 높은 강아지 둔감화 훈련하기",
+          "score": 0.819989,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 3,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.813899,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 10,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.811661,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "query_id": "s051",
+      "split": "synthetic",
+      "query_type": "symptom_to_solution",
+      "video_id": "9FWfbXwXbP0",
+      "gold_span_count": 1,
+      "relevant_chunk_count": 1,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "recall@5": 1.0,
+      "span_recall@5": 1.0,
+      "covered_spans": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 7,
+          "chapter_title": "야생성이 살아있는 집개의 특징",
+          "score": 0.851248,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 4,
+          "chapter_title": "문제견(?) 새봄이 성격 파악하기",
+          "score": 0.838821,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "chunk_id": "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
+          "video_id": "Ry3NnrbVjAM",
+          "chunk_index": 8,
+          "chapter_title": "산책을 싫어하는데 산책 시키는 방법",
+          "score": 0.835176,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "chunk_id": "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 11,
+          "chapter_title": "입질하는 강아지 버릇 고쳐주는 방법",
+          "score": 0.832138,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "chunk_id": "chunk-99f589d7a2497d3716a32d4a30ebc9301bbe366867bdde9302614fd472203dbf",
+          "video_id": "9FWfbXwXbP0",
+          "chunk_index": 2,
+          "chapter_title": "(보호자 말고 다른) 사람만 좋아하는 강아지",
+          "score": 0.831971,
+          "relevant": false
+        }
+      ]
+    }
+  ],
+  "split_policy": [
+    "dev(12): 모델·설정 비교와 오류 분석에 사용한다.",
+    "test(6): 최종 설정을 확정한 뒤 마지막 확인에만 사용한다.",
+    "test 결과를 보면서 threshold, passage 구성, 모델 설정을 조정하지 않는다."
+  ],
+  "limitations": [
+    "영상 3개 / embedding_eligible chunk 42개만으로 측정한 smoke benchmark다.",
+    "이 수치는 일반적인 한국어 검색 성능을 증명하지 않는다.",
+    "corpus가 작아 무작위 순위로도 지표가 크게 흔들린다. 절대값이 아니라 설정 간 상대 비교에만 쓴다.",
+    "gold span은 사람이 검토한 구간이며 span에 겹치는 eligible chunk 전부를 정답으로 본다.",
+    "동일 환경에서의 ranking/metrics 재현성만 보장한다. CPU/GPU 또는 라이브러리 버전이 다르면 embedding score는 달라질 수 있다.",
+    "latency는 환경 의존 값이라 결정론 검증 대상이 아니며 metrics 산출물과 분리해 기록한다."
+  ]
+}

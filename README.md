@@ -1,121 +1,188 @@
 # dog-training-rag
 
-강아지 훈련 도메인 질의응답을 위한 RAG 지식베이스. 개인 학습·포트폴리오 목적의 비공개 저장소입니다.
+개인 GraphRAG/RAG 실험 저장소입니다. 강아지 훈련·행동 질문에 답하기 위해 YouTube
+훈련 영상·문서 코퍼스를 대상으로 벡터 검색과 GraphRAG 하이브리드 검색을 비교하고,
+근거 기반(grounded) 답변 생성과 의료 경계 가드레일을 평가합니다.
 
-한국어 반려견 훈련 정보는 영상에 몰려 있고 텍스트로 검색 가능한 형태가 거의 없습니다. 이 프로젝트는 훈련 영상의 발화를 검색 가능한 청크로 만들고, **답변마다 원본 영상의 해당 시점을 근거로 되짚어주는 것**을 목표로 합니다.
+여기 적힌 스택과 구조는 이 저장소의 실험 선택이며, 팀 저장소의 확정된 런타임
+구조가 아닙니다.
 
 ## 현재 상태
 
-수집 대상 실측까지 완료. 파이프라인 미구현.
+현재 브랜치(`feature/graphrag-demo-sprint` 계열)에 실제로 구현된 범위는 다음과
+같습니다.
 
-| 항목 | 실측값 |
-|---|---|
-| 대상 영상 | 832개 / 84.4시간 (중앙값 3.5분) |
-| 한국어 자막 보유 | 95% |
-| **실사용 가능 (수동자막)** | **약 25% / 21시간** |
-| 재전사 필요 (자동자막·무자막) | 약 75% / 63시간 |
-| 예상 최종 분량 | 약 230만 자, 청크 2,500~3,000개 |
+- YouTube 메타데이터 후보 수집과 수동 검토 ledger (`scripts/collect_youtube_metadata.py`, `data/reviews/`)
+- 승인된 자막 수집·정규화·챕터 기반 청킹 (`scripts/collect_approved_youtube_captions.py`, `scripts/normalize_youtube_vtt.py`, `scripts/chunk_approved_youtube.py`)
+- 외부 문서 인제스트, 로그인·유료 구간 URL 차단 (`scripts/ingest_documents.py`)
+- 벡터 검색 평가 기준선 (`scripts/evaluate_youtube_retrieval.py`)
+- LLM 기반 엔티티·관계 추출 (`scripts/extract_entities.py`)
+- Neo4j 적재 (`scripts/load_graph_neo4j.py`)
+- 벡터+그래프 하이브리드 후보 병합 (`scripts/run_combined_retrieval_eval.py`)
+- 근거 기반 답변 생성 실험 (`scripts/generate_answers.py`)
+- 의료 입력·출력 가드레일 v1/v2 (`scripts/medical_guardrail.py`)
+- 평가 질문·결과·동결 그래프 스냅샷 (`data/eval/`, `frozen/`)
 
-## 핵심 제약: 한국어 자동자막은 쓸 수 없다
+FastAPI `/chat` 서비스, EvidenceCard 근거 계약, Next.js 채팅 UI는 이 브랜치에
+없습니다. 다른 브랜치에 있는 별도 실험이며, [관련 실험 브랜치](#관련-실험-브랜치)를
+참고하세요.
 
-자막 보유율 95%는 착시입니다. 유튜브 한국어 **자동**자막은 이 도메인의 핵심어가 전부 깨집니다.
+## 검색 구조
 
-```
-[자동자막] "터미널이 할 때 으르렁 되는데 나온 자 들 거야 그만 나라 거라는 뜻인가요"
-           → 원문 추정: "터그놀이 할 때 으르렁거리는데 …"
+- **벡터 검색**: 질문과 코퍼스 청크(영상+문서)의 임베딩 유사도로 후보를 검색합니다.
+- **그래프 검색**: 질문 문자열에 리터럴로 매칭된 엔티티에서 최대 2-hop까지 후보를
+  확장합니다. Neo4j에 연결하지 않고 `data/graph/` 아래의 추출 결과 파일을 직접
+  읽습니다.
+- **하이브리드**: 벡터 후보 뒤에 그래프 후보를 추가하고 청크 단위로 중복을
+  제거합니다. 게이트 판정(PASS/REFUSE)은 벡터 `score_gap`만으로 내리고, 그래프
+  결과는 판정에 관여하지 않습니다.
+- **답변 생성**: 병합된 근거 후보를 LLM이 읽고 답변을 작성합니다.
 
-[수동자막] "오늘은 강아지를 보는 것보다 선생님이 상화 씨를 많이 봤으면 좋겠어요
-            얘네들은 문제가 없어 상화 씨가 문제지"
-```
+알려진 한계:
 
-수동자막은 구두점·화자 구분·효과음 주석까지 완비되어 그대로 투입 가능합니다. 반면 자동자막은 구두점이 없고 개체명이 붕괴합니다.
+- `score_gap` 게이트는 코퍼스가 커지면서 판별력이 흔들린 사례가 있어 운영
+  정책으로 확정하지 않았습니다.
+- GraphRAG는 현재 데모·평가 단계이며 FastAPI `/chat`과 연결되어 있지 않습니다.
+- GraphRAG가 반환하는 raw chunk와 EvidenceCard의 근거 계약은 아직 통합되지
+  않았습니다.
 
-RAG에서 깨진 청크는 없느니만 못합니다. 출처 링크를 붙여도 내용이 틀리면 신뢰만 깎입니다. **따라서 자동자막 구간은 폐기하고 `faster-whisper large-v3`로 재전사합니다.** 전사 시 `initial_prompt`에 도메인 용어집(터그놀이, 분리불안, 사회화, 역조건화, 크레이트, 노즈워크 …)을 넣어 오인식을 줄입니다.
+설계 결정과 근거는 [`docs/graph_hybrid_retrieval_design.md`](docs/graph_hybrid_retrieval_design.md),
+이관 시 재사용 판단은 [`docs/TEAM_HANDOFF.md`](docs/TEAM_HANDOFF.md)를 참고하세요.
 
-## 소스 구성
+## 현재 브랜치 기술 구성
 
-한 채널만 긁으면 검증할 수 없는 데이터가 됩니다. 2층 구조로 갑니다.
-
-- **1층 — 사례·발화**: 유튜브 훈련 영상 (보듬TV, KBS 「개는 훌륭하다」 공식 클립, 기타 훈련사 채널)
-- **2층 — 정답 기준**: AI-Hub 반려동물 데이터셋, 농식품부 동물사랑배움터 커리큘럼, 반려동물행동지도사(국가자격) 표준교재, AVSAB 포지션 스테이트먼트
-
-상세는 [`docs/SOURCES.md`](docs/SOURCES.md).
-
-## 스택
-
-팀 그라운드룰로 고정된 것과, 이 PC 환경에 맞춰 고른 것이 섞여 있습니다. 판단 근거는 [`docs/GROUNDRULES.md`](docs/GROUNDRULES.md).
-
-| | | |
+| 구분 | 선택 | 비고 |
 |---|---|---|
-| 백엔드 | FastAPI | 규칙 |
-| 프론트 | Next.js | 규칙 |
-| 패키지 | uv | 규칙 |
-| 벡터 DB | Qdrant 임베디드 (`path=`) | 선택 — Docker 없이 로컬 파일로 |
-| 임베딩 | 로컬 (`bge-m3` / `KURE-v1`) | 선택 — 청킹 재실험 비용을 낮추려고 |
-| 생성 | API | 선택 — VRAM 6GB로는 한국어 생성 품질이 안 나옴 |
-| 전사 | faster-whisper `int8_float16` | 선택 — 6GB에 맞춤 |
+| 언어 | Python 3.12 | `pyproject.toml`의 `requires-python` |
+| 패키지 관리 | uv | `pip install` 직접 사용 금지 |
+| 임베딩 | sentence-transformers, `intfloat/multilingual-e5-base` | 로컬 실행 |
+| 생성 | OpenAI API | `scripts/extract_entities.py`, `scripts/generate_answers.py`에서 사용 |
+| 그래프 DB | Neo4j | `scripts/load_graph_neo4j.py`. 검색 평가 자체는 Neo4j 없이 로컬 파일로 동작 |
+| 수집 | yt-dlp | YouTube 자막·메타데이터 수집 |
+| 자막 파싱 | webvtt-py | VTT 정규화 |
 
-ERD와 관계형 스키마 설계는 규칙에 따라 배제합니다. 메타데이터는 벡터 DB payload에 넣습니다.
+`google-genai`는 `pyproject.toml`에 있지만 `scripts/`, `tests/` 어디에서도
+import되지 않는, 현재 실행 경로에서 쓰이지 않는 정리 후보 의존성입니다.
 
-## 구조
+Qdrant, FastAPI, Next.js, `bge-m3`, `faster-whisper`는 이 브랜치의 실행 경로에
+없습니다 — 다른 브랜치의 선택이거나(`docs/GROUNDRULES.md`) 아직 구현되지 않은
+계획입니다.
+
+## 저장소 구조
 
 ```
-scripts/
-  collect_index.py   채널 전체 영상 인덱스 덤프
-  check_subs.py      수동/자동 자막 보유 여부 샘플 실측
-  vtt_stats.py       VTT 롤업 중복 제거 후 실제 본문 분량 측정
-docs/
-  SOURCES.md         소스 지도와 라이선스 메모
-  GROUNDRULES.md     팀 규칙과 이 저장소의 선택 근거
-data/                수집물 (gitignored — 저장소에 올리지 않음)
+scripts/      수집·청킹·추출·검색·생성·평가 CLI
+data/         추적 허용된 평가셋·가드레일 어휘·수동 검토 ledger·데모 프로필
+docs/         설계 결정, 소스 지도, 브랜치·handoff 문서
+frozen/       재추출하면 동일하게 재현되지 않는 그래프 동결 스냅샷
+reports/      평가·실패 분석 리포트
+tests/        파이프라인·가드레일 unittest
+prompts/      엔티티 추출 프롬프트 초안
+guardrail/    초기 가드레일 시드 어휘
 ```
 
-백엔드(`backend/`)와 프론트(`frontend/`)는 아직 없습니다. 수집·청킹이 한 바퀴 돈 뒤에 올립니다.
+`data/`의 나머지(수집된 원본 영상·자막·오디오, 처리된 청크, 그래프 추출 중간
+산출물 등)는 저장소에 커밋하지 않습니다. 아래 [데이터와 비밀정보 정책](#데이터와-비밀정보-정책)을
+참고하세요.
 
-## 실행
-
-패키지 관리는 **uv**를 씁니다 (팀 그라운드룰). `pip`을 직접 쓰지 마세요.
+## 빠른 시작
 
 ```powershell
-# 의존성 설치 — .venv 생성부터 lock 반영까지 한 번에
 uv sync
-
-# 1. 채널 인덱스 수집
-uv run python scripts/collect_index.py "https://www.youtube.com/channel/UCee1MvXr6E8qC_d2WEYTU5g/videos" data/bodeum_index.tsv
-
-# 2. 자막 커버리지 실측 (20개 샘플)
-uv run python scripts/check_subs.py data/bodeum_index.tsv 20
-
-# 3. 받은 자막의 실제 본문 분량 확인
-uv run python scripts/vtt_stats.py "data/subs/*.vtt"
 ```
 
-### YouTube 메타데이터 검토 CSV
+### 설치 확인 (부작용 없음)
 
-`.env.example`을 참고해 `.env`에 `YOUTUBE_API_KEY`를 설정합니다. 채널 handle은
-`YOUTUBE_CHANNEL_HANDLE`로 바꿀 수 있으며 기본값은 `Bodeumofficial`입니다.
-영상, 음원, 자막 및 원본 API 응답은 저장하지 않습니다.
+API 키·Neo4j 연결·로컬 데이터 없이 실행되고, tracked 파일을 건드리지 않습니다.
+처음 clone했다면 이것부터 실행해 설치가 됐는지 확인하세요.
 
 ```powershell
-# 확인용 제한 수집
-uv run python scripts/collect_youtube_metadata.py --max-videos 100
-
-# 채널 전체 수집
-uv run python scripts/collect_youtube_metadata.py
+uv run python scripts/extract_entities.py --stage 2 --dry-run --limit 2
+uv run python scripts/load_graph_neo4j.py --dry-run
+uv run python -m unittest discover -s tests -p "test_*.py"
 ```
 
-기본 출력 파일은 `data/reviews/bodeum_youtube_metadata.csv`입니다. 다른 위치는
-`--output <경로>`로 지정할 수 있습니다.
+### 검색 평가 시험 실행
 
-의존성을 추가할 때도 `uv add <패키지>`로 넣습니다. `uv.lock`은 커밋합니다.
+`scripts/run_combined_retrieval_eval.py`를 옵션 없이 실행하면 기본 출력 경로가
+`data/eval/results/`, `reports/` 아래 커밋된 스냅샷이라 그대로 덮어씁니다. 처음
+시험할 때는 `--metrics`/`--report`로 `.gitignore`가 이미 제외하는 로컬 경로
+(`data/scratch/`)를 지정하세요. 둘 다 API 키·Neo4j 연결이 필요 없습니다 — 하이브리드
+모드도 그래프를 `data/graph/`의 로컬 파일로만 읽습니다.
 
-### 외부 도구는 필요 없습니다
+```powershell
+# 벡터 전용
+uv run python scripts/run_combined_retrieval_eval.py --graph-off --metrics data/scratch/metrics.json --report data/scratch/report.md
 
-`ffmpeg`도 별도 Python 환경도 필요 없습니다. 둘 다 실측으로 확인했습니다.
+# 벡터+그래프 하이브리드 (기본값)
+uv run python scripts/run_combined_retrieval_eval.py --metrics data/scratch/metrics.json --report data/scratch/report.md
+```
 
-- **ffmpeg 불필요** — 오디오를 `-f bestaudio`로 원본 스트림(opus/webm) 그대로 받고, faster-whisper가 쓰는 **PyAV가 ffmpeg 라이브러리를 내장**해 그걸 직접 디코딩합니다. 시스템 ffmpeg 없이 48kHz opus → 16kHz mono 변환이 되는 것을 확인했습니다. ffmpeg가 필요해지는 건 yt-dlp에 `--extract-audio --audio-format wav` 같은 후처리를 시킬 때인데, 이 파이프라인은 그걸 하지 않습니다.
-- **Python 3.12 사용** — 프로젝트 가상환경과 의존성은 Python 3.12 기준으로 관리합니다.
+커밋된 스냅샷을 실제로 갱신하려는 것이라면 `--metrics`/`--report` 없이 기본
+경로로 실행해 덮어쓴 뒤 `git diff`로 변경을 검토하세요.
 
-## 데이터 취급
+### 답변 생성 시험 실행
 
-수집물은 저장소에 커밋하지 않습니다 (`data/` gitignore). 원저작물이고 배포 대상이 아니며, 용량상으로도 git에 맞지 않습니다. 이 저장소는 코드·스키마·문서만 담습니다.
+`--dry-run`은 API를 호출하지 않지만 기본 출력 경로(`data/eval/generation/`)는
+tracked 패턴(`answers_*.jsonl`)과 겹칠 수 있어, `--out-dir`로 로컬 경로를
+지정하세요.
+
+```powershell
+uv run python scripts/generate_answers.py --dry-run --out-dir data/scratch/gen
+```
+
+실제로 API를 호출하려면 `--dry-run` 없이 실행하고, `.env`에 `OPENAI_API_KEY`가
+있어야 합니다 (`.env.example` 참고).
+
+### 로컬 데이터 생성 단계 (dry-run 없음)
+
+아래 두 명령은 이전 단계가 만든 로컬 `data/` 산출물을 입력·출력으로 쓰고,
+dry-run 옵션이 없습니다. 저장소를 새로 clone한 상태에서는 이 순서대로 실행해야
+이후 단계에 쓸 로컬 데이터가 생깁니다.
+
+```powershell
+# YouTube 메타데이터 수집 (제한 수집) — .env에 YOUTUBE_API_KEY 필요
+uv run python scripts/collect_youtube_metadata.py --max-videos 20
+
+# 승인된 자막을 챕터 기준으로 청킹 — 로컬 검토 ledger·전사 결과 필요
+uv run python scripts/chunk_approved_youtube.py
+```
+
+## 데이터와 비밀정보 정책
+
+사용한 자료와 출처 목록은 [`docs/SOURCES.md`](docs/SOURCES.md)에서 확인할 수
+있습니다.
+
+Git에 올리지 않는 것 (`.gitignore` 기준):
+
+- 원본 영상·오디오·자막, 일반 수집 데이터
+- 처리된 청크, 그래프 추출 중간 산출물
+- 벡터 인덱스·임베딩 캐시
+- `.env`와 API 키
+
+의도적으로 추적하는 것:
+
+- 평가 질문셋과 그 합성 근거 (`data/eval/queries/`)
+- 이름 붙인 평가 스냅샷·리포트 (`data/eval/results/*_metrics.json`, `*_report.md`)
+- 답변 생성 결과 (`data/eval/generation/answers_*.jsonl`)
+- 의료 가드레일 어휘 파일 (`data/guardrail/`)
+- 데모 프로필 (`data/profiles/`)
+- 수동 검토 ledger (`data/reviews/bodeum_youtube_manual_reviews.csv`)
+- 재추출 시 결과가 흔들리는 그래프 동결 스냅샷 (`frozen/`)
+
+## 관련 실험 브랜치
+
+- `feature/dog-training-rag`: EvidenceCard·FastAPI `/chat` 서비스 실험
+- `feature/chat-ui`: Next.js 채팅 UI 실험
+
+두 브랜치 모두 이 GraphRAG 기준 브랜치에 병합되지 않았습니다. 팀 이관 시 구현
+전체가 아니라 필요한 계약과 코드만 선택적으로 참고합니다. 전체 브랜치 관계는
+[`docs/BRANCH_MAP.md`](docs/BRANCH_MAP.md)를 참고하세요.
+
+## 팀 이관
+
+팀 런타임은 pgvector를 쓸 예정이며, 현재 저장소의 Qdrant 기반 서비스 실험이나
+GraphRAG 평가 스크립트를 그대로 이관하지 않습니다. 팀 공통 요청·응답 JSON, 근거
+단위 계약, GraphRAG 운영 여부는 팀 저장소에서 별도로 결정합니다. 재사용 가능한
+것과 재사용하면 안 되는 것의 상세 목록은 [`docs/TEAM_HANDOFF.md`](docs/TEAM_HANDOFF.md)를
+참고하세요.

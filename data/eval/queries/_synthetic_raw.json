@@ -1,0 +1,81 @@
+[
+  {"passage": 1, "query_type": "direct_lookup", "question": "낯가리는 개 앞에서 훈련사가 몸을 움직이지 않는 이유는 무엇인가요?"},
+  {"passage": 1, "query_type": "paraphrase", "question": "처음 만난 강아지에게 좋은 인상을 주려면 손을 어떻게 두어야 하나요?"},
+  {"passage": 1, "query_type": "symptom_to_solution", "question": "새로 데려온 강아지가 저를 무서워하는데 어떻게 믿음을 쌓을 수 있을까요?"},
+
+  {"passage": 2, "query_type": "direct_lookup", "question": "산책 중 다른 사람이 우리 개에게 다가올 때 적당한 거리는 어느 정도인가요?"},
+  {"passage": 2, "query_type": "paraphrase", "question": "길에서 만난 강아지를 쓰다듬고 싶을 때 어떤 순서로 다가가야 예의에 맞나요?"},
+  {"passage": 2, "query_type": "symptom_to_solution", "question": "밖에 나가면 모르는 분들이 갑자기 우리 개를 두 손으로 붙잡아서 곤란해요. 어떻게 안내하면 좋을까요?"},
+
+  {"passage": 3, "query_type": "direct_lookup", "question": "강아지 젖니가 빠지고 새 이가 나는 시기는 대략 몇 개월인가요?"},
+  {"passage": 3, "query_type": "paraphrase", "question": "강아지가 자라면서 가장 먼저 겪는 몸의 괴로움은 무엇인가요?"},
+  {"passage": 3, "query_type": "symptom_to_solution", "question": "5개월 된 강아지가 갑자기 예민해졌는데 성격이 나빠진 걸까요?"},
+
+  {"passage": 4, "query_type": "direct_lookup", "question": "보호자 손만 깨무는 행동은 어떤 마음을 나타내나요?"},
+  {"passage": 4, "query_type": "paraphrase", "question": "강아지가 배를 드러내고 뒷다리를 쓰기 시작하면 그만 만져야 하나요?"},
+  {"passage": 4, "query_type": "symptom_to_solution", "question": "놀아줄 때 강아지가 점점 세게 깨무는데 제가 어떤 동작을 잘못하고 있는 걸까요?"},
+
+  {"passage": 5, "query_type": "direct_lookup", "question": "다치기 전에 주둥이 보호구를 미리 익히게 해두라는 이유는 무엇인가요?"},
+  {"passage": 5, "query_type": "paraphrase", "question": "가슴에 두르는 줄을 자연스럽게 적응시키려면 어떤 식으로 채워야 하나요?"},
+  {"passage": 5, "query_type": "symptom_to_solution", "question": "우리 개가 아플 때 몸에 손도 못 대게 하는데 지금부터 뭘 준비해두면 좋을까요?"},
+
+  {"passage": 6, "query_type": "direct_lookup", "question": "개가 허리 뒤쪽부터 손대는 걸 거부하는 이유는 무엇인가요?"},
+  {"passage": 6, "query_type": "skip", "question": ""},
+  {"passage": 6, "query_type": "skip", "question": ""},
+
+  {"passage": 7, "query_type": "direct_lookup", "question": "사람 가까이에서 살아온 유형의 개를 부르는 말은 무엇인가요?"},
+  {"passage": 7, "query_type": "paraphrase", "question": "가슴줄만 채우면 그 자리에서 굳어버리는 개는 어떤 성향인가요?"},
+  {"passage": 7, "query_type": "symptom_to_solution", "question": "품에 안기는 걸 싫어하는 개와 친해지려면 몸의 어느 부분부터 만져야 하나요?"},
+
+  {"passage": 8, "query_type": "direct_lookup", "question": "한번 채운 개 목걸이는 얼마나 자주 다시 맞춰줘야 하나요?"},
+  {"passage": 8, "query_type": "paraphrase", "question": "가슴에 두르는 줄과 목에 채우는 줄 중 어느 쪽이 더 나은 개가 있나요?"},
+  {"passage": 8, "query_type": "symptom_to_solution", "question": "산책 범위를 넓히고 싶은데 어떤 식으로 조금씩 늘려가야 하나요?"},
+
+  {"passage": 9, "query_type": "direct_lookup", "question": "겁이 많거나 신경이 곤두선 개는 어떤 감각을 우선해서 쓰나요?"},
+  {"passage": 9, "query_type": "paraphrase", "question": "숨겨둔 먹이를 우리 개가 잘 못 찾는데 코가 나쁜 걸까요?"},
+  {"passage": 9, "query_type": "symptom_to_solution", "question": "우리 개가 자리를 고르지도 않고 달리다가 갑자기 변을 봐요. 정상인가요?"},
+
+  {"passage": 10, "query_type": "direct_lookup", "question": "어릴 때 아무 사람이나 좋아하게 두면 보호자와의 관계에 어떤 일이 생기나요?"},
+  {"passage": 10, "query_type": "paraphrase", "question": "지나가면서 잠깐 예뻐해주고 바로 가버리는 방식이 왜 도움이 안 되나요?"},
+  {"passage": 10, "query_type": "symptom_to_solution", "question": "우리 강아지가 사람만 보면 좋아서 달려가는데 그냥 두어도 괜찮을까요?"},
+
+  {"passage": 11, "query_type": "direct_lookup", "question": "바닥에 둔 먹이를 참아냈을 때 보호자가 하지 말아야 할 행동은 무엇인가요?"},
+  {"passage": 11, "query_type": "paraphrase", "question": "떨어진 음식을 함부로 주워 먹지 않게 하려면 어떤 연습을 시키나요?"},
+  {"passage": 11, "query_type": "symptom_to_solution", "question": "사람이 자리를 비우면 우리 개가 몰래 음식을 집어먹어요. 어떻게 가르쳐야 할까요?"},
+
+  {"passage": 12, "query_type": "direct_lookup", "question": "집이 눈에 보이는 곳까지만 걸었다가 되돌아오는 산책은 어떤 순서로 하나요?"},
+  {"passage": 12, "query_type": "paraphrase", "question": "어디로 가는지 모르면 개가 불안해한다는데 산책 방식을 어떻게 바꿔야 하나요?"},
+  {"passage": 12, "query_type": "symptom_to_solution", "question": "가족이 둘일 때 불안이 많은 개의 산책을 어떻게 나눠서 하면 좋을까요?"},
+
+  {"passage": 13, "query_type": "direct_lookup", "question": "어린 강아지가 연습 중에 다가와 킁킁거리면 보호자는 어떻게 해야 하나요?"},
+  {"passage": 13, "query_type": "skip", "question": ""},
+  {"passage": 13, "query_type": "skip", "question": ""},
+
+  {"passage": 14, "query_type": "skip", "question": ""},
+  {"passage": 14, "query_type": "skip", "question": ""},
+  {"passage": 14, "query_type": "skip", "question": ""},
+
+  {"passage": 15, "query_type": "direct_lookup", "question": "개가 제자리에서 뱅뱅 도는 행동의 몸쪽 원인은 무엇인가요?"},
+  {"passage": 15, "query_type": "paraphrase", "question": "보호자가 집에 들어오면 우리 개가 꼬리를 쫓아 도는데 왜 그러는 건가요?"},
+  {"passage": 15, "query_type": "symptom_to_solution", "question": "뛰어다니다가 변을 흘리는 개는 어떤 문제가 있는 걸까요?"},
+
+  {"passage": 16, "query_type": "direct_lookup", "question": "곡예 공연에 스탠더드 푸들이 자주 쓰이는 까닭은 무엇인가요?"},
+  {"passage": 16, "query_type": "paraphrase", "question": "리트리버 계열은 유독 앞다리를 능숙하게 쓰는 편인가요?"},
+  {"passage": 16, "query_type": "symptom_to_solution", "question": "우리 개가 식탁에 앞다리를 올려 물건을 집어 오는데 타고난 성향인가요?"},
+
+  {"passage": 17, "query_type": "direct_lookup", "question": "우리 집이 눈에 안 보이면 불안해하는 개는 어떤 산책을 힘들어하나요?"},
+  {"passage": 17, "query_type": "paraphrase", "question": "밖에 나가자마자 걷기를 거부하는 개는 무엇 때문에 그러는 건가요?"},
+  {"passage": 17, "query_type": "symptom_to_solution", "question": "아파트 현관 근처만 맴돌고 더 멀리 가지 않으려는 개는 어떻게 해야 하나요?"},
+
+  {"passage": 18, "query_type": "direct_lookup", "question": "연습 도중 개가 뛰어오르면 보호자는 어떤 태도를 가져야 하나요?"},
+  {"passage": 18, "query_type": "skip", "question": ""},
+  {"passage": 18, "query_type": "skip", "question": ""},
+
+  {"passage": 19, "query_type": "direct_lookup", "question": "예전 지침에서 권하던 불쾌한 자극이란 구체적으로 어떤 방법이었나요?"},
+  {"passage": 19, "query_type": "paraphrase", "question": "손님한테 매달리는 습관을 혼내지 않고 없앨 수 있을까요?"},
+  {"passage": 19, "query_type": "symptom_to_solution", "question": "연세 많은 어르신과 함께 사는데 개가 달려들어 위험해요. 어떻게 해야 하나요?"},
+
+  {"passage": 20, "query_type": "direct_lookup", "question": "혼자 남겨진 개가 장난감을 거실 한가운데로 모아두는 건 무슨 뜻인가요?"},
+  {"passage": 20, "query_type": "paraphrase", "question": "외출했다 오면 하필 문 앞에만 실수를 해두는데 왜 그 자리인가요?"},
+  {"passage": 20, "query_type": "symptom_to_solution", "question": "집에 돌아오면 물건이 다 끌려나와 있는데 개가 화가 나서 그런 건가요?"}
+]
