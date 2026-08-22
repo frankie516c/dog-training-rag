@@ -32,6 +32,10 @@ if sys.platform == "win32":                       # cp949 UnicodeEncodeError 방
 
 SEED = 20260822
 
+# 본문을 담은 크롤 산출물만. blog_raw/ · blog_raw_africaamc/ · blog_raw_rescue/의
+# posts.jsonl 3종(529 + 189 + 103 = 821건). --pattern으로 덮어쓸 수 있다.
+CORPUS_GLOB = "**/posts.jsonl"
+
 # ---------------------------------------------------------------- 사전
 
 # 그래프에 실재하는 19개 + 코퍼스에 나올 법한 확장
@@ -91,8 +95,15 @@ COND_MARKERS = [
 # ---------------------------------------------------------------- 로더
 
 
-def iter_docs(root: Path):
-    """포맷을 모르므로 방어적으로 읽는다. 안 맞으면 --inspect 결과 보고 여기만 고칠 것."""
+def iter_docs(root: Path, pattern: str = CORPUS_GLOB):
+    """포맷을 모르므로 방어적으로 읽는다. 안 맞으면 --inspect 결과 보고 여기만 고칠 것.
+
+    2026-08-22 실측 수정: root 전체를 rglob하면 blog_list*/의 목록 파일(posts_list,
+    excluded, posts_training)까지 문서로 잡혀 6431건이 된다. 이 파일들은 본문 없이
+    제목만 있어서 hit 문장 1539건 중 194건(12.6%)이 본문이 아닌 제목이 되고, 제목은
+    구조상 열거형이라 조건성 비율이 왜곡된다. 본문을 담은 파일만 읽도록 좁힌다.
+    (key_body의 'text'는 이미 실제 키와 일치하므로 키는 고치지 않았다.)
+    """
     key_title = ("title", "제목", "subject", "post_title")
     key_body = ("content", "body", "text", "본문", "clean_text", "cleaned")
     key_url = ("url", "link", "source_url", "permalink")
@@ -104,7 +115,8 @@ def iter_docs(root: Path):
                 return str(d[k])
         return default
 
-    files = [p for p in root.rglob("*") if p.suffix.lower() in (".json", ".jsonl", ".txt", ".md")]
+    files = [p for p in root.rglob(pattern)
+             if p.suffix.lower() in (".json", ".jsonl", ".txt", ".md")]
     for path in sorted(files):
         try:
             raw = path.read_text(encoding="utf-8", errors="replace")
@@ -172,6 +184,8 @@ def main():
                     help="크롤 결과 폴더 (예: C:/backup/dogtraining_0821/scrapper)")
     ap.add_argument("--out", default="./breed_factcheck")
     ap.add_argument("--per-topic", type=int, default=5, help="주제별 무작위 표본 수")
+    ap.add_argument("--pattern", default=CORPUS_GLOB,
+                    help=f"읽을 파일 glob (기본 {CORPUS_GLOB}). 목록 파일 혼입 방지용")
     ap.add_argument("--inspect", action="store_true", help="포맷·건수만 보고 종료")
     args = ap.parse_args()
 
@@ -179,7 +193,7 @@ def main():
     if not root.exists():
         sys.exit(f"경로 없음: {root}")
 
-    docs = list(iter_docs(root))
+    docs = list(iter_docs(root, args.pattern))
     if args.inspect:
         print(f"문서 {len(docs)}건")
         for d in docs[:3]:
