@@ -61,6 +61,10 @@ CHANNEL_GROUP = {
     "설채현의 놀로와": "B",
 }
 
+# 블로그 측정(env_axis_measurement_0822.md)에서 확인된 순환 매칭어 — ENV_ALL과
+# TOPICS 키워드 양쪽에 동일 문자열이 그대로 존재하는 것. 표시만 한다.
+CIRCULAR_ENV_TERMS = {"산책", "켄넬", "울타리", "목줄", "배변패드", "배변 패드", "배변판"}
+
 # 비지식 서술 신호 (표시만 한다. 제거하지 않는다 — 판정은 사람이 한다)
 NON_KNOWLEDGE_MARKERS = {
     "인사/구독유도": ["안녕하세요", "구독", "좋아요"],
@@ -265,7 +269,7 @@ def strip_particle(tok):
 
 
 def is_hangul_run(s):
-    return bool(s) and all("\uac00" <= ch <= "\ud7a3" for ch in s)
+    return bool(s) and all("가" <= ch <= "힣" for ch in s)
 
 
 def levenshtein(a, b):
@@ -283,9 +287,9 @@ def levenshtein(a, b):
 
 
 def nearest_breed(norm_tok, breed_pool):
-    """\ud1a0\ud070\uc774 \uc54c\ub824\uc9c4 \uacac\uc885\uba85\uacfc \uc74c\uc808 \uae38\uc774 \ub300\ube44 \ud3b8\uc9d1\uac70\ub9ac\uac00 \uac00\uae4c\uc6b0\uba74 \ud45c\uc2dc\ub9cc \ud55c\ub2e4
-    (\ud544\ud130 \uc544\ub2d8, \uc815\ub82c\u00b7\uac80\ud1a0 \ubcf4\uc870\uc6a9 \u2014 \uc0ac\uc804\uc5d0 \ub123\uc9c0 \uc54a\uc73c\uba70 \ucc44\ud0dd \uc5ec\ubd80\ub97c \uacb0\uc815\ud558\uc9c0 \uc54a\ub294\ub2e4).
-    \uae38\uc774 2~3 \ud1a0\ud070\uc740 \ud3b8\uc9d1\uac70\ub9ac 2\ub3c4 \uc0ac\uc2e4\uc0c1 \uc544\ubb34 \ub2e8\uc5b4\ub098 \uac78\ub9ac\ubbc0\ub85c 1\ub85c, 4\uc790 \uc774\uc0c1\uc740 2\ub85c \ub454\ub2e4."""
+    """토큰이 알려진 견종명과 음절 길이 대비 편집거리가 가까우면 표시만 한다
+    (필터 아님, 정렬·검토 보조용 — 사전에 넣지 않으며 채택 여부를 결정하지 않는다).
+    길이 2~3 토큰은 편집거리 2도 사실상 아무 단어나 걸리므로 1로, 4자 이상은 2로 둔다."""
     limit = 1 if len(norm_tok) <= 3 else 2
     best, best_d = "", limit + 1
     for b in breed_pool:
@@ -449,6 +453,7 @@ def main():
     breed_videos_hit = defaultdict(set)      # group -> set(video_id) with >=1 hit
     env_term_hits = defaultdict(Counter)
     env_videos_hit = defaultdict(set)
+    env_term_videos = defaultdict(lambda: defaultdict(set))  # group -> term -> {video_id,...}
 
     for vid, v in per_video.items():
         group, channel, tokens, token_ts = v["group"], v["channel"], v["tokens"], v["token_ts"]
@@ -476,6 +481,7 @@ def main():
             env_videos_hit[group].add(vid)
         for o in env_occ:
             env_term_hits[group][o["term"]] += 1
+            env_term_videos[group][o["term"]].add(vid)
 
         # 그룹 A: 문장분할 병행
         if group == "A":
@@ -492,6 +498,19 @@ def main():
                            주제="|".join(tag_topics(s)) or "(미분류)",
                            관계유형="", 메모="")
                 sent_rows_by_group[group].append(row)
+
+    # ---- 환경어 키워드별 분해 (그룹A/B 각각, 순환 매칭어 표시만) ----
+    env_breakdown_cols = ["그룹", "키워드", "분류", "등장건수", "등장영상수", "순환매칭어"]
+    with open(outdir / "env_keyword_breakdown.csv", "w", newline="", encoding="utf-8-sig") as f:
+        w = csv.DictWriter(f, fieldnames=env_breakdown_cols)
+        w.writeheader()
+        for g in ("A", "B"):
+            for term, c in env_term_hits[g].most_common():
+                w.writerow(dict(
+                    그룹=g, 키워드=term, 분류=ENV_GROUP.get(term, "?"),
+                    등장건수=c, 등장영상수=len(env_term_videos[g][term]),
+                    순환매칭어="Y" if term in CIRCULAR_ENV_TERMS else "",
+                ))
 
     # ---- OOV 후보 ----
     video_records = [(vid, v["channel"], v["group"], v["tokens"]) for vid, v in per_video.items()]
@@ -565,6 +584,8 @@ def main():
 
     print(f"\n[표본] sample_subtitle_v1.csv: 그룹B {len(sample_b)}행 + 그룹A {len(sample_a)}행 "
           f"= {len(sample_b)+len(sample_a)}행 (seed={SEED})")
+    print(f"[환경어 키워드 분해] -> {outdir}/env_keyword_breakdown.csv "
+          f"(그룹A {len(env_term_hits['A'])}종, 그룹B {len(env_term_hits['B'])}종)")
     print(f"[OOV 후보] {len(oov)}건 -> {outdir}/oov_candidates.csv (사전 미반영, 사람 승인 대기)")
     print(f"[모집단 보존] {outdir}/population_group_A.csv ({len(dict_rows_by_group['A'])+len(sent_rows_by_group['A'])}행), "
           f"population_group_B.csv ({len(dict_rows_by_group['B'])}행)")
