@@ -483,3 +483,12 @@ Method.measured_at         측정 시점 (재측정 시 갱신)
 
 **승격 조건**: 가구 구성이 훈련 조건을 가르는 문장이 유의미한 수로 관측될 것. 미분류
 95%를 걷어낸 뒤에도 남는 것이 있어야 합니다.
+
+## 21. 표본 CSV 백업 경로 미정
+
+- 표본 CSV 백업 경로 미정 — 오늘 사이클 산출물 6종
+  (sample_random.csv, sample_random_v2.csv, sample_env_v1.csv,
+   sample_subtitle_v1.csv, env_keyword_breakdown.csv, oov_candidates.csv)이
+  data/* gitignore로 로컬 유일 사본 상태. 자막 원문은 저작권상 저장소 밖이
+  맞으나 표본 CSV는 문맥 창 단위라 성격이 다름. 라벨 작업을 다른 PC에서
+  이어받으려면 백업 경로를 정해야 함.
