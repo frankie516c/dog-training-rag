@@ -314,7 +314,7 @@
     const title = document.createElement("strong");
     title.textContent = `실제 배치 좌표 · ${physics.GRID}×${physics.GRID}`;
     const legend = document.createElement("span");
-    legend.textContent = "채움=점유 셀 / 색 파선=PNG 충돌 / 흰 점선=접지";
+    legend.textContent = "채움=바닥 경계 판정 / 색 파선=PNG 충돌 / 흰 점선=접지 참고";
     developerPanel.append(title, legend);
 
     entries.forEach(([id, placement], index) => {
@@ -396,7 +396,6 @@
 
   function placementIsValid(asset, placement, excludeId = null) {
     if (!physics.canPlace(asset, placement, currentOccupied(excludeId))) return false;
-    if (!physics.floorBoxFits(asset, placement, 0.2)) return false;
     const candidateBounds = physics.visualBounds(asset, placement);
     return Object.entries(state.items).every(([id, existingPlacement]) => {
       if (id === excludeId) return true;

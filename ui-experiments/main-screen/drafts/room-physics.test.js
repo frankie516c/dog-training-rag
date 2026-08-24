@@ -73,6 +73,10 @@ const catalog = [
   const separate = physics.visualBounds(floorAsset, { col: 12, row: 2, facing: 0 });
   assert.equal(physics.boundsOverlap(first, overlapping, 0.35), true);
   assert.equal(physics.boundsOverlap(first, separate, 0.35), false);
+
+  const edgePlacement = { col: 0, row: physics.GRID - 2, facing: 0 };
+  assert.equal(physics.canPlace(floorAsset, edgePlacement, new Set()), true, "an in-grid footprint must be placeable at the floor edge");
+  assert.equal(physics.floorBoxFits(floorAsset, edgePlacement, 0.2), false, "the art box may overhang without overriding the grid boundary");
 }
 
 {
