@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>댕토리 · Pixel Room</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #4b3b2b;
+      --paper: #f8f1e4;
+      --paper-shadow: #dfcfb4;
+      --sage: #7f9661;
+      --sage-dark: #536745;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      display: grid;
+      place-items: center;
+      overflow-x: hidden;
+      background:
+        linear-gradient(90deg, rgba(128, 100, 66, .035) 1px, transparent 1px) 0 0 / 4px 4px,
+        linear-gradient(rgba(128, 100, 66, .025) 1px, transparent 1px) 0 0 / 4px 4px,
+        #eee5d7;
+      color: var(--ink);
+      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+      padding: clamp(12px, 3vw, 28px);
+    }
+
+    .room-shell {
+      width: min(94vw, 760px);
+      position: relative;
+      filter: drop-shadow(0 22px 28px rgba(77, 57, 34, .22));
+    }
+
+    .room-frame {
+      position: relative;
+      padding: clamp(7px, 1.5vw, 12px);
+      background: var(--paper);
+      border: clamp(3px, .6vw, 6px) solid #fffaf0;
+      box-shadow:
+        0 0 0 clamp(2px, .45vw, 4px) var(--paper-shadow),
+        inset 0 0 0 2px #eadcc6;
+      clip-path: polygon(
+        2.2% 0, 97.8% 0, 100% 2.8%, 100% 97.2%,
+        97.8% 100%, 2.2% 100%, 0 97.2%, 0 2.8%
+      );
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 360 / 430;
+      background: #f6ead6;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      cursor: default;
+      touch-action: manipulation;
+    }
+
+    .room-actions {
+      position: absolute;
+      top: clamp(17px, 3vw, 28px);
+      right: clamp(17px, 3vw, 28px);
+      display: flex;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .pixel-button {
+      pointer-events: auto;
+      width: clamp(38px, 7vw, 52px);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      color: var(--ink);
+      background: #fffaf0;
+      border: 0;
+      box-shadow:
+        0 -3px 0 #fff,
+        3px 0 0 #c7b797,
+        0 3px 0 #aa9978,
+        -3px 0 0 #e4d7c0,
+        inset 0 -4px 0 #eee1cb;
+      cursor: pointer;
+    }
+
+    .pixel-button:hover { background: #fffdf7; }
+    .pixel-button:active { transform: translate(2px, 2px); }
+    .pixel-button:focus-visible { outline: 3px solid #657b4e; outline-offset: 5px; }
+
+    .pixel-button svg {
+      width: 56%;
+      height: 56%;
+      shape-rendering: crispEdges;
+    }
+
+    .room-label {
+      position: absolute;
+      left: 50%;
+      bottom: clamp(12px, 2.5vw, 22px);
+      transform: translateX(-50%);
+      min-width: 116px;
+      padding: 7px 14px 8px;
+      text-align: center;
+      font-size: clamp(9px, 1.7vw, 13px);
+      font-weight: 800;
+      letter-spacing: .14em;
+      color: #445336;
+      background: #dce5b8;
+      box-shadow:
+        0 -3px 0 #edf2d5,
+        3px 0 0 #8ea06a,
+        0 3px 0 #718356,
+        -3px 0 0 #bdca96,
+        inset 0 -3px 0 #c3cf98;
+      pointer-events: none;
+    }
+
+    .room-label::before,
+    .room-label::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      background: #8fa46d;
+      transform: translateY(-50%);
+    }
+
+    .room-label::before { left: 9px; }
+    .room-label::after { right: 9px; }
+
+    .hint {
+      margin: 14px auto 0;
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #7d6e5a;
+    }
+
+    @media (max-width: 520px) {
+      body { padding: 0; background: #f8f1e4; }
+      .room-shell { width: 100vw; }
+      .room-frame { border-width: 0; padding: 0; box-shadow: none; clip-path: none; }
+      .hint { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pixel-button:active { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="room-shell" aria-label="댕토리 픽셀 룸">
+    <section class="room-frame">
+      <canvas id="pixelRoom" width="360" height="430" role="img" aria-label="창문, 식물, 강아지 집, 러그, 공, 문과 강아지가 모두 픽셀 아트로 그려진 포근한 방"></canvas>
+      <div class="room-actions">
+        <button class="pixel-button" id="lightButton" type="button" aria-label="방 조명 켜기 또는 끄기" aria-pressed="false">
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path fill="currentColor" d="M7 0h2v3H7zM2 2h2v2H2zm10 0h2v2h-2zM0 7h3v2H0zm13 0h3v2h-3zM2 12h2v2H2zm10 0h2v2h-2zM7 13h2v3H7zM6 5h4v1h1v4h-1v1H6v-1H5V6h1z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="room-label">MY ROOM</div>
+    </section>
+    <p class="hint">Light button changes the room in discrete pixel-art frames.</p>
+  </main>
+  <script src="./pixel-room.js"></script>
+</body>
+</html>

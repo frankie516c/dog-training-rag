@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>댕스 · High Fidelity Pixel Room</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      background: #cbae83;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      overflow: auto;
+    }
+
+    .pixel-room {
+      display: block;
+      width: min(100vw, calc(100vh * 0.82));
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    @media (max-aspect-ratio: 4 / 5) {
+      .pixel-room {
+        width: 100vw;
+        min-height: 100vh;
+        object-fit: cover;
+        object-position: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <img
+      class="pixel-room"
+      src="../assets/pixel-room-v4.png"
+      alt="아치형 창문과 올리브색 문, 식물, 수납장, 강아지 집, 러그, 공과 강아지가 있는 포근한 고해상도 픽셀 아트 방"
+    >
+  </main>
+</body>
+</html>
