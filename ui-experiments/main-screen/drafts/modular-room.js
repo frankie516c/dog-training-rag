@@ -26,21 +26,21 @@
     {
       id: "rug-cream",
       category: "rug",
-      anchor: "center",
       label: "크림 러그",
       src: "../assets/modular-rug-v1-final.png",
       width: 40,
+      artAnchor: [50, 50],
       footprint: [3, 3],
       flat: true,
-      defaultPlacement: { col: 1, row: 2, facing: 0 }
+      defaultPlacement: { col: 2, row: 2, facing: 0 }
     },
     {
       id: "plant-tall",
       category: "plant",
-      anchor: "ground",
       label: "큰 화분",
       src: "../assets/modular-plant-v1-final.png",
       width: 11.5,
+      artAnchor: [50, 93],
       footprint: [1, 1],
       flat: false,
       defaultPlacement: { col: 5, row: 1, facing: 0 }
@@ -48,10 +48,10 @@
     {
       id: "doghouse-sage",
       category: "doghouse",
-      anchor: "ground",
       label: "강아지 집",
       src: "../assets/modular-doghouse-v1-final.png",
       width: 19.5,
+      artAnchor: [50, 78],
       footprint: [2, 2],
       flat: false,
       defaultPlacement: { col: 4, row: 2, facing: 0 }
@@ -59,10 +59,10 @@
     {
       id: "ball-sage",
       category: "toy",
-      anchor: "center",
       label: "초록 공",
       src: "../assets/modular-ball-v1-final.png",
       width: 4.8,
+      artAnchor: [50, 94],
       footprint: [1, 1],
       flat: false,
       defaultPlacement: { col: 3, row: 4, facing: 0 }
@@ -70,10 +70,10 @@
     {
       id: "cabinet-sage",
       category: "cabinet",
-      anchor: "ground",
       label: "세이지 수납장",
       src: "../assets/modular-cabinet-v1-final.png",
       width: 22,
+      artAnchor: [50, 77],
       footprint: [2, 1],
       flat: false,
       defaultPlacement: { col: 3, row: 0, facing: 0 }
@@ -81,10 +81,10 @@
     {
       id: "toy-basket",
       category: "basket",
-      anchor: "ground",
       label: "장난감 바구니",
       src: "../assets/modular-toy-basket-v1-final.png",
       width: 10,
+      artAnchor: [50, 78],
       footprint: [1, 1],
       flat: false,
       defaultPlacement: { col: 1, row: 5, facing: 0 }
@@ -92,10 +92,10 @@
     {
       id: "feeding-bowls",
       category: "feeding",
-      anchor: "center",
       label: "밥그릇 세트",
       src: "../assets/modular-feeding-bowls-v1-final.png",
       width: 9,
+      artAnchor: [50, 58],
       footprint: [1, 1],
       flat: false,
       defaultPlacement: { col: 3, row: 3, facing: 0 }
@@ -103,13 +103,13 @@
     {
       id: "rug-sage",
       category: "rug",
-      anchor: "center",
       label: "세이지 러그",
       src: "../assets/modular-rug-sage-v1-final.png",
       width: 40,
+      artAnchor: [50, 50],
       footprint: [3, 3],
       flat: true,
-      defaultPlacement: { col: 1, row: 2, facing: 0 }
+      defaultPlacement: { col: 2, row: 2, facing: 0 }
     }
   ];
 
@@ -250,15 +250,18 @@
 
   function positionElement(element, asset, placement) {
     const anchor = physics.placementAnchor(asset, placement);
+    const [artAnchorX, artAnchorY] = asset.artAnchor || [50, 50];
     element.style.setProperty("--x", anchor.x);
     element.style.setProperty("--y", anchor.y);
+    element.style.setProperty("--art-anchor-x", `${-artAnchorX}%`);
+    element.style.setProperty("--art-anchor-y", `${-artAnchorY}%`);
     element.style.zIndex = String(itemDepth(asset, placement));
   }
 
   function makeRoomItem(asset, placement) {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = `room-item anchor-${asset.anchor}`;
+    button.className = "room-item";
     button.dataset.id = asset.id;
     button.setAttribute("aria-label", `${asset.label} 이동하기. Delete 키로 치울 수 있습니다.`);
     if (selectedId === asset.id) button.classList.add("is-selected");

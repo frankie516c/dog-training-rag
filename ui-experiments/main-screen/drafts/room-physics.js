@@ -6,26 +6,74 @@
   "use strict";
 
   // Browser port of the grid-footprint and axis-slide approach from
-  // https://github.com/gayeoniee/isometric_test (IsoMath, MiniRoomState, DogHerd).
+  // https://github.com/gayeoniee/isometric_test
+  // (IsoMath, MiniRoomState, DogHerd, and ItemArt's per-asset anchors).
   const GRID = 6;
   const GEOMETRY = Object.freeze({
-    originX: 56,
-    originY: 52.5,
-    halfTileWidth: 6.25,
-    halfTileHeight: 3.05
+    // The generated v7 room is not a symmetric isometric diamond. These are
+    // its four visible floor corners in room-stage percentages.
+    back: Object.freeze({ x: 56, y: 52.5 }),
+    right: Object.freeze({ x: 96, y: 70.3 }),
+    front: Object.freeze({ x: 44, y: 93 }),
+    left: Object.freeze({ x: 4, y: 72.5 })
   });
 
   function gridToScreen(col, row) {
+    const u = col / GRID;
+    const v = row / GRID;
+    const inverseU = 1 - u;
+    const inverseV = 1 - v;
     return {
-      x: GEOMETRY.originX + (col - row) * GEOMETRY.halfTileWidth,
-      y: GEOMETRY.originY + (col + row) * GEOMETRY.halfTileHeight
+      x: inverseU * inverseV * GEOMETRY.back.x
+        + u * inverseV * GEOMETRY.right.x
+        + u * v * GEOMETRY.front.x
+        + inverseU * v * GEOMETRY.left.x,
+      y: inverseU * inverseV * GEOMETRY.back.y
+        + u * inverseV * GEOMETRY.right.y
+        + u * v * GEOMETRY.front.y
+        + inverseU * v * GEOMETRY.left.y
     };
   }
 
   function screenToGrid(x, y) {
-    const dx = (x - GEOMETRY.originX) / GEOMETRY.halfTileWidth;
-    const dy = (y - GEOMETRY.originY) / GEOMETRY.halfTileHeight;
-    return { col: (dx + dy) / 2, row: (dy - dx) / 2 };
+    const horizontal = {
+      x: GEOMETRY.right.x - GEOMETRY.back.x,
+      y: GEOMETRY.right.y - GEOMETRY.back.y
+    };
+    const vertical = {
+      x: GEOMETRY.left.x - GEOMETRY.back.x,
+      y: GEOMETRY.left.y - GEOMETRY.back.y
+    };
+    const fromBack = { x: x - GEOMETRY.back.x, y: y - GEOMETRY.back.y };
+    const determinant = horizontal.x * vertical.y - horizontal.y * vertical.x;
+    let u = (fromBack.x * vertical.y - fromBack.y * vertical.x) / determinant;
+    let v = (horizontal.x * fromBack.y - horizontal.y * fromBack.x) / determinant;
+
+    // Invert the bilinear quadrilateral. Keeping u/v unclamped is important:
+    // drag code needs to know that the pointer has moved beyond an edge.
+    for (let iteration = 0; iteration < 8; iteration += 1) {
+      const point = gridToScreen(u * GRID, v * GRID);
+      const errorX = x - point.x;
+      const errorY = y - point.y;
+      const derivativeU = {
+        x: (1 - v) * (GEOMETRY.right.x - GEOMETRY.back.x)
+          + v * (GEOMETRY.front.x - GEOMETRY.left.x),
+        y: (1 - v) * (GEOMETRY.right.y - GEOMETRY.back.y)
+          + v * (GEOMETRY.front.y - GEOMETRY.left.y)
+      };
+      const derivativeV = {
+        x: (1 - u) * (GEOMETRY.left.x - GEOMETRY.back.x)
+          + u * (GEOMETRY.front.x - GEOMETRY.right.x),
+        y: (1 - u) * (GEOMETRY.left.y - GEOMETRY.back.y)
+          + u * (GEOMETRY.front.y - GEOMETRY.right.y)
+      };
+      const jacobian = derivativeU.x * derivativeV.y - derivativeU.y * derivativeV.x;
+      if (Math.abs(jacobian) < 1e-9) break;
+      u += (errorX * derivativeV.y - errorY * derivativeV.x) / jacobian;
+      v += (derivativeU.x * errorY - derivativeU.y * errorX) / jacobian;
+    }
+
+    return { col: u * GRID, row: v * GRID };
   }
 
   function footprintFor(asset, facing = 0) {

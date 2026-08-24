@@ -42,6 +42,7 @@ button { font: inherit; }
   place-items: center;
   overflow: hidden;
   padding: 8px 12px;
+  container-type: size;
   background:
     radial-gradient(circle at 50% 36%, rgba(255, 248, 229, .92), transparent 53%),
     #ccb087;
@@ -49,8 +50,11 @@ button { font: inherit; }
 
 .room-stage {
   position: relative;
-  height: 100%;
+  width: 80vh;
+  width: 80.0285cqh;
   max-width: 100%;
+  max-height: 100%;
+  height: auto;
   aspect-ratio: var(--room-ratio);
   overflow: hidden;
   isolation: isolate;
@@ -87,17 +91,12 @@ button { font: inherit; }
   padding: 0;
   border: 0;
   background: transparent;
-  transform: translate(-50%, -50%);
+  transform: translate(var(--art-anchor-x, -50%), var(--art-anchor-y, -50%));
   transform-origin: 50% 90%;
   pointer-events: auto;
   touch-action: none;
   cursor: grab;
   -webkit-tap-highlight-color: transparent;
-}
-
-.room-item.anchor-ground {
-  transform: translate(-50%, -100%);
-  transform-origin: 50% 100%;
 }
 
 .room-item:active,

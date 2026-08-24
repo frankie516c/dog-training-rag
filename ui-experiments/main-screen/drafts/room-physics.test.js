@@ -12,8 +12,39 @@ const catalog = [
 {
   const point = physics.gridToScreen(3.25, 1.75);
   const grid = physics.screenToGrid(point.x, point.y);
-  assert.ok(Math.abs(grid.col - 3.25) < 1e-9);
-  assert.ok(Math.abs(grid.row - 1.75) < 1e-9);
+  assert.ok(Math.abs(grid.col - 3.25) < 1e-8);
+  assert.ok(Math.abs(grid.row - 1.75) < 1e-8);
+}
+
+{
+  const corners = [
+    [0, 0, physics.GEOMETRY.back],
+    [physics.GRID, 0, physics.GEOMETRY.right],
+    [physics.GRID, physics.GRID, physics.GEOMETRY.front],
+    [0, physics.GRID, physics.GEOMETRY.left]
+  ];
+  corners.forEach(([col, row, expected]) => {
+    const screen = physics.gridToScreen(col, row);
+    assert.ok(Math.abs(screen.x - expected.x) < 1e-9);
+    assert.ok(Math.abs(screen.y - expected.y) < 1e-9);
+    const grid = physics.screenToGrid(screen.x, screen.y);
+    assert.ok(Math.abs(grid.col - col) < 1e-8);
+    assert.ok(Math.abs(grid.row - row) < 1e-8);
+  });
+
+  for (let index = 0; index <= 20; index += 1) {
+    const col = (index * 1.73) % physics.GRID;
+    const row = (index * 2.41) % physics.GRID;
+    const screen = physics.gridToScreen(col, row);
+    const roundTrip = physics.screenToGrid(screen.x, screen.y);
+    assert.ok(Math.abs(roundTrip.col - col) < 1e-8);
+    assert.ok(Math.abs(roundTrip.row - row) < 1e-8);
+  }
+
+  const leftFrontCell = physics.gridToScreen(0.5, 5.5);
+  const deepestCell = physics.gridToScreen(5.5, 5.5);
+  assert.ok(leftFrontCell.x < 12, "the left floor strip must be placeable");
+  assert.ok(deepestCell.y > 89, "the front floor strip must be placeable");
 }
 
 {
