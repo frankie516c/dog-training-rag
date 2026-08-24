@@ -128,44 +128,51 @@ button { font: inherit; }
   filter: drop-shadow(0 8px 5px rgba(78, 51, 25, .24));
 }
 
+.room-item.is-invalid img {
+  filter:
+    drop-shadow(2px 0 0 #b84b3c)
+    drop-shadow(-2px 0 0 #b84b3c)
+    drop-shadow(0 2px 0 #b84b3c)
+    drop-shadow(0 -2px 0 #b84b3c);
+  opacity: .72;
+}
+
 .dog-walker {
   position: absolute;
-  left: 43%;
-  top: 75%;
+  left: 43.5%;
+  top: 67.75%;
   width: 13.5%;
+  aspect-ratio: 582 / 568;
   margin: 0;
   padding: 0;
   border: 0;
   background: transparent;
   transform: translate(-50%, -100%);
   transform-origin: 50% 100%;
-  transition:
-    left var(--walk-duration, 2.4s) linear,
-    top var(--walk-duration, 2.4s) linear;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
 .dog-facing {
   display: block;
+  width: 100%;
+  height: 100%;
   transform: scaleX(var(--facing, 1));
 }
 
-.dog-walker img {
+.dog-sprite {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: 33.333% 0;
+  background-size: 400% 100%;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  animation: dog-breathe 1.8s steps(6, end) infinite;
   pointer-events: none;
 }
 
-.dog-walker.is-walking img {
-  animation: dog-walk-step .27s steps(2, end) infinite;
-}
-
-.dog-walker.is-happy img {
+.dog-walker.is-happy .dog-sprite {
   animation: dog-happy .72s steps(7, end) 1;
 }
 
@@ -354,21 +361,11 @@ button { font: inherit; }
 .reset-button span { display: block; }
 .reset-button span:first-child { margin-bottom: 3px; font-size: 20px; color: var(--sage-dark); }
 
-@keyframes dog-breathe {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-2.4%) scale(.99, 1.015); }
-}
-
 @keyframes dog-happy {
   0%, 100% { transform: translateY(0) scale(1); }
   28% { transform: translateY(-13%) rotate(-2deg) scale(.98, 1.04); }
   52% { transform: translateY(-15%) rotate(2deg) scale(.98, 1.04); }
   76% { transform: translateY(2%) scale(1.04, .95); }
-}
-
-@keyframes dog-walk-step {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2.2%); }
 }
 
 @media (max-width: 640px) {
@@ -397,7 +394,7 @@ button { font: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   .dog-walker,
-  .dog-walker img,
-  .dog-walker.is-happy img,
+  .dog-sprite,
+  .dog-walker.is-happy .dog-sprite,
   .toast { transition: none; animation: none; }
 }
