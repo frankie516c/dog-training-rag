@@ -168,15 +168,19 @@
     return { left: Math.min(...intersections), right: Math.max(...intersections) };
   }
 
-  function floorBoxFits(asset, placement, gap = 0) {
+  function floorBoxBounds(asset, placement) {
     const bounds = visualBounds(asset, placement);
     const [leftPercent, topPercent, rightPercent, bottomPercent] = asset.floorBox || [0, 0, 100, 100];
-    const box = {
+    return {
       left: bounds.left + (bounds.right - bounds.left) * leftPercent / 100,
       right: bounds.left + (bounds.right - bounds.left) * rightPercent / 100,
       top: bounds.top + (bounds.bottom - bounds.top) * topPercent / 100,
       bottom: bounds.top + (bounds.bottom - bounds.top) * bottomPercent / 100
     };
+  }
+
+  function floorBoxFits(asset, placement, gap = 0) {
+    const box = floorBoxBounds(asset, placement);
     const topRange = floorHorizontalRange(box.top);
     const bottomRange = floorHorizontalRange(box.bottom);
     if (!topRange || !bottomRange) return false;
@@ -260,6 +264,7 @@
     visualBounds,
     boundsOverlap,
     floorHorizontalRange,
+    floorBoxBounds,
     floorBoxFits,
     depthKey,
     clampDog,

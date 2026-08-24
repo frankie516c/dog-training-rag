@@ -137,6 +137,9 @@
   const progressLabel = document.querySelector("#progressLabel");
   const roomHint = document.querySelector("#roomHint");
   const toast = document.querySelector("#toast");
+  const developerToggle = document.querySelector("#developerToggle");
+  const developerFloorOverlay = document.querySelector("#developerFloorOverlay");
+  const developerPanel = document.querySelector("#developerPanel");
   const dogWalker = document.querySelector("#dogWalker");
   const dogFacing = dogWalker.querySelector(".dog-facing");
   const dogSprite = document.querySelector("#dogSprite");
@@ -146,6 +149,18 @@
   let selectedId = null;
   let toastTimer;
   let lastFrameTime = 0;
+  let developerMode = false;
+
+  const DEBUG_COLORS = [
+    "#e64b35",
+    "#4d8fd6",
+    "#7f54c7",
+    "#d0921f",
+    "#2f9d74",
+    "#cc5a9b",
+    "#608d2d",
+    "#c26735"
+  ];
 
   const dog = {
     definition: getDogDefinition(state.dogId),
@@ -192,6 +207,176 @@
 
   function getDogDefinition(id) {
     return DOG_CATALOG.find((entry) => entry.id === id) || DOG_CATALOG[0];
+  }
+
+  function svgElement(tag, attributes = {}) {
+    const element = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    Object.entries(attributes).forEach(([name, value]) => element.setAttribute(name, String(value)));
+    return element;
+  }
+
+  function svgPoints(points) {
+    return points.map((point) => `${point.x},${point.y}`).join(" ");
+  }
+
+  function drawDeveloperGrid(fragment) {
+    const edge = svgElement("polygon", {
+      class: "dev-grid-edge",
+      points: svgPoints([
+        physics.GEOMETRY.back,
+        physics.GEOMETRY.right,
+        physics.GEOMETRY.front,
+        physics.GEOMETRY.left
+      ])
+    });
+    fragment.append(edge);
+
+    for (let index = 0; index <= physics.GRID; index += 1) {
+      const colStart = physics.gridToScreen(index, 0);
+      const colEnd = physics.gridToScreen(index, physics.GRID);
+      const rowStart = physics.gridToScreen(0, index);
+      const rowEnd = physics.gridToScreen(physics.GRID, index);
+      fragment.append(
+        svgElement("line", { class: "dev-grid-line", x1: colStart.x, y1: colStart.y, x2: colEnd.x, y2: colEnd.y }),
+        svgElement("line", { class: "dev-grid-line", x1: rowStart.x, y1: rowStart.y, x2: rowEnd.x, y2: rowEnd.y })
+      );
+
+      if (index % 2 === 0) {
+        const colLabel = svgElement("text", { class: "dev-axis-label", x: colStart.x + 0.25, y: colStart.y - 0.55 });
+        colLabel.textContent = `c${index}`;
+        const rowLabel = svgElement("text", { class: "dev-axis-label", x: rowStart.x - 2.7, y: rowStart.y + 0.3 });
+        rowLabel.textContent = `r${index}`;
+        fragment.append(colLabel, rowLabel);
+      }
+    }
+  }
+
+  function drawDeveloperItem(fragment, asset, placement, color, invalid = false) {
+    const footprint = physics.footprintFor(asset, placement.facing || 0);
+    const drawColor = invalid ? "#ff2d20" : color;
+    for (let dCol = 0; dCol < footprint.width; dCol += 1) {
+      for (let dRow = 0; dRow < footprint.height; dRow += 1) {
+        const col = placement.col + dCol;
+        const row = placement.row + dRow;
+        fragment.append(svgElement("polygon", {
+          class: "dev-footprint",
+          points: svgPoints([
+            physics.gridToScreen(col, row),
+            physics.gridToScreen(col + 1, row),
+            physics.gridToScreen(col + 1, row + 1),
+            physics.gridToScreen(col, row + 1)
+          ]),
+          fill: drawColor,
+          "fill-opacity": invalid ? 0.42 : asset.flat ? 0.2 : 0.28,
+          stroke: drawColor
+        }));
+      }
+    }
+
+    const visual = physics.visualBounds(asset, placement);
+    fragment.append(svgElement("rect", {
+      class: "dev-visual-box",
+      x: visual.left,
+      y: visual.top,
+      width: visual.right - visual.left,
+      height: visual.bottom - visual.top,
+      stroke: drawColor
+    }));
+
+    const floorBox = physics.floorBoxBounds(asset, placement);
+    fragment.append(svgElement("rect", {
+      class: "dev-floor-box",
+      x: floorBox.left,
+      y: floorBox.top,
+      width: floorBox.right - floorBox.left,
+      height: floorBox.bottom - floorBox.top
+    }));
+
+    const anchor = physics.placementAnchor(asset, placement);
+    fragment.append(svgElement("circle", {
+      class: "dev-anchor",
+      cx: anchor.x,
+      cy: anchor.y,
+      r: 0.52,
+      stroke: drawColor
+    }));
+    const label = svgElement("text", {
+      class: "dev-item-label",
+      x: anchor.x,
+      y: anchor.y - 1.25
+    });
+    label.textContent = `${invalid ? "× " : ""}${asset.label} [${placement.col},${placement.row}] ${footprint.width}×${footprint.height}`;
+    fragment.append(label);
+  }
+
+  function renderDeveloperPanel(entries, preview) {
+    developerPanel.replaceChildren();
+    const title = document.createElement("strong");
+    title.textContent = `실제 배치 좌표 · ${physics.GRID}×${physics.GRID}`;
+    const legend = document.createElement("span");
+    legend.textContent = "채움=점유 셀 / 색 파선=PNG 충돌 / 흰 점선=접지";
+    developerPanel.append(title, legend);
+
+    entries.forEach(([id, placement], index) => {
+      const asset = getAsset(id);
+      if (!asset) return;
+      const footprint = physics.footprintFor(asset, placement.facing || 0);
+      const bounds = physics.visualBounds(asset, placement);
+      const invalid = preview?.id === id && preview.valid === false;
+      const row = document.createElement("div");
+      row.className = "developer-row";
+      row.style.setProperty("--debug-color", invalid ? "#ff2d20" : DEBUG_COLORS[index % DEBUG_COLORS.length]);
+      const swatch = document.createElement("i");
+      const content = document.createElement("div");
+      const name = document.createElement("b");
+      name.textContent = `${asset.label}${invalid ? " · INVALID" : ""}`;
+      const grid = document.createElement("code");
+      grid.textContent = `col ${placement.col}, row ${placement.row} · ${footprint.width}×${footprint.height} cells`;
+      const visual = document.createElement("code");
+      visual.textContent = `PNG L${bounds.left.toFixed(1)} T${bounds.top.toFixed(1)} R${bounds.right.toFixed(1)} B${bounds.bottom.toFixed(1)}`;
+      const blocking = document.createElement("code");
+      blocking.textContent = asset.flat ? "가구 배치 차단 · 강아지 통과" : "가구 배치 + 강아지 이동 차단";
+      content.append(name, grid, visual, blocking);
+      row.append(swatch, content);
+      developerPanel.append(row);
+    });
+  }
+
+  function renderDeveloperOverlay(preview = null) {
+    if (!developerMode) return;
+    const entries = Object.entries(state.items).map(([id, placement]) => [
+      id,
+      preview?.id === id ? preview.placement : placement
+    ]);
+    const fragment = document.createDocumentFragment();
+    drawDeveloperGrid(fragment);
+    entries.forEach(([id, placement], index) => {
+      const asset = getAsset(id);
+      if (!asset) return;
+      drawDeveloperItem(
+        fragment,
+        asset,
+        placement,
+        DEBUG_COLORS[index % DEBUG_COLORS.length],
+        preview?.id === id && preview.valid === false
+      );
+    });
+    developerFloorOverlay.replaceChildren(fragment);
+    renderDeveloperPanel(entries, preview);
+  }
+
+  function setDeveloperMode(enabled) {
+    developerMode = enabled;
+    roomStage.classList.toggle("is-developer", enabled);
+    developerToggle.setAttribute("aria-pressed", String(enabled));
+    developerToggle.querySelector("b").textContent = enabled ? "ON" : "OFF";
+    if (enabled) {
+      renderDeveloperOverlay();
+      showToast("개발자 모드: 실제 점유 좌표를 표시합니다.");
+    } else {
+      developerFloorOverlay.replaceChildren();
+      developerPanel.replaceChildren();
+    }
   }
 
   function showToast(message) {
@@ -350,6 +535,7 @@
       moved ||= Math.hypot(moveEvent.clientX - event.clientX, moveEvent.clientY - event.clientY) > 4;
       positionElement(element, asset, preview);
       element.classList.toggle("is-invalid", !valid);
+      renderDeveloperOverlay({ id: asset.id, placement: preview, valid });
     }
 
     function end() {
@@ -408,6 +594,7 @@
     completeTask.disabled = state.progress >= CATALOG.length;
     completeTask.querySelector("b").textContent = state.progress >= CATALOG.length ? "모두 완료" : "훈련 완료";
     completeTask.querySelector("small").textContent = state.progress >= CATALOG.length ? "모든 소품을 받았어요" : "소품 하나 받기";
+    renderDeveloperOverlay();
   }
 
   completeTask.addEventListener("click", () => {
@@ -433,6 +620,13 @@
     if (event.target === roomStage || event.target.classList.contains("room-background")) {
       selectedId = null;
       render();
+    }
+  });
+
+  developerToggle.addEventListener("click", () => setDeveloperMode(!developerMode));
+  document.addEventListener("keydown", (event) => {
+    if (event.key.toLowerCase() === "d" && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      setDeveloperMode(!developerMode);
     }
   });
 
@@ -523,6 +717,7 @@
   dogSprite.style.backgroundSize = `${dog.definition.frameCount * 100}% 100%`;
   render();
   renderDog();
+  if (new URLSearchParams(location.search).get("debug") === "1") setDeveloperMode(true);
   if (!reducedMotion.matches) requestAnimationFrame(animationLoop);
 
   // A future breed picker only needs to change state.dogId and dog.definition.
