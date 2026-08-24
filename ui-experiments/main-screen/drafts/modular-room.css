@@ -54,35 +54,35 @@ button { font: inherit; }
 body[data-theme="cherry-blossom"] {
   --sage: #b97588;
   --sage-dark: #8f5065;
-  --scene-bg: #d3adb7;
+  --scene-bg: #d7b7bf;
   --scene-glow: rgba(255, 235, 240, .94);
 }
 
 body[data-theme="mint"] {
   --sage: #68a78f;
   --sage-dark: #467865;
-  --scene-bg: #a9c9b9;
+  --scene-bg: #b8d4c8;
   --scene-glow: rgba(234, 255, 246, .94);
 }
 
 body[data-theme="lavender"] {
   --sage: #927ab1;
   --sage-dark: #675485;
-  --scene-bg: #b9aacb;
+  --scene-bg: #c8bcd6;
   --scene-glow: rgba(247, 239, 255, .94);
 }
 
 body[data-theme="sky-blue"] {
   --sage: #6b9dbc;
   --sage-dark: #47738f;
-  --scene-bg: #a9c5d7;
+  --scene-bg: #bdd3e2;
   --scene-glow: rgba(236, 249, 255, .94);
 }
 
 body[data-theme="butter"] {
   --sage: #b89652;
   --sage-dark: #80662f;
-  --scene-bg: #d2bd87;
+  --scene-bg: #d9c997;
   --scene-glow: rgba(255, 248, 217, .94);
 }
 
@@ -209,89 +209,6 @@ body[data-theme="butter"] {
   pointer-events: none;
 }
 
-.room-theme-layer,
-.room-theme-layer span {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.room-theme-layer {
-  z-index: 1;
-  isolation: isolate;
-}
-
-.room-theme-wall,
-.room-theme-floor,
-.room-theme-door {
-  transition: background-color .24s ease, opacity .24s ease;
-}
-
-.room-theme-wall {
-  background: var(--theme-wall);
-  clip-path: polygon(0 0, 100% 0, 100% 71%, 56.5% 52%, 0 68.5%);
-  mix-blend-mode: color;
-  opacity: .58;
-}
-
-.room-theme-floor {
-  background: var(--theme-floor);
-  clip-path: polygon(0 68.5%, 56.5% 52%, 100% 71%, 43% 96.5%);
-  mix-blend-mode: color;
-  opacity: .62;
-}
-
-.room-theme-door {
-  inset: 39.2% auto auto 6.4% !important;
-  width: 12.6%;
-  height: 27.2%;
-  background: var(--theme-accent);
-  border-radius: 50% 50% 4% 4% / 17% 17% 2% 2%;
-  mix-blend-mode: color;
-  opacity: .78;
-}
-
-.room-theme-light {
-  background: radial-gradient(circle at 48% 38%, var(--theme-glow), transparent 52%);
-  mix-blend-mode: soft-light;
-  opacity: .55;
-}
-
-.room-stage[data-theme="cherry-blossom"] {
-  --theme-wall: #efb7c6;
-  --theme-floor: #d6a29a;
-  --theme-accent: #a95e76;
-  --theme-glow: #fff0f3;
-}
-
-.room-stage[data-theme="mint"] {
-  --theme-wall: #afd8c6;
-  --theme-floor: #aec8b0;
-  --theme-accent: #4f8b77;
-  --theme-glow: #ebfff6;
-}
-
-.room-stage[data-theme="lavender"] {
-  --theme-wall: #cdbce4;
-  --theme-floor: #bca9cf;
-  --theme-accent: #79629a;
-  --theme-glow: #f8f1ff;
-}
-
-.room-stage[data-theme="sky-blue"] {
-  --theme-wall: #b5d8ee;
-  --theme-floor: #a9c5d9;
-  --theme-accent: #4f83aa;
-  --theme-glow: #edf9ff;
-}
-
-.room-stage[data-theme="butter"] {
-  --theme-wall: #f1d991;
-  --theme-floor: #d3b275;
-  --theme-accent: #9b763d;
-  --theme-glow: #fff8d9;
-}
-
 .breed-picker,
 .theme-picker {
   position: absolute;
@@ -300,6 +217,7 @@ body[data-theme="butter"] {
   right: 5.2%;
   display: grid;
   gap: 4px;
+  width: 142px;
   min-width: 142px;
   padding: 8px 10px;
   color: var(--ink);
@@ -319,6 +237,7 @@ body[data-theme="butter"] {
 
 .breed-picker select,
 .theme-picker select {
+  width: 100%;
   min-width: 0;
   max-width: 170px;
   color: var(--sage-dark);
@@ -719,8 +638,8 @@ body[data-theme="butter"] {
   .reset-button span:last-child { display: none; }
   .room-hud { top: 3.5%; left: 4%; padding: 7px 9px; }
   .room-hud p { display: none; }
-  .breed-picker { top: 3.5%; right: 4%; min-width: 118px; padding: 6px 7px; }
-  .theme-picker { top: 12%; right: 4%; min-width: 118px; padding: 6px 7px; }
+  .breed-picker { top: 3.5%; right: 4%; width: 132px; min-width: 0; max-width: 42%; padding: 6px 7px; }
+  .theme-picker { top: 12%; right: 4%; width: 132px; min-width: 0; max-width: 42%; padding: 6px 7px; }
   .breed-picker select,
   .theme-picker select { max-width: 130px; }
 }

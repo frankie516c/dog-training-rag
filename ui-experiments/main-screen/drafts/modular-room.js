@@ -19,6 +19,7 @@
       category: "rug",
       label: "크림 러그",
       src: "../assets/modular-rug-v1-final.png",
+      themeFile: "rug-cream.png",
       width: 39,
       aspectRatio: 1155 / 620,
       artAnchor: [50, 50],
@@ -32,6 +33,7 @@
       category: "plant",
       label: "큰 화분",
       src: "../assets/modular-plant-v1-final.png",
+      themeFile: "plant.png",
       width: 9,
       aspectRatio: 667 / 1075,
       artAnchor: [50, 93],
@@ -45,6 +47,7 @@
       category: "doghouse",
       label: "강아지 집",
       src: "../assets/modular-doghouse-v1-final.png",
+      themeFile: "doghouse.png",
       width: 19.5,
       aspectRatio: 927 / 952,
       artAnchor: [50, 78],
@@ -56,8 +59,9 @@
     {
       id: "ball-sage",
       category: "toy",
-      label: "초록 공",
+      label: "공",
       src: "../assets/modular-ball-v1-final.png",
+      themeFile: "ball.png",
       width: 4.8,
       aspectRatio: 504 / 519,
       artAnchor: [50, 94],
@@ -69,8 +73,9 @@
     {
       id: "cabinet-sage",
       category: "cabinet",
-      label: "세이지 수납장",
+      label: "수납장",
       src: "../assets/modular-cabinet-v1-final.png",
+      themeFile: "cabinet.png",
       width: 22,
       aspectRatio: 890 / 874,
       artAnchor: [50, 77],
@@ -84,6 +89,7 @@
       category: "basket",
       label: "장난감 바구니",
       src: "../assets/modular-toy-basket-v1-final.png",
+      themeFile: "basket.png",
       width: 9,
       aspectRatio: 774 / 667,
       artAnchor: [50, 78],
@@ -97,6 +103,7 @@
       category: "feeding",
       label: "밥그릇 세트",
       src: "../assets/modular-feeding-bowls-v1-final.png",
+      themeFile: "bowls.png",
       width: 9,
       aspectRatio: 873 / 446,
       artAnchor: [50, 58],
@@ -108,8 +115,9 @@
     {
       id: "rug-sage",
       category: "rug",
-      label: "세이지 러그",
+      label: "패턴 러그",
       src: "../assets/modular-rug-sage-v1-final.png",
+      themeFile: "rug.png",
       width: 39,
       aspectRatio: 1156 / 622,
       artAnchor: [50, 50],
@@ -121,6 +129,7 @@
   ];
 
   const roomStage = document.querySelector("#roomStage");
+  const roomBackground = document.querySelector("#roomBackground");
   const roomItems = document.querySelector("#roomItems");
   const inventoryList = document.querySelector("#inventoryList");
   const completeTask = document.querySelector("#completeTask");
@@ -207,11 +216,16 @@
     return dogPresets.get(id);
   }
 
+  function themedAssetSource(asset) {
+    return asset.themeFile ? `../assets/themes/${state.themeId}/${asset.themeFile}` : asset.src;
+  }
+
   function applyTheme(id, persist = true) {
     const theme = roomThemes.get(id);
     state.themeId = theme.id;
     roomStage.dataset.theme = theme.id;
     document.body.dataset.theme = theme.id;
+    roomBackground.src = `../assets/themes/${theme.id}/room.png`;
     themePicker.value = theme.id;
     if (persist) saveState();
   }
@@ -512,7 +526,7 @@
     positionElement(button, asset, placement);
 
     const image = document.createElement("img");
-    image.src = asset.src;
+    image.src = themedAssetSource(asset);
     image.alt = asset.label;
     image.draggable = false;
     button.append(image);
@@ -594,7 +608,7 @@
       if (!unlocked) button.classList.add("is-locked");
       if (state.items[asset.id]) button.classList.add("is-active");
       const image = document.createElement("img");
-      image.src = asset.src;
+      image.src = themedAssetSource(asset);
       image.alt = "";
       const label = document.createElement("span");
       label.textContent = asset.label;
