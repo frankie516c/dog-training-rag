@@ -42,6 +42,7 @@ button { font: inherit; }
   place-items: center;
   overflow: hidden;
   padding: 8px 12px;
+  container-type: size;
   background:
     radial-gradient(circle at 50% 36%, rgba(255, 248, 229, .92), transparent 53%),
     #ccb087;
@@ -49,8 +50,11 @@ button { font: inherit; }
 
 .room-stage {
   position: relative;
-  height: 100%;
+  width: 80vh;
+  width: 80.0285cqh;
   max-width: 100%;
+  max-height: 100%;
+  height: auto;
   aspect-ratio: var(--room-ratio);
   overflow: hidden;
   isolation: isolate;
@@ -87,17 +91,12 @@ button { font: inherit; }
   padding: 0;
   border: 0;
   background: transparent;
-  transform: translate(-50%, -50%);
+  transform: translate(var(--art-anchor-x, -50%), var(--art-anchor-y, -50%));
   transform-origin: 50% 90%;
   pointer-events: auto;
   touch-action: none;
   cursor: grab;
   -webkit-tap-highlight-color: transparent;
-}
-
-.room-item.anchor-ground {
-  transform: translate(-50%, -100%);
-  transform-origin: 50% 100%;
 }
 
 .room-item:active,
@@ -128,44 +127,225 @@ button { font: inherit; }
   filter: drop-shadow(0 8px 5px rgba(78, 51, 25, .24));
 }
 
+.room-item.is-invalid img {
+  filter:
+    drop-shadow(2px 0 0 #b84b3c)
+    drop-shadow(-2px 0 0 #b84b3c)
+    drop-shadow(0 2px 0 #b84b3c)
+    drop-shadow(0 -2px 0 #b84b3c);
+  opacity: .72;
+}
+
 .dog-walker {
   position: absolute;
-  left: 43%;
-  top: 75%;
+  left: 43.5%;
+  top: 67.75%;
   width: 13.5%;
+  aspect-ratio: 582 / 568;
   margin: 0;
   padding: 0;
   border: 0;
   background: transparent;
   transform: translate(-50%, -100%);
   transform-origin: 50% 100%;
-  transition:
-    left var(--walk-duration, 2.4s) linear,
-    top var(--walk-duration, 2.4s) linear;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
 .dog-facing {
   display: block;
+  width: 100%;
+  height: 100%;
   transform: scaleX(var(--facing, 1));
 }
 
-.dog-walker img {
+.dog-sprite {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: 33.333% 0;
+  background-size: 400% 100%;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  animation: dog-breathe 1.8s steps(6, end) infinite;
   pointer-events: none;
 }
 
-.dog-walker.is-walking img {
-  animation: dog-walk-step .27s steps(2, end) infinite;
+.developer-floor-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1900;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
-.dog-walker.is-happy img {
+.room-stage.is-developer .developer-floor-overlay { display: block; }
+
+.room-stage.is-developer .room-item img { opacity: .72; }
+
+.dev-grid-line {
+  stroke: rgba(17, 70, 96, .8);
+  stroke-width: .28;
+  vector-effect: non-scaling-stroke;
+}
+
+.dev-grid-line.is-major {
+  stroke: #073e57;
+  stroke-width: .52;
+}
+
+.dev-grid-edge {
+  fill: rgba(81, 169, 210, .09);
+  stroke: #00658a;
+  stroke-width: .62;
+  vector-effect: non-scaling-stroke;
+}
+
+.dev-image-floor {
+  fill: none;
+  stroke: #ffd429;
+  stroke-width: .78;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 1px #2b2100);
+  vector-effect: non-scaling-stroke;
+}
+
+.dev-axis-label,
+.dev-item-label {
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, .96);
+  stroke-width: .58;
+  stroke-linejoin: round;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.dev-axis-label {
+  fill: #003f5a;
+  font-size: 1.48px;
+}
+
+.dev-item-label {
+  fill: #273119;
+  font-size: 1.52px;
+  text-anchor: middle;
+}
+
+.dev-footprint {
+  stroke-width: .38;
+  vector-effect: non-scaling-stroke;
+}
+
+.dev-visual-box {
+  fill: none;
+  stroke-width: .42;
+  stroke-dasharray: 1.25 .65;
+  vector-effect: non-scaling-stroke;
+}
+
+.dev-floor-box {
+  fill: rgba(255, 255, 255, .15);
+  stroke: #fff;
+  stroke-width: .36;
+  stroke-dasharray: .45 .45;
+  vector-effect: non-scaling-stroke;
+}
+
+.dev-anchor {
+  fill: #fff;
+  stroke-width: .28;
+  vector-effect: non-scaling-stroke;
+}
+
+.developer-toggle {
+  position: absolute;
+  z-index: 2200;
+  top: 4.7%;
+  right: 5.2%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 68px;
+  padding: 7px 9px;
+  color: #f8fff0;
+  background: #3f4a33;
+  border: 1px solid #26311e;
+  box-shadow: 2px 2px 0 rgba(48, 37, 24, .3);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.developer-toggle span { letter-spacing: .12em; }
+.developer-toggle b { color: #ffcb65; }
+
+.developer-toggle[aria-pressed="true"] {
+  color: #142711;
+  background: #b9ec85;
+  border-color: #315025;
+}
+
+.developer-toggle[aria-pressed="true"] b { color: #8e251e; }
+
+.developer-toggle:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+.developer-panel {
+  display: none;
+  position: absolute;
+  z-index: 2050;
+  top: 10.5%;
+  right: 5.2%;
+  width: min(218px, 43%);
+  max-height: 43%;
+  overflow: hidden;
+  padding: 8px;
+  color: #eef9e5;
+  background: rgba(27, 38, 24, .91);
+  border: 1px solid rgba(218, 245, 186, .78);
+  box-shadow: 3px 3px 0 rgba(22, 29, 18, .32);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 8.5px;
+  line-height: 1.35;
+  pointer-events: none;
+}
+
+.room-stage.is-developer .developer-panel { display: block; }
+
+.developer-panel strong,
+.developer-panel > span { display: block; }
+
+.developer-panel > span {
+  margin: 2px 0 6px;
+  color: #bfdaa7;
+}
+
+.developer-row {
+  display: grid;
+  grid-template-columns: 7px minmax(0, 1fr);
+  gap: 5px;
+  padding: 3px 0;
+  border-top: 1px solid rgba(218, 245, 186, .17);
+}
+
+.developer-row i {
+  width: 7px;
+  height: 7px;
+  margin-top: 2px;
+  background: var(--debug-color);
+}
+
+.developer-row b,
+.developer-row code { display: block; }
+.developer-row code { color: #d7e9c8; font: inherit; }
+
+.dog-walker.is-happy .dog-sprite {
   animation: dog-happy .72s steps(7, end) 1;
 }
 
@@ -354,21 +534,11 @@ button { font: inherit; }
 .reset-button span { display: block; }
 .reset-button span:first-child { margin-bottom: 3px; font-size: 20px; color: var(--sage-dark); }
 
-@keyframes dog-breathe {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-2.4%) scale(.99, 1.015); }
-}
-
 @keyframes dog-happy {
   0%, 100% { transform: translateY(0) scale(1); }
   28% { transform: translateY(-13%) rotate(-2deg) scale(.98, 1.04); }
   52% { transform: translateY(-15%) rotate(2deg) scale(.98, 1.04); }
   76% { transform: translateY(2%) scale(1.04, .95); }
-}
-
-@keyframes dog-walk-step {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2.2%); }
 }
 
 @media (max-width: 640px) {
@@ -397,7 +567,7 @@ button { font: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   .dog-walker,
-  .dog-walker img,
-  .dog-walker.is-happy img,
+  .dog-sprite,
+  .dog-walker.is-happy .dog-sprite,
   .toast { transition: none; animation: none; }
 }
