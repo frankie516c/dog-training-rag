@@ -52,17 +52,19 @@ FastAPI `/chat` 서비스, EvidenceCard 근거 계약, Next.js 채팅 UI는 main
   확장합니다. Neo4j에 연결하지 않고 `data/graph/` 아래의 추출 결과 파일을 직접
   읽습니다.
 - **하이브리드**: 벡터 후보 뒤에 그래프 후보를 추가하고 청크 단위로 중복을
-  제거합니다. 게이트 판정(PASS/REFUSE)은 벡터 `score_gap`만으로 내리고, 그래프
-  결과는 판정에 관여하지 않습니다.
+  제거합니다. 게이트 판정(PASS/REFUSE)은 벡터 신호 하나로만 내리고 그래프
+  결과는 관여하지 않습니다. 기본 신호는 2026-08-25부터 `margin_top5`이고
+  `score_gap`은 비교용 옵션(`--gate-signal score_gap`)으로 남아 있습니다.
 - **답변 생성**: 병합된 근거 후보를 LLM이 읽고 답변을 작성합니다.
 
 알려진 한계:
 
-- `score_gap` 게이트는 코퍼스가 커지면서 판별력이 흔들린 사례가 있어 운영
-  정책으로 확정하지 않았습니다.
-- GraphRAG는 현재 데모·평가 단계이며 FastAPI `/chat`과 연결되어 있지 않습니다.
-- GraphRAG가 반환하는 raw chunk와 EvidenceCard의 근거 계약은 아직 통합되지
-  않았습니다.
+- 게이트 기본 신호를 `score_gap`에서 `margin_top5`로 바꿨습니다(2026-08-25) —
+  `score_gap`이 코퍼스가 커지면서 판별력을 잃는 사례가 있었고 held-out 28건
+  기준 `margin_top5`가 92.9% 일치로 더 안정적이었습니다. `score_gap`은 비교용
+  옵션으로 남아 있습니다.
+- `scripts/generate_answers.py`의 답변 밴드 분류는 이 전환 범위 밖이라 여전히
+  `score_gap` 단독 기준입니다 — 게이트 신호와 밴드 신호가 서로 다릅니다.
 
 설계 결정과 근거는 [`docs/graph_hybrid_retrieval_design.md`](docs/graph_hybrid_retrieval_design.md),
 이관 시 재사용 판단은 [`docs/TEAM_HANDOFF.md`](docs/TEAM_HANDOFF.md)를 참고하세요.
