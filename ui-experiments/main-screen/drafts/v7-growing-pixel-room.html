@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>댕스 · Growing Pixel Room</title>
+  <link rel="stylesheet" href="./modular-room.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="scene-area" aria-label="꾸밀 수 있는 픽셀 아트 방">
+      <div class="room-stage" id="roomStage">
+        <img
+          class="room-background"
+          src="../assets/modular-empty-room-v1.png"
+          alt="아치형 창문과 올리브색 문이 있는 비어 있는 픽셀 아트 방"
+          draggable="false"
+        >
+
+        <div class="room-items" id="roomItems" aria-label="배치된 방 소품"></div>
+
+        <button class="dog-walker" id="dogWalker" type="button" aria-label="걷는 강아지와 놀기">
+          <span class="dog-facing">
+            <img id="dogSprite" src="../assets/modular-dog-v1-final.png" alt="크림색 토이푸들" draggable="false">
+          </span>
+        </button>
+
+        <div class="room-hud">
+          <div>
+            <strong>MY ROOM</strong>
+            <span id="progressLabel">방 성장도 0 / 8</span>
+          </div>
+          <p id="roomHint">훈련을 완료해서 첫 소품을 받아보세요.</p>
+        </div>
+
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="inventory" aria-label="방 꾸미기 인벤토리">
+      <button class="task-button" id="completeTask" type="button">
+        <span class="task-paw" aria-hidden="true">◆</span>
+        <span><b>훈련 완료</b><small>소품 하나 받기</small></span>
+      </button>
+
+      <div class="inventory-scroll" id="inventoryList"></div>
+
+      <button class="reset-button" id="resetRoom" type="button">
+        <span aria-hidden="true">↺</span>
+        <span>빈 방으로</span>
+      </button>
+    </section>
+  </main>
+
+  <script src="./modular-room.js"></script>
+</body>
+</html>
