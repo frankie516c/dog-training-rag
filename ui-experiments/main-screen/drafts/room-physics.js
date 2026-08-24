@@ -8,8 +8,9 @@
   // Browser port of the grid-footprint and axis-slide approach from
   // https://github.com/gayeoniee/isometric_test
   // (IsoMath, MiniRoomState, DogHerd, and ItemArt's per-asset anchors).
-  const GRID = 6;
+  const GRID = 16;
   const GEOMETRY = Object.freeze({
+    stageAspect: 1122 / 1402,
     // The generated v7 room is not a symmetric isometric diamond. These are
     // its four visible floor corners in room-stage percentages.
     back: Object.freeze({ x: 56, y: 52.5 }),
@@ -102,12 +103,12 @@
     return `${col},${row}`;
   }
 
-  function occupiedCells(items, catalog, excludeId = null) {
+  function occupiedCells(items, catalog, excludeId = null, includeFlat = false) {
     const occupied = new Set();
     Object.entries(items).forEach(([id, placement]) => {
       if (id === excludeId) return;
       const asset = catalog.find((entry) => entry.id === id);
-      if (!asset || asset.flat) return;
+      if (!asset || (asset.flat && !includeFlat)) return;
       const footprint = footprintFor(asset, placement.facing || 0);
       for (let dc = 0; dc < footprint.width; dc += 1) {
         for (let dr = 0; dr < footprint.height; dr += 1) {
@@ -131,19 +132,71 @@
     return true;
   }
 
+  function visualBounds(asset, placement) {
+    const anchor = placementAnchor(asset, placement);
+    const [anchorX, anchorY] = asset.artAnchor || [50, 50];
+    const width = asset.width;
+    const height = width * GEOMETRY.stageAspect / asset.aspectRatio;
+    return {
+      left: anchor.x - width * anchorX / 100,
+      right: anchor.x + width * (100 - anchorX) / 100,
+      top: anchor.y - height * anchorY / 100,
+      bottom: anchor.y + height * (100 - anchorY) / 100
+    };
+  }
+
+  function boundsOverlap(first, second, gap = 0) {
+    return first.left < second.right + gap
+      && first.right + gap > second.left
+      && first.top < second.bottom + gap
+      && first.bottom + gap > second.top;
+  }
+
+  function floorHorizontalRange(y) {
+    const corners = [GEOMETRY.back, GEOMETRY.right, GEOMETRY.front, GEOMETRY.left];
+    const intersections = [];
+    for (let index = 0; index < corners.length; index += 1) {
+      const first = corners[index];
+      const second = corners[(index + 1) % corners.length];
+      const low = Math.min(first.y, second.y);
+      const high = Math.max(first.y, second.y);
+      if (y < low || y > high || first.y === second.y) continue;
+      const ratio = (y - first.y) / (second.y - first.y);
+      intersections.push(first.x + (second.x - first.x) * ratio);
+    }
+    if (intersections.length < 2) return null;
+    return { left: Math.min(...intersections), right: Math.max(...intersections) };
+  }
+
+  function floorBoxFits(asset, placement, gap = 0) {
+    const bounds = visualBounds(asset, placement);
+    const [leftPercent, topPercent, rightPercent, bottomPercent] = asset.floorBox || [0, 0, 100, 100];
+    const box = {
+      left: bounds.left + (bounds.right - bounds.left) * leftPercent / 100,
+      right: bounds.left + (bounds.right - bounds.left) * rightPercent / 100,
+      top: bounds.top + (bounds.bottom - bounds.top) * topPercent / 100,
+      bottom: bounds.top + (bounds.bottom - bounds.top) * bottomPercent / 100
+    };
+    const topRange = floorHorizontalRange(box.top);
+    const bottomRange = floorHorizontalRange(box.bottom);
+    if (!topRange || !bottomRange) return false;
+    return box.left >= Math.max(topRange.left, bottomRange.left) + gap
+      && box.right <= Math.min(topRange.right, bottomRange.right) - gap;
+  }
+
   function depthKey(asset, placement) {
     const footprint = footprintFor(asset, placement.facing || 0);
     return placement.col + footprint.width - 1 + placement.row + footprint.height - 1;
   }
 
-  function clampDog(point, radius = 0.22) {
+  function clampDog(point, radius = 0.58) {
     return {
       x: Math.max(radius, Math.min(GRID - radius, point.x)),
       y: Math.max(radius, Math.min(GRID - radius, point.y))
     };
   }
 
-  function blockedAt(x, y, blocked, radius = 0.22) {
+  function blockedAt(x, y, blocked, radius = 0.58) {
     if (!blocked.size) return false;
     for (const dx of [-radius, radius]) {
       for (const dy of [-radius, radius]) {
@@ -155,7 +208,7 @@
 
   // Try each axis separately so a dog glides around a corner instead of
   // stopping or tunnelling through the obstacle on a diagonal step.
-  function slide(from, to, blocked, radius = 0.22) {
+  function slide(from, to, blocked, radius = 0.58) {
     let x = from.x;
     let y = from.y;
     if (!blockedAt(to.x, y, blocked, radius)) x = to.x;
@@ -180,9 +233,9 @@
     return best;
   }
 
-  function randomFreeSpot(blocked, random = Math.random, radius = 0.22) {
-    const low = 0.4;
-    const high = GRID - 0.4;
+  function randomFreeSpot(blocked, random = Math.random, radius = 0.58) {
+    const low = Math.max(1, radius + 0.15);
+    const high = GRID - low;
     for (let attempt = 0; attempt < 16; attempt += 1) {
       const point = {
         x: low + random() * (high - low),
@@ -204,6 +257,10 @@
     cellKey,
     occupiedCells,
     canPlace,
+    visualBounds,
+    boundsOverlap,
+    floorHorizontalRange,
+    floorBoxFits,
     depthKey,
     clampDog,
     blockedAt,

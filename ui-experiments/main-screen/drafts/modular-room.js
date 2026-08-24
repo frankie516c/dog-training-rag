@@ -4,7 +4,7 @@
   const physics = window.DaengsRoomPhysics;
   if (!physics) throw new Error("DaengsRoomPhysics must load before modular-room.js");
 
-  const STORAGE_KEY = "daengs.modular-room.v3";
+  const STORAGE_KEY = "daengs.modular-room.v4";
 
   // Adding the later 20 breeds means appending catalog entries with the same
   // frame contract. Size is deliberately constant per breed and never changes
@@ -15,10 +15,10 @@
       label: "크림 토이푸들",
       sheet: "../assets/modular-dog-poodle-walk-stable-v2.png",
       frameCount: 4,
-      fps: 8,
+      fps: 5,
       visualWidth: 13.5,
-      bodyRadius: 0.22,
-      speed: 0.72
+      bodyRadius: 0.58,
+      speed: 0.5
     }
   ];
 
@@ -28,22 +28,26 @@
       category: "rug",
       label: "크림 러그",
       src: "../assets/modular-rug-v1-final.png",
-      width: 40,
+      width: 39,
+      aspectRatio: 1155 / 620,
       artAnchor: [50, 50],
-      footprint: [3, 3],
+      floorBox: [6, 10, 94, 90],
+      footprint: [7, 7],
       flat: true,
-      defaultPlacement: { col: 2, row: 2, facing: 0 }
+      defaultPlacement: { col: 5, row: 6, facing: 0 }
     },
     {
       id: "plant-tall",
       category: "plant",
       label: "큰 화분",
       src: "../assets/modular-plant-v1-final.png",
-      width: 11.5,
+      width: 9,
+      aspectRatio: 667 / 1075,
       artAnchor: [50, 93],
-      footprint: [1, 1],
+      floorBox: [45, 92, 50, 99],
+      footprint: [1, 2],
       flat: false,
-      defaultPlacement: { col: 5, row: 1, facing: 0 }
+      defaultPlacement: { col: 15, row: 0, facing: 0 }
     },
     {
       id: "doghouse-sage",
@@ -51,10 +55,12 @@
       label: "강아지 집",
       src: "../assets/modular-doghouse-v1-final.png",
       width: 19.5,
+      aspectRatio: 927 / 952,
       artAnchor: [50, 78],
-      footprint: [2, 2],
+      floorBox: [42, 90, 50, 98],
+      footprint: [3, 4],
       flat: false,
-      defaultPlacement: { col: 4, row: 2, facing: 0 }
+      defaultPlacement: { col: 13, row: 3, facing: 0 }
     },
     {
       id: "ball-sage",
@@ -62,10 +68,12 @@
       label: "초록 공",
       src: "../assets/modular-ball-v1-final.png",
       width: 4.8,
+      aspectRatio: 504 / 519,
       artAnchor: [50, 94],
+      floorBox: [22, 72, 78, 98],
       footprint: [1, 1],
       flat: false,
-      defaultPlacement: { col: 3, row: 4, facing: 0 }
+      defaultPlacement: { col: 15, row: 12, facing: 0 }
     },
     {
       id: "cabinet-sage",
@@ -73,21 +81,25 @@
       label: "세이지 수납장",
       src: "../assets/modular-cabinet-v1-final.png",
       width: 22,
+      aspectRatio: 890 / 874,
       artAnchor: [50, 77],
-      footprint: [2, 1],
+      floorBox: [45, 90, 55, 98],
+      footprint: [5, 2],
       flat: false,
-      defaultPlacement: { col: 3, row: 0, facing: 0 }
+      defaultPlacement: { col: 0, row: 0, facing: 0 }
     },
     {
       id: "toy-basket",
       category: "basket",
       label: "장난감 바구니",
       src: "../assets/modular-toy-basket-v1-final.png",
-      width: 10,
+      width: 9,
+      aspectRatio: 774 / 667,
       artAnchor: [50, 78],
-      footprint: [1, 1],
+      floorBox: [7, 25, 93, 96],
+      footprint: [2, 2],
       flat: false,
-      defaultPlacement: { col: 1, row: 5, facing: 0 }
+      defaultPlacement: { col: 3, row: 13, facing: 0 }
     },
     {
       id: "feeding-bowls",
@@ -95,21 +107,25 @@
       label: "밥그릇 세트",
       src: "../assets/modular-feeding-bowls-v1-final.png",
       width: 9,
+      aspectRatio: 873 / 446,
       artAnchor: [50, 58],
-      footprint: [1, 1],
+      floorBox: [5, 12, 95, 92],
+      footprint: [2, 1],
       flat: false,
-      defaultPlacement: { col: 3, row: 3, facing: 0 }
+      defaultPlacement: { col: 11, row: 14, facing: 0 }
     },
     {
       id: "rug-sage",
       category: "rug",
       label: "세이지 러그",
       src: "../assets/modular-rug-sage-v1-final.png",
-      width: 40,
+      width: 39,
+      aspectRatio: 1156 / 622,
       artAnchor: [50, 50],
-      footprint: [3, 3],
+      floorBox: [6, 10, 94, 90],
+      footprint: [7, 7],
       flat: true,
-      defaultPlacement: { col: 2, row: 2, facing: 0 }
+      defaultPlacement: { col: 5, row: 6, facing: 0 }
     }
   ];
 
@@ -133,7 +149,7 @@
 
   const dog = {
     definition: getDogDefinition(state.dogId),
-    pos: { x: 1.5, y: 3.5 },
+    pos: { x: 4, y: 9 },
     target: null,
     restUntil: 0,
     moving: false,
@@ -186,7 +202,24 @@
   }
 
   function currentOccupied(excludeId = null) {
-    return physics.occupiedCells(state.items, CATALOG, excludeId);
+    return physics.occupiedCells(state.items, CATALOG, excludeId, true);
+  }
+
+  function currentBlocked() {
+    return physics.occupiedCells(state.items, CATALOG);
+  }
+
+  function placementIsValid(asset, placement, excludeId = null) {
+    if (!physics.canPlace(asset, placement, currentOccupied(excludeId))) return false;
+    if (!physics.floorBoxFits(asset, placement, 0.2)) return false;
+    const candidateBounds = physics.visualBounds(asset, placement);
+    return Object.entries(state.items).every(([id, existingPlacement]) => {
+      if (id === excludeId) return true;
+      const existingAsset = getAsset(id);
+      if (!existingAsset) return true;
+      const existingBounds = physics.visualBounds(existingAsset, existingPlacement);
+      return !physics.boundsOverlap(candidateBounds, existingBounds, 0.35);
+    });
   }
 
   function firstFreePlacement(asset) {
@@ -203,13 +236,12 @@
       const db = (b.col - midpoint) ** 2 + (b.row - midpoint) ** 2;
       return da - db || a.col + a.row - b.col - b.row;
     });
-    const occupied = currentOccupied();
-    return candidates.find((placement) => physics.canPlace(asset, placement, occupied)) || null;
+    return candidates.find((placement) => placementIsValid(asset, placement)) || null;
   }
 
   function validDefaultOrFree(asset) {
     const placement = physics.clampPlacement(asset, asset.defaultPlacement.col, asset.defaultPlacement.row, asset.defaultPlacement.facing);
-    return physics.canPlace(asset, placement, currentOccupied()) ? placement : firstFreePlacement(asset);
+    return placementIsValid(asset, placement) ? placement : firstFreePlacement(asset);
   }
 
   function addOrReplaceAsset(asset) {
@@ -228,6 +260,8 @@
       }
       placement = { ...existingPlacement };
       delete state.items[existingId];
+      placement = physics.clampPlacement(asset, placement.col, placement.row, placement.facing || 0);
+      if (!placementIsValid(asset, placement)) placement = firstFreePlacement(asset);
       showToast(`${asset.label}(으)로 교체되었어요.`);
     } else {
       placement = validDefaultOrFree(asset);
@@ -245,7 +279,7 @@
   }
 
   function itemDepth(asset, placement) {
-    return asset.flat ? 40 : 100 + physics.depthKey(asset, placement) * 100;
+    return asset.flat ? 40 : 100 + physics.depthKey(asset, placement) * 50;
   }
 
   function positionElement(element, asset, placement) {
@@ -312,7 +346,7 @@
       const dCol = Math.floor(current.col) - Math.floor(startPointer.col);
       const dRow = Math.floor(current.row) - Math.floor(startPointer.row);
       preview = physics.clampPlacement(asset, original.col + dCol, original.row + dRow, original.facing || 0);
-      valid = physics.canPlace(asset, preview, currentOccupied(asset.id));
+      valid = placementIsValid(asset, preview, asset.id);
       moved ||= Math.hypot(moveEvent.clientX - event.clientX, moveEvent.clientY - event.clientY) > 4;
       positionElement(element, asset, preview);
       element.classList.toggle("is-invalid", !valid);
@@ -387,7 +421,7 @@
   resetRoom.addEventListener("click", () => {
     state = initialState();
     dog.definition = getDogDefinition(state.dogId);
-    dog.pos = { x: 1.5, y: 3.5 };
+    dog.pos = { x: 4, y: 9 };
     dog.target = null;
     selectedId = null;
     saveState();
@@ -414,14 +448,14 @@
     dogWalker.style.left = `${point.x}%`;
     dogWalker.style.top = `${point.y}%`;
     dogWalker.style.width = `${dog.definition.visualWidth}%`;
-    dogWalker.style.zIndex = String(150 + depth * 100);
+    dogWalker.style.zIndex = String(150 + depth * 50);
     dogFacing.style.setProperty("--facing", dog.mirrored ? -1 : 1);
     dogWalker.classList.toggle("is-moving", dog.moving);
     setDogFrame(dog.moving ? Math.floor(dog.phase) : 1);
   }
 
   function updateDog(now, deltaSeconds) {
-    const blocked = currentOccupied();
+    const blocked = currentBlocked();
     const radius = dog.definition.bodyRadius;
     if (!dog.target) dog.target = physics.randomFreeSpot(blocked, Math.random, radius);
 
@@ -438,7 +472,7 @@
     const dy = dog.target.y - dog.pos.y;
     const distance = Math.hypot(dx, dy);
     if (distance < 0.06) {
-      dog.restUntil = now + 2500 + Math.random() * 5000;
+      dog.restUntil = now + 4000 + Math.random() * 6000;
       dog.target = physics.randomFreeSpot(blocked, Math.random, radius);
       dog.moving = false;
       return;
@@ -463,7 +497,7 @@
     if (Math.abs(screenDirection) > 0.0005) dog.mirrored = screenDirection < 0;
     dog.pos = next;
     dog.moving = true;
-    dog.phase += gained * 18;
+    dog.phase += deltaSeconds * dog.definition.fps;
   }
 
   function animationLoop(now) {

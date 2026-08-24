@@ -41,8 +41,8 @@ const catalog = [
     assert.ok(Math.abs(roundTrip.row - row) < 1e-8);
   }
 
-  const leftFrontCell = physics.gridToScreen(0.5, 5.5);
-  const deepestCell = physics.gridToScreen(5.5, 5.5);
+  const leftFrontCell = physics.gridToScreen(0.5, physics.GRID - 0.5);
+  const deepestCell = physics.gridToScreen(physics.GRID - 0.5, physics.GRID - 0.5);
   assert.ok(leftFrontCell.x < 12, "the left floor strip must be placeable");
   assert.ok(deepestCell.y > 89, "the front floor strip must be placeable");
 }
@@ -54,23 +54,68 @@ const catalog = [
   };
   const occupied = physics.occupiedCells(items, catalog);
   assert.deepEqual([...occupied].sort(), ["3,0", "4,0"]);
+  const placementOccupied = physics.occupiedCells(items, catalog, null, true);
+  assert.equal(placementOccupied.size, 11, "rug cells must be reserved for asset placement");
   assert.equal(physics.canPlace(catalog[2], { col: 3, row: 0, facing: 0 }, occupied), false);
   assert.equal(physics.canPlace(catalog[2], { col: 2, row: 2, facing: 0 }, occupied), true);
 }
 
 {
-  const wall = new Set(Array.from({ length: 6 }, (_, row) => physics.cellKey(2, row)));
-  const from = { x: 1.7, y: 1.2 };
-  const diagonal = physics.slide(from, { x: 2.1, y: 1.5 }, wall);
+  const floorAsset = {
+    width: 10,
+    aspectRatio: 1,
+    artAnchor: [50, 80],
+    floorBox: [10, 70, 90, 95],
+    footprint: [2, 2]
+  };
+  const first = physics.visualBounds(floorAsset, { col: 5, row: 7, facing: 0 });
+  const overlapping = physics.visualBounds(floorAsset, { col: 6, row: 7, facing: 0 });
+  const separate = physics.visualBounds(floorAsset, { col: 12, row: 2, facing: 0 });
+  assert.equal(physics.boundsOverlap(first, overlapping, 0.35), true);
+  assert.equal(physics.boundsOverlap(first, separate, 0.35), false);
+}
+
+{
+  const wall = new Set(Array.from({ length: physics.GRID }, (_, row) => physics.cellKey(2, row)));
+  const from = { x: 1.3, y: 1.2 };
+  const diagonal = physics.slide(from, { x: 1.7, y: 1.5 }, wall);
   assert.equal(diagonal.x, from.x, "blocked x axis must not cross the wall");
   assert.equal(diagonal.y, 1.5, "free y axis should slide along the wall");
-  assert.equal(physics.blockedAt(1.9, 1.5, wall), true, "body radius must catch the wall before the center enters");
+  assert.equal(physics.blockedAt(1.5, 1.5, wall), true, "body radius must catch the wall before the center enters");
 }
 
 {
   const blocked = new Set([physics.cellKey(2, 2)]);
   const free = physics.nearestFree({ x: 2.5, y: 2.5 }, blocked);
   assert.equal(blocked.has(physics.cellKey(Math.floor(free.x), Math.floor(free.y))), false);
+}
+
+{
+  const layout = [
+    { id: "rug", width: 39, aspectRatio: 1156 / 622, artAnchor: [50, 50], floorBox: [6, 10, 94, 90], footprint: [7, 7], flat: true, placement: { col: 5, row: 6, facing: 0 } },
+    { id: "plant", width: 9, aspectRatio: 667 / 1075, artAnchor: [50, 93], floorBox: [45, 92, 50, 99], footprint: [1, 2], flat: false, placement: { col: 15, row: 0, facing: 0 } },
+    { id: "house", width: 19.5, aspectRatio: 927 / 952, artAnchor: [50, 78], floorBox: [42, 90, 50, 98], footprint: [3, 4], flat: false, placement: { col: 13, row: 3, facing: 0 } },
+    { id: "ball", width: 4.8, aspectRatio: 504 / 519, artAnchor: [50, 94], floorBox: [22, 72, 78, 98], footprint: [1, 1], flat: false, placement: { col: 15, row: 12, facing: 0 } },
+    { id: "cabinet", width: 22, aspectRatio: 890 / 874, artAnchor: [50, 77], floorBox: [45, 90, 55, 98], footprint: [5, 2], flat: false, placement: { col: 0, row: 0, facing: 0 } },
+    { id: "basket", width: 9, aspectRatio: 774 / 667, artAnchor: [50, 78], floorBox: [7, 25, 93, 96], footprint: [2, 2], flat: false, placement: { col: 3, row: 13, facing: 0 } },
+    { id: "bowls", width: 9, aspectRatio: 873 / 446, artAnchor: [50, 58], floorBox: [5, 12, 95, 92], footprint: [2, 1], flat: false, placement: { col: 11, row: 14, facing: 0 } }
+  ];
+  const placed = {};
+
+  layout.forEach((asset, index) => {
+    const occupied = physics.occupiedCells(placed, layout, null, true);
+    assert.equal(physics.canPlace(asset, asset.placement, occupied), true, `${asset.id} footprint overlaps`);
+    assert.equal(physics.floorBoxFits(asset, asset.placement, 0.2), true, `${asset.id} leaves the floor`);
+    const bounds = physics.visualBounds(asset, asset.placement);
+    layout.slice(0, index).forEach((existing) => {
+      assert.equal(
+        physics.boundsOverlap(bounds, physics.visualBounds(existing, existing.placement), 0.35),
+        false,
+        `${asset.id} visually overlaps ${existing.id}`
+      );
+    });
+    placed[asset.id] = asset.placement;
+  });
 }
 
 {
@@ -82,9 +127,9 @@ const catalog = [
     physics.cellKey(4, 4)
   ]);
   const targets = [
-    { x: 5.5, y: 0.5 },
-    { x: 5.5, y: 5.5 },
-    { x: 0.5, y: 5.5 },
+    { x: physics.GRID - 0.5, y: 0.5 },
+    { x: physics.GRID - 0.5, y: physics.GRID - 0.5 },
+    { x: 0.5, y: physics.GRID - 0.5 },
     { x: 0.5, y: 0.5 }
   ];
   let dog = { x: 0.5, y: 0.5 };
