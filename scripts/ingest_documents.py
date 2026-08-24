@@ -33,7 +33,7 @@ from chunking_config import CHUNKING as _SHARED_CHUNKING
 
 CRAWL_ROOT = Path("../scrapper/data")
 MANUAL_DIR = CRAWL_ROOT / "manual"
-CRAWL_POOLS = ("blog_raw", "blog_raw_africaamc")
+CRAWL_POOLS = ("blog_raw", "blog_raw_africaamc", "blog_raw_newsource_0825", "blog_raw_fitpet")
 
 DEFAULT_DOC_DIR = Path("data/raw/documents")
 DEFAULT_CHUNK_DIR = Path("data/processed/documents/chunks")
@@ -163,6 +163,79 @@ MANIFEST = [
         "file": "salgoonews_kennel.md",
         "blog": "살구뉴스",
         "author": "유영지",
+    },
+    # Track E (2026-08-25) — a third independent blog, deliberately not more of
+    # yoonsu3454/africaamc. reports/new_source_procurement_0825.md. A 7th
+    # easiestip post (39230461, "화장실 배변 훈련") was dropped before it ever
+    # reached this list: its real content was a 216-char teaser stub, the rest
+    # was the site's related-post footer.
+    {
+        "doc_id": "easiestip-wait-training",
+        "slot": "vector-new-source-0825",
+        "origin": "crawl",
+        "crawl_id": "generic-m-easiestip-com-33662647",
+        "blog": "더벅한 강아지 (easiestip.com)",
+        "author": "더벅한 강아지",
+    },
+    {
+        "doc_id": "easiestip-kennel-training",
+        "slot": "vector-new-source-0825",
+        "origin": "crawl",
+        "crawl_id": "generic-m-easiestip-com-51729265",
+        "blog": "더벅한 강아지 (easiestip.com)",
+        "author": "더벅한 강아지",
+    },
+    {
+        "doc_id": "easiestip-separation-anxiety-hideseek",
+        "slot": "vector-new-source-0825",
+        "origin": "crawl",
+        "crawl_id": "generic-m-easiestip-com-66536148",
+        "blog": "더벅한 강아지 (easiestip.com)",
+        "author": "더벅한 강아지",
+    },
+    {
+        "doc_id": "easiestip-isolation-vs-separation-anxiety",
+        "slot": "vector-new-source-0825",
+        "origin": "crawl",
+        "crawl_id": "generic-m-easiestip-com-81848586",
+        "blog": "더벅한 강아지 (easiestip.com)",
+        "author": "더벅한 강아지",
+    },
+    {
+        "doc_id": "easiestip-bell-training",
+        "slot": "vector-new-source-0825",
+        "origin": "crawl",
+        "crawl_id": "generic-m-easiestip-com-88606952",
+        "blog": "더벅한 강아지 (easiestip.com)",
+        "author": "더벅한 강아지",
+    },
+    {
+        "doc_id": "easiestip-bark-on-command",
+        "slot": "vector-new-source-0825",
+        "origin": "crawl",
+        "crawl_id": "generic-m-easiestip-com-91597821",
+        "blog": "더벅한 강아지 (easiestip.com)",
+        "author": "더벅한 강아지",
+    },
+    # Handled and vetted 2026-08-24 (reports/graphrag_final_attempt_stage1_sourcing_0824.md),
+    # briefly ingested and rolled back with the rest of the failed 68-doc expansion
+    # (reports/corpus_expansion_0825.md), re-added here alone — a 4th independent
+    # voice (a pet-commerce company blog), not more volume from an existing one.
+    {
+        "doc_id": "fitpet-fence-training",
+        "slot": "vector-new-source-0825",
+        "origin": "crawl",
+        "crawl_id": "generic-www-fitpetmall-com-92633876",
+        "blog": "핏펫(Fitpet)",
+        "author": "핏펫",
+    },
+    {
+        "doc_id": "fitpet-potty-training",
+        "slot": "vector-new-source-0825",
+        "origin": "crawl",
+        "crawl_id": "generic-www-fitpetmall-com-81774060",
+        "blog": "핏펫(Fitpet)",
+        "author": "핏펫",
     },
 ]
 

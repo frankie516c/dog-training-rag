@@ -72,6 +72,21 @@ GATE_THRESHOLD = 0.024
 GATE_PASS = "PASS"
 GATE_REFUSE = "REFUSE"
 
+# Experimental alternatives to score_gap (docs/agenda_0825.md #1 — score_gap loses
+# discriminative power as the corpus grows: PASS 11/20 -> 20/20 across a 26->77
+# chunk expansion, and 20/20 again at 567 chunks in the corpus-expansion trial that
+# was rolled back 2026-08-25). NOT the default; opt in with --gate-signal.
+#
+# reports/retrieval_gate_redesign_0825.md found neither margin beats a trivial
+# always-REFUSE baseline on the 20-fixture owner set (14 REFUSE / 6 ANSWER, so
+# always-REFUSE already scores 14/20 = 70% by class imbalance alone) — these
+# thresholds are the in-sample optimum on that same 20 rows, not a cross-validated
+# operating point. They exist so the signal can be re-measured as fixtures grow,
+# not because they are ready to replace GATE_THRESHOLD.
+GATE_SIGNALS = ("score_gap", "margin_top2", "margin_top5")
+GATE_MARGIN_TOP2_THRESHOLD = 0.011  # in-sample optimum: 14/20 match, ties the always-REFUSE baseline
+GATE_MARGIN_TOP5_THRESHOLD = 0.0183  # in-sample optimum: 15/20 match, barely beats the baseline
+
 # Fixtures the acquisition was meant to unblock, and the slot that should do it.
 UNBLOCK_TARGETS = {
     "Q06": "3", "Q12": "1a", "Q13": "2", "Q14": "1b", "Q15": "1a", "Q16": "1a",
@@ -223,12 +238,35 @@ def score_stats(scores: Sequence[float]) -> dict[str, float | None]:
         "corpus_mean_score": serialize_score(mean),
         "score_gap": serialize_score(top1 - mean),
         "top1_minus_top2": serialize_score(top1 - ordered[1]) if len(ordered) > 1 else None,
+        "top1_minus_top5": serialize_score(top1 - ordered[4]) if len(ordered) >= 5 else None,
         "top5_std": serialize_score(statistics.pstdev(ordered[:5])) if len(ordered) >= 5 else None,
     }
 
 
 def gate(score_gap: float) -> str:
     return GATE_PASS if score_gap >= GATE_THRESHOLD else GATE_REFUSE
+
+
+def gate_verdict(stats: dict[str, Any], signal: str = "score_gap") -> str:
+    """Same PASS/REFUSE contract as gate(), generalized over GATE_SIGNALS.
+
+    signal='score_gap' reproduces gate(stats['score_gap']) exactly — this is the
+    default and the only signal wired into the demo path. The margin signals are
+    experimental (see the GATE_SIGNALS comment) and only reachable via --gate-signal.
+    """
+    if signal == "score_gap":
+        return gate(stats["score_gap"])
+    if signal == "margin_top2":
+        value = stats.get("top1_minus_top2")
+        threshold = GATE_MARGIN_TOP2_THRESHOLD
+    elif signal == "margin_top5":
+        value = stats.get("top1_minus_top5")
+        threshold = GATE_MARGIN_TOP5_THRESHOLD
+    else:
+        raise EvalError(f"unknown --gate-signal {signal!r}, expected one of {GATE_SIGNALS}")
+    if value is None:  # corpus too small for this rank (e.g. <5 chunks for top5)
+        return GATE_PASS
+    return GATE_PASS if value >= threshold else GATE_REFUSE
 
 
 def describe(chunk: dict[str, Any]) -> str:
@@ -363,6 +401,7 @@ def run(
     graph_extractions: Path = DEFAULT_GRAPH_EXTRACTIONS,
     graph_aliases: Path = DEFAULT_GRAPH_ALIASES,
     graph_off: bool = False,
+    gate_signal: str = "score_gap",
 ) -> dict[str, Any]:
     video_all = load_video_chunks(video_dir)
     video = [c for c in video_all if c.get("embedding_eligible")]
@@ -408,7 +447,7 @@ def run(
     fixture_rows = []
     for row in fixtures:
         ranked, stats = rank_one(str(row["question"]))
-        verdict = gate(stats["score_gap"])
+        verdict = gate_verdict(stats, gate_signal)
         # Both retrievers always run (no routing on query type); the gate decides
         # only whether the graph's chunks are admitted as evidence, and it never
         # sees them — score_gap above is computed from vector similarity alone.
@@ -460,7 +499,7 @@ def run(
         relevant = set(gold_relevant_chunks(row, video))
         ranked, stats = rank_one(str(row["question"]))
         first = next((r for r, (cid, _) in enumerate(ranked, start=1) if cid in relevant), None)
-        verdict = gate(stats["score_gap"])
+        verdict = gate_verdict(stats, gate_signal)
         graph_chunks = search_graph(str(row["question"]))
         evidence_ids = (
             hybrid_merge(ranked, graph_chunks) if verdict == GATE_PASS
@@ -912,6 +951,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--graph-aliases", type=Path, default=DEFAULT_GRAPH_ALIASES)
     parser.add_argument("--graph-off", action="store_true",
                         help="vector-only run, no graph search — for the vector-vs-hybrid comparison")
+    parser.add_argument("--gate-signal", choices=GATE_SIGNALS, default="score_gap",
+                        help="experimental (see GATE_SIGNALS comment) — default score_gap is the "
+                             "only signal the demo path uses; margin_top2/margin_top5 are for "
+                             "reports/retrieval_gate_redesign_0825.md-style comparison runs only")
     return parser
 
 
@@ -925,6 +968,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             graph_extractions=args.graph_extractions,
             graph_aliases=args.graph_aliases,
             graph_off=args.graph_off,
+            gate_signal=args.gate_signal,
         )
         dryrun = (
             {r["query_id"]: r for r in _rows(args.dryrun)} if args.dryrun.is_file() else {}
