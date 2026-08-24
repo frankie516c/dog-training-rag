@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Sequence
 
+from chunking_config import MAX_CHARS, MIN_CHARS, OVERLAP_SEGMENTS, TARGET_CHARS
 
 DEFAULT_LEDGER = Path("data/reviews/bodeum_youtube_manual_reviews.csv")
 DEFAULT_METADATA = Path("data/reviews/bodeum_youtube_metadata.csv")
@@ -42,10 +43,10 @@ class ChunkingConfig:
     always says which run produced it.
     """
 
-    target_chars: int = 420
-    min_chars: int = 150
-    max_chars: int = 480
-    overlap_segments: int = 0
+    target_chars: int = TARGET_CHARS
+    min_chars: int = MIN_CHARS
+    max_chars: int = MAX_CHARS
+    overlap_segments: int = OVERLAP_SEGMENTS
 
     def validate(self) -> None:
         if not (0 < self.min_chars <= self.target_chars <= self.max_chars):

@@ -1,0 +1,83 @@
+# 청킹 v4(대형 청크) 실험 — v3 유지로 결론
+
+측정일 2026-08-25. GraphRAG 폐기(`docs/decision_graphrag_abandoned_0824.md`) 이후,
+청크 크기가 더 이상 "그래프 추출 단위와 맞아야 한다"는 제약을 받지 않으므로 더 큰
+청크가 벡터 검색에 유리한지 재검증했다. Neo4j·OpenAI/Claude API 미사용(로컬 임베딩만).
+
+## 1. 토큰 검증 — v3(420/150/480)는 512토큰 한도에 여유가 큼
+
+`intfloat/multilingual-e5-base` 토크나이저로 현재 83청크(영상 26 + 문서 57, `passage: `
+프리픽스 포함) 전수를 확인.
+
+| 지표 | 문자 | 토큰 |
+|---|---:|---:|
+| min | 61 | 38 |
+| max | 480 | 323 |
+| mean | 316.5 | 179.2 |
+| median | 362 | 197 |
+
+512토큰 초과 0건. 관측된 char당 토큰 비율 최댓값 0.708 — 480자 최악 추정
+약 340토큰으로, 512 한도까지 약 170토큰(33%) 여유가 있다. **v3는 토큰 예산 관점에서
+더 키울 여지가 있었다.**
+
+## 2. v4(600/220/650) 실험 — 여유가 있다고 키운 결과는 오히려 악화
+
+같은 스크립트(`chunk_approved_youtube.py --target-chars 600 --min-chars 220
+--max-chars 650`, `ingest_documents.py`의 `CHUNKING`을 동일 값으로 monkeypatch)로
+83청크를 67청크(영상 20 + 문서 47)로 재청킹하고, `run_combined_retrieval_eval.py
+--graph-off`로 **동일 하네스·동일 질의셋**으로 v3와 재비교했다.
+
+| 설정 | 청크 수 | Hit@1 | Hit@5 | MRR@5 | owner 기대일치 |
+|---|---:|---:|---:|---:|---:|
+| v3 (420/150/480, 현행) | 83 | **0.667** | 0.75 | **0.708** | **7/20** |
+| v4 (600/220/650, 실험) | 67 | 0.5 | 0.75 | 0.590 | 5/20 |
+
+토큰 여유가 있다고 해서 청크를 키우면 안 된다 — **v4는 Hit@1·MRR·기대일치 세
+지표 모두 v3보다 나빴다.** 512토큰 안에 들어간다는 것과 검색 품질이 좋다는 것은
+별개 질문이었다.
+
+문서 쪽 상세: 헤딩이 있는 문서(`yd-patella-stages`, `salgoonews-kennel-steps`)는
+헤딩 경계가 char 예산보다 우선이라 v4에서도 "1단계"/"2단계" 같은 섹션이 그대로
+분리 유지됐다 — 즉 오늘 우려했던 "절차가 한 청크 안에서 잘린다"는 문제는 char
+예산을 키운다고 해결되지 않는다(헤딩 기반 문서에는 애초에 해당 안 됨). 오히려
+헤딩이 없어 char 기준으로만 쪼개지던 하드랩 블로그(`berrardog-*`,
+`africaamc-night-barking`)만 청크가 더 커졌는데, 정작 이 문서들은 절차형이
+아니라 서사형이라 청크를 키워도 얻는 게 적고 검색 정밀도만 떨어뜨렸을 가능성이
+있다(각 청크가 다루는 주제 폭이 넓어져 임베딩이 흐려짐 — 확정 아님, 이번 실험의
+해석).
+
+## 3. 결론 — v3(420/150/480) 유지
+
+**최종 채택: 기존 v3 값을 그대로 유지한다.** 근거: 실측 지표(Hit@1·MRR·기대일치)가
+전부 v3 우위. "절차형 콘텐츠가 다단계라 큰 청크가 유리할 것"이라는 가설은 이번
+실험으로 반박됐다 — 최소한 char 예산을 키우는 방식으로는 아니었다.
+
+## 4. 상수 통합 (리팩터링, 값 변경 없음)
+
+`chunk_approved_youtube.py`의 `ChunkingConfig` 기본값과 `ingest_documents.py`의
+`CHUNKING` 딕셔너리가 각자 `420/150/480/0`을 하드코딩하고 있던 것을
+`scripts/chunking_config.py`(신규) 하나로 통합했다. 두 스크립트 모두 여기서
+값을 import하며, 동작·출력은 리팩터링 전후로 동일함을 확인:
+
+- 영상 재청킹: 3개 파일 정상 생성, 오류 없음.
+- 문서 재청킹: "문서 6건 → 청크 57개" — 리팩터링 전 커밋된 수치와 동일.
+- `uv run python -m unittest discover -s tests -p "test_*.py"` — 278개 테스트 전부 통과.
+
+## 다음에 시도해볼 것 (이번엔 안 함)
+
+- **부모-자식(parent-child) 청킹**: 작은 청크로 검색하되 반환 시 부모(더 넓은 문맥)를
+  같이 주는 방식. `heading_path`가 이미 이를 위한 발판으로 기록되고 있음
+  (`ingest_documents.py` 주석 참고). 이번 실험은 "청크 자체를 키우는" 단순한
+  접근만 봤고, 이 대안은 시도하지 않았다.
+- 절차형 문서(STEP형)만 선별적으로 더 큰 청크를 쓰는 문서별 가변 설정 — 이번엔
+  전역 설정만 바꿔서 봤다.
+
+## 산출물
+
+- `scripts/chunking_config.py` (신규 공유 상수 모듈)
+- `scripts/chunk_approved_youtube.py`, `scripts/ingest_documents.py` (import로 전환,
+  동작 동일)
+- 실험용 스크래치(커밋 대상 아님): `data/scratch/token_check_v3.py`,
+  `data/scratch/token_check_v4.py`, `data/scratch/rechunk_docs_v4.py`,
+  `data/scratch/youtube_chunks_v4/`, `data/scratch/documents_chunks_v4/`,
+  `data/scratch/v3_recheck_*`, `data/scratch/v4_*`

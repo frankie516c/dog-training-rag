@@ -29,6 +29,8 @@ import sys
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 
+from chunking_config import CHUNKING as _SHARED_CHUNKING
+
 CRAWL_ROOT = Path("../scrapper/data")
 MANUAL_DIR = CRAWL_ROOT / "manual"
 CRAWL_POOLS = ("blog_raw", "blog_raw_africaamc")
@@ -39,9 +41,11 @@ DEFAULT_LOG = Path("data/processed/documents/ingest_log.json")
 
 CHUNK_SCHEMA_VERSION = "document-chunk-v1"
 
-# Same length contract as the v3 video chunking, so the combined corpus is one corpus
-# rather than two with different chunk sizes silently skewing every similarity score.
-CHUNKING = {"target_chars": 420, "min_chars": 150, "max_chars": 480, "overlap_segments": 0}
+# Same length contract as the video chunking (scripts/chunking_config.py), so the
+# combined corpus is one corpus rather than two with different chunk sizes silently
+# skewing every similarity score. A local copy, not the same dict object, so a test
+# harness can monkeypatch this module's CHUNKING without touching the shared default.
+CHUNKING = dict(_SHARED_CHUNKING)
 
 # --- header promotion -------------------------------------------------------
 #
