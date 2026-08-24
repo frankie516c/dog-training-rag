@@ -17,6 +17,7 @@ const catalog = [
 }
 
 {
+  assert.equal(physics.GEOMETRY.actualFloor.length, 6, "the PNG floor outline has two wall-to-lip joins");
   const corners = [
     [0, 0, physics.GEOMETRY.back],
     [physics.GRID, 0, physics.GEOMETRY.right],
@@ -74,9 +75,16 @@ const catalog = [
   assert.equal(physics.boundsOverlap(first, overlapping, 0.35), true);
   assert.equal(physics.boundsOverlap(first, separate, 0.35), false);
 
+  const basketAtEdge = {
+    width: 9,
+    aspectRatio: 774 / 667,
+    artAnchor: [50, 78],
+    floorBox: [7, 25, 93, 96],
+    footprint: [2, 2]
+  };
   const edgePlacement = { col: 0, row: physics.GRID - 2, facing: 0 };
-  assert.equal(physics.canPlace(floorAsset, edgePlacement, new Set()), true, "an in-grid footprint must be placeable at the floor edge");
-  assert.equal(physics.floorBoxFits(floorAsset, edgePlacement, 0.2), false, "the art box may overhang without overriding the grid boundary");
+  assert.equal(physics.canPlace(basketAtEdge, edgePlacement, new Set()), true, "an in-grid footprint must be placeable at the floor edge");
+  assert.equal(physics.floorBoxFits(basketAtEdge, edgePlacement, 0.2), false, "the art box may overhang without overriding the grid boundary");
 }
 
 {

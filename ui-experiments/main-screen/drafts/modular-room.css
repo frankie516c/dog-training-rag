@@ -186,15 +186,29 @@ button { font: inherit; }
 .room-stage.is-developer .room-item img { opacity: .72; }
 
 .dev-grid-line {
-  stroke: rgba(45, 74, 92, .48);
-  stroke-width: .16;
+  stroke: rgba(17, 70, 96, .8);
+  stroke-width: .28;
   vector-effect: non-scaling-stroke;
 }
 
+.dev-grid-line.is-major {
+  stroke: #073e57;
+  stroke-width: .52;
+}
+
 .dev-grid-edge {
-  fill: rgba(81, 145, 178, .06);
-  stroke: #184d67;
-  stroke-width: .34;
+  fill: rgba(81, 169, 210, .09);
+  stroke: #00658a;
+  stroke-width: .62;
+  vector-effect: non-scaling-stroke;
+}
+
+.dev-image-floor {
+  fill: none;
+  stroke: #ffd429;
+  stroke-width: .78;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 1px #2b2100);
   vector-effect: non-scaling-stroke;
 }
 
@@ -202,7 +216,7 @@ button { font: inherit; }
 .dev-item-label {
   paint-order: stroke;
   stroke: rgba(255, 255, 255, .96);
-  stroke-width: .42;
+  stroke-width: .58;
   stroke-linejoin: round;
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
   font-weight: 800;
@@ -210,32 +224,32 @@ button { font: inherit; }
 }
 
 .dev-axis-label {
-  fill: #174b63;
-  font-size: 1.25px;
+  fill: #003f5a;
+  font-size: 1.48px;
 }
 
 .dev-item-label {
   fill: #273119;
-  font-size: 1.4px;
+  font-size: 1.52px;
   text-anchor: middle;
 }
 
 .dev-footprint {
-  stroke-width: .24;
+  stroke-width: .38;
   vector-effect: non-scaling-stroke;
 }
 
 .dev-visual-box {
   fill: none;
-  stroke-width: .3;
-  stroke-dasharray: 1.1 .72;
+  stroke-width: .42;
+  stroke-dasharray: 1.25 .65;
   vector-effect: non-scaling-stroke;
 }
 
 .dev-floor-box {
   fill: rgba(255, 255, 255, .15);
   stroke: #fff;
-  stroke-width: .25;
+  stroke-width: .36;
   stroke-dasharray: .45 .45;
   vector-effect: non-scaling-stroke;
 }
@@ -297,7 +311,7 @@ button { font: inherit; }
   border: 1px solid rgba(218, 245, 186, .78);
   box-shadow: 3px 3px 0 rgba(22, 29, 18, .32);
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 8px;
+  font-size: 8.5px;
   line-height: 1.35;
   pointer-events: none;
 }

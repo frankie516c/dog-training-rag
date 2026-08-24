@@ -229,7 +229,13 @@
         physics.GEOMETRY.left
       ])
     });
-    fragment.append(edge);
+    fragment.append(
+      edge,
+      svgElement("polygon", {
+        class: "dev-image-floor",
+        points: svgPoints(physics.GEOMETRY.actualFloor)
+      })
+    );
 
     for (let index = 0; index <= physics.GRID; index += 1) {
       const colStart = physics.gridToScreen(index, 0);
@@ -237,8 +243,8 @@
       const rowStart = physics.gridToScreen(0, index);
       const rowEnd = physics.gridToScreen(physics.GRID, index);
       fragment.append(
-        svgElement("line", { class: "dev-grid-line", x1: colStart.x, y1: colStart.y, x2: colEnd.x, y2: colEnd.y }),
-        svgElement("line", { class: "dev-grid-line", x1: rowStart.x, y1: rowStart.y, x2: rowEnd.x, y2: rowEnd.y })
+        svgElement("line", { class: `dev-grid-line${index % 4 === 0 ? " is-major" : ""}`, x1: colStart.x, y1: colStart.y, x2: colEnd.x, y2: colEnd.y }),
+        svgElement("line", { class: `dev-grid-line${index % 4 === 0 ? " is-major" : ""}`, x1: rowStart.x, y1: rowStart.y, x2: rowEnd.x, y2: rowEnd.y })
       );
 
       if (index % 2 === 0) {
@@ -314,7 +320,7 @@
     const title = document.createElement("strong");
     title.textContent = `실제 배치 좌표 · ${physics.GRID}×${physics.GRID}`;
     const legend = document.createElement("span");
-    legend.textContent = "채움=바닥 경계 판정 / 색 파선=PNG 충돌 / 흰 점선=접지 참고";
+    legend.textContent = "노랑=실제 PNG 바닥 / 청록=논리 격자 / 채움=점유 셀";
     developerPanel.append(title, legend);
 
     entries.forEach(([id, placement], index) => {

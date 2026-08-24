@@ -11,12 +11,23 @@
   const GRID = 16;
   const GEOMETRY = Object.freeze({
     stageAspect: 1122 / 1402,
-    // The generated v7 room is not a symmetric isometric diamond. These are
-    // its four visible floor corners in room-stage percentages.
-    back: Object.freeze({ x: 56, y: 52.5 }),
-    right: Object.freeze({ x: 96, y: 70.3 }),
-    front: Object.freeze({ x: 44, y: 93 }),
-    left: Object.freeze({ x: 4, y: 72.5 })
+    // Pixel-calibrated against modular-empty-room-v1.png (1122x1402):
+    // B(635,758), R-wall(1104,983), R-lip(1073,1018), F(482,1325),
+    // L-lip(31,1019), L-wall(10,965).
+    // The image floor has short vertical joins on both sides, so its true
+    // outline is a hexagon while the placement grid remains quadrilateral.
+    back: Object.freeze({ x: 56.6, y: 54.1 }),
+    right: Object.freeze({ x: 98.4, y: 70.1 }),
+    front: Object.freeze({ x: 43, y: 94.5 }),
+    left: Object.freeze({ x: 0.9, y: 68.8 }),
+    actualFloor: Object.freeze([
+      Object.freeze({ x: 56.6, y: 54.1 }),
+      Object.freeze({ x: 98.4, y: 70.1 }),
+      Object.freeze({ x: 95.6, y: 72.6 }),
+      Object.freeze({ x: 43, y: 94.5 }),
+      Object.freeze({ x: 2.8, y: 72.7 }),
+      Object.freeze({ x: 0.9, y: 68.8 })
+    ])
   });
 
   function gridToScreen(col, row) {
@@ -153,7 +164,7 @@
   }
 
   function floorHorizontalRange(y) {
-    const corners = [GEOMETRY.back, GEOMETRY.right, GEOMETRY.front, GEOMETRY.left];
+    const corners = GEOMETRY.actualFloor;
     const intersections = [];
     for (let index = 0; index < corners.length; index += 1) {
       const first = corners[index];
