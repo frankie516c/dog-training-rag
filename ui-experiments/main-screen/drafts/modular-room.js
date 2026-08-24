@@ -5,10 +5,13 @@
   if (!physics) throw new Error("DaengsRoomPhysics must load before modular-room.js");
   const dogPresets = window.DaengsDogPresets;
   if (!dogPresets) throw new Error("DaengsDogPresets must load before modular-room.js");
+  const roomThemes = window.DaengsRoomThemes;
+  if (!roomThemes) throw new Error("DaengsRoomThemes must load before modular-room.js");
 
   const STORAGE_KEY = "daengs.modular-room.v4";
 
   const DOG_CATALOG = dogPresets.catalog;
+  const THEME_CATALOG = roomThemes.catalog;
 
   const CATALOG = [
     {
@@ -132,11 +135,14 @@
   const dogFacing = dogWalker.querySelector(".dog-facing");
   const dogSprite = document.querySelector("#dogSprite");
   const breedPicker = document.querySelector("#breedPicker");
+  const themePicker = document.querySelector("#themePicker");
 
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   let state = location.hash === "#full" ? fullPreviewState() : loadState();
   const requestedDogId = new URLSearchParams(location.search).get("dog");
   if (DOG_CATALOG.some((entry) => entry.id === requestedDogId)) state.dogId = requestedDogId;
+  const requestedThemeId = new URLSearchParams(location.search).get("theme");
+  if (THEME_CATALOG.some((entry) => entry.id === requestedThemeId)) state.themeId = requestedThemeId;
   let selectedId = null;
   let toastTimer;
   let lastFrameTime = 0;
@@ -164,7 +170,7 @@
   };
 
   function initialState() {
-    return { progress: 0, items: {}, dogId: DOG_CATALOG[0].id };
+    return { progress: 0, items: {}, dogId: DOG_CATALOG[0].id, themeId: THEME_CATALOG[0].id };
   }
 
   function fullPreviewState() {
@@ -173,7 +179,7 @@
       if (asset.category === "rug" && asset.id !== "rug-sage") return;
       items[asset.id] = { ...asset.defaultPlacement };
     });
-    return { progress: CATALOG.length, items, dogId: DOG_CATALOG[0].id };
+    return { progress: CATALOG.length, items, dogId: DOG_CATALOG[0].id, themeId: THEME_CATALOG[0].id };
   }
 
   function loadState() {
@@ -182,6 +188,7 @@
       if (!parsed || typeof parsed.progress !== "number" || typeof parsed.items !== "object") return initialState();
       parsed.progress = Math.max(0, Math.min(CATALOG.length, parsed.progress));
       parsed.dogId = DOG_CATALOG.some((entry) => entry.id === parsed.dogId) ? parsed.dogId : DOG_CATALOG[0].id;
+      parsed.themeId = THEME_CATALOG.some((entry) => entry.id === parsed.themeId) ? parsed.themeId : THEME_CATALOG[0].id;
       return parsed;
     } catch {
       return initialState();
@@ -198,6 +205,15 @@
 
   function getDogDefinition(id) {
     return dogPresets.get(id);
+  }
+
+  function applyTheme(id, persist = true) {
+    const theme = roomThemes.get(id);
+    state.themeId = theme.id;
+    roomStage.dataset.theme = theme.id;
+    document.body.dataset.theme = theme.id;
+    themePicker.value = theme.id;
+    if (persist) saveState();
   }
 
   function applyDogDefinition(id, persist = true) {
@@ -616,6 +632,7 @@
   resetRoom.addEventListener("click", () => {
     state = initialState();
     applyDogDefinition(state.dogId, false);
+    applyTheme(state.themeId, false);
     dog.pos = { x: 4, y: 9 };
     dog.target = null;
     selectedId = null;
@@ -636,6 +653,10 @@
     applyDogDefinition(breedPicker.value);
     renderDog();
     showToast(`${dog.definition.labelKo} 선택`);
+  });
+  themePicker.addEventListener("change", () => {
+    applyTheme(themePicker.value);
+    showToast(`${roomThemes.get(state.themeId).label} theme`);
   });
   document.addEventListener("keydown", (event) => {
     if (event.key.toLowerCase() === "d" && !event.ctrlKey && !event.metaKey && !event.altKey) {
@@ -732,11 +753,19 @@
     option.textContent = `${definition.labelKo} · ${definition.label}`;
     breedPicker.append(option);
   });
+  THEME_CATALOG.forEach((theme) => {
+    const option = document.createElement("option");
+    option.value = theme.id;
+    option.textContent = `${theme.labelKo} · ${theme.label}`;
+    themePicker.append(option);
+  });
   applyDogDefinition(state.dogId, false);
+  applyTheme(state.themeId, false);
   render();
   renderDog();
   if (new URLSearchParams(location.search).get("debug") === "1") setDeveloperMode(true);
   if (!reducedMotion.matches) requestAnimationFrame(animationLoop);
 
   window.DaengsDogCatalog = DOG_CATALOG;
+  window.DaengsRoomThemeCatalog = THEME_CATALOG;
 })();

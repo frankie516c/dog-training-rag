@@ -16,6 +16,12 @@
           alt="아치형 창문과 올리브색 문이 있는 비어 있는 픽셀 아트 방"
           draggable="false"
         >
+        <div class="room-theme-layer" aria-hidden="true">
+          <span class="room-theme-wall"></span>
+          <span class="room-theme-floor"></span>
+          <span class="room-theme-door"></span>
+          <span class="room-theme-light"></span>
+        </div>
 
         <div class="room-items" id="roomItems" aria-label="배치된 방 소품"></div>
         <svg
@@ -35,6 +41,11 @@
         <label class="breed-picker" for="breedPicker">
           <span>MY DOG</span>
           <select id="breedPicker" aria-label="강아지 견종 선택"></select>
+        </label>
+
+        <label class="theme-picker" for="themePicker">
+          <span>ROOM THEME</span>
+          <select id="themePicker" aria-label="방 테마 선택"></select>
         </label>
 
         <div class="room-hud">
@@ -78,6 +89,7 @@
 
   <script src="./room-physics.js"></script>
   <script src="./dog-presets.js"></script>
+  <script src="./room-themes.js"></script>
   <script src="./modular-room.js"></script>
 </body>
 </html>
