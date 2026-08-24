@@ -1,5 +1,14 @@
 """Rank the owner fixtures and the gold queries against the video+document corpus.
 
+Graph/hybrid path DEPRECATED (2026-08-24): see docs/decision_graphrag_abandoned_0824.md
+— reports/retrieval_perf_graph_vs_vector_0824.md measured 0/32 queries where the
+graph candidates changed top_k, gate, or rank, which this docstring's own design
+(gate decided from vector ranked[] alone, graph chunks merged in after) makes
+structural rather than a sampling artifact. --graph-off (vector-only) remains the
+live path; kept here rather than split out to preserve the A/B comparison history.
+
+
+
 One code path for both query sets. The point of the acquisition was to change what
 the corpus can answer, and score_gap is measured against the corpus mean, so every
 number moves when documents land — including for questions the documents have

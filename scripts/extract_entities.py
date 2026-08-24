@@ -1,5 +1,9 @@
 """Extract entities and relations from corpus chunks for the GraphRAG pilot.
 
+DEPRECATED (2026-08-24): GraphRAG was abandoned for this repo — see
+docs/decision_graphrag_abandoned_0824.md. Kept, not deleted, as methodological
+evidence of how that decision was reached.
+
 Stage 1 runs a hand-picked set of chunks so a person can read every extraction
 before 77 of them exist. The set is written out in STAGE1_CHUNK_IDS rather than
 sampled, because the point is to cover specific hard cases — an ASR-corrupted

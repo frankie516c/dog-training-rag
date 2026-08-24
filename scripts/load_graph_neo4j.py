@@ -1,5 +1,9 @@
 """Load the stage 2 extraction into Neo4j for the GraphRAG demo.
 
+DEPRECATED (2026-08-24): GraphRAG was abandoned for this repo — see
+docs/decision_graphrag_abandoned_0824.md. Kept, not deleted, as methodological
+evidence of how that decision was reached.
+
 Node identity is (name, type), not name alone: 증상 "통증" and 문제행동 "통증" are
 different things in this schema and merging them would invent an edge that no
 chunk supports. Edges are MERGEd on (source, type, target) so re-running the
