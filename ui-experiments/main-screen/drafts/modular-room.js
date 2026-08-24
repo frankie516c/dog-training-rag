@@ -3,24 +3,12 @@
 
   const physics = window.DaengsRoomPhysics;
   if (!physics) throw new Error("DaengsRoomPhysics must load before modular-room.js");
+  const dogPresets = window.DaengsDogPresets;
+  if (!dogPresets) throw new Error("DaengsDogPresets must load before modular-room.js");
 
   const STORAGE_KEY = "daengs.modular-room.v4";
 
-  // Adding the later 20 breeds means appending catalog entries with the same
-  // frame contract. Size is deliberately constant per breed and never changes
-  // between idle/walk states.
-  const DOG_CATALOG = [
-    {
-      id: "toy-poodle",
-      label: "크림 토이푸들",
-      sheet: "../assets/modular-dog-poodle-walk-stable-v2.png",
-      frameCount: 4,
-      fps: 5,
-      visualWidth: 13.5,
-      bodyRadius: 0.58,
-      speed: 0.5
-    }
-  ];
+  const DOG_CATALOG = dogPresets.catalog;
 
   const CATALOG = [
     {
@@ -143,9 +131,12 @@
   const dogWalker = document.querySelector("#dogWalker");
   const dogFacing = dogWalker.querySelector(".dog-facing");
   const dogSprite = document.querySelector("#dogSprite");
+  const breedPicker = document.querySelector("#breedPicker");
 
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   let state = location.hash === "#full" ? fullPreviewState() : loadState();
+  const requestedDogId = new URLSearchParams(location.search).get("dog");
+  if (DOG_CATALOG.some((entry) => entry.id === requestedDogId)) state.dogId = requestedDogId;
   let selectedId = null;
   let toastTimer;
   let lastFrameTime = 0;
@@ -206,7 +197,19 @@
   }
 
   function getDogDefinition(id) {
-    return DOG_CATALOG.find((entry) => entry.id === id) || DOG_CATALOG[0];
+    return dogPresets.get(id);
+  }
+
+  function applyDogDefinition(id, persist = true) {
+    state.dogId = getDogDefinition(id).id;
+    dog.definition = getDogDefinition(state.dogId);
+    dog.target = null;
+    dogSprite.style.backgroundImage = `url("${dog.definition.sheet}")`;
+    dogSprite.style.backgroundSize = `${dog.definition.frameCount * 100}% 100%`;
+    dogWalker.setAttribute("aria-label", `${dog.definition.labelKo} 강아지와 놀기`);
+    dogSprite.setAttribute("aria-label", dog.definition.labelKo);
+    breedPicker.value = dog.definition.id;
+    if (persist) saveState();
   }
 
   function svgElement(tag, attributes = {}) {
@@ -612,7 +615,7 @@
 
   resetRoom.addEventListener("click", () => {
     state = initialState();
-    dog.definition = getDogDefinition(state.dogId);
+    applyDogDefinition(state.dogId, false);
     dog.pos = { x: 4, y: 9 };
     dog.target = null;
     selectedId = null;
@@ -629,6 +632,11 @@
   });
 
   developerToggle.addEventListener("click", () => setDeveloperMode(!developerMode));
+  breedPicker.addEventListener("change", () => {
+    applyDogDefinition(breedPicker.value);
+    renderDog();
+    showToast(`${dog.definition.labelKo} 선택`);
+  });
   document.addEventListener("keydown", (event) => {
     if (event.key.toLowerCase() === "d" && !event.ctrlKey && !event.metaKey && !event.altKey) {
       setDeveloperMode(!developerMode);
@@ -718,13 +726,17 @@
     setTimeout(() => dogWalker.classList.remove("is-happy"), 760);
   });
 
-  dogSprite.style.backgroundImage = `url("${dog.definition.sheet}")`;
-  dogSprite.style.backgroundSize = `${dog.definition.frameCount * 100}% 100%`;
+  DOG_CATALOG.forEach((definition) => {
+    const option = document.createElement("option");
+    option.value = definition.id;
+    option.textContent = `${definition.labelKo} · ${definition.label}`;
+    breedPicker.append(option);
+  });
+  applyDogDefinition(state.dogId, false);
   render();
   renderDog();
   if (new URLSearchParams(location.search).get("debug") === "1") setDeveloperMode(true);
   if (!reducedMotion.matches) requestAnimationFrame(animationLoop);
 
-  // A future breed picker only needs to change state.dogId and dog.definition.
-  window.DaengsDogCatalog = Object.freeze(DOG_CATALOG.map((entry) => Object.freeze({ ...entry })));
+  window.DaengsDogCatalog = DOG_CATALOG;
 })();
