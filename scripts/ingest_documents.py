@@ -39,7 +39,55 @@ DEFAULT_DOC_DIR = Path("data/raw/documents")
 DEFAULT_CHUNK_DIR = Path("data/processed/documents/chunks")
 DEFAULT_LOG = Path("data/processed/documents/ingest_log.json")
 
-CHUNK_SCHEMA_VERSION = "document-chunk-v1"
+CHUNK_SCHEMA_VERSION = "document-chunk-v2"
+
+# --- v2에서 바뀐 것: chunk_id가 정체성 기반이 됐다 -------------------------
+#
+# v1의 문서 chunk_id는 `sha256(text)` — 텍스트만 들어갔다. 그래서 동일 텍스트가
+# 두 곳에 나오면 같은 id가 나왔고, 그 청크에 `qa_id`나 `segment_role` 같은
+# 정체성 값을 매달 수 없었다(어느 쪽 값을 줄지 결정 불가, 게다가 에러 없이
+# 조용히 깨진다).
+#
+# v2는 영상 청커(`chunk_approved_youtube.py: make_chunk_id`)가 원래 쓰던 방식을
+# 따른다 — 정체성 payload를 정규화해 해시한다. 새로 만든 규약이 아니라 이미
+# 이 저장소에서 검증된 규약으로 문서를 맞춘 것이다.
+#
+# payload에 `text_sha256`을 함께 넣는 이유: 문서에는 영상의 start_ms/end_ms처럼
+# 원본 구간을 고정해주는 것이 없다. doc_id+chunk_index만으로는 원문에 문단이
+# 삽입돼 청크 경계가 밀려도 chunk_index가 그대로라 **id는 같은데 내용은 다른**
+# 상태가 조용히 만들어진다. 텍스트 해시를 넣어 내용 변경이 반드시 id 변경으로
+# 드러나게 한다.
+#
+# 이 전환은 문서 청크 id를 전부 바꾼다. 랭킹 동점이 chunk_id로 깨지므로
+# (`run_combined_retrieval_eval.py: rank_scores`) 순위가 흔들릴 수 있는데,
+# 전환 전 실측에서 48개 픽스처·254청크 전역에 동점이 0건이라 영향이 없음을
+# 확인했다(data/scratch/tie_check.py).
+CHUNK_ID_PAYLOAD_KEYS = (
+    "schema_version", "doc_id", "chunk_index", "qa_id", "segment_role",
+    "text_sha256", "target_chars", "min_chars", "max_chars", "overlap_segments",
+)
+
+# --- 권위 계약 기본값 -------------------------------------------------------
+#
+# Q&A가 아닌 일반 문서는 전부 DIRECT/인용가능이다. 역할 분리가 필요한 것은
+# 견주 질문과 훈련사 답변이 한 문서에 섞이는 Q&A 소스뿐이다.
+# 자세한 배경은 docs/design_qa_authority_retrieval.md 참조.
+AUTHORITY_DIRECT = "DIRECT"
+AUTHORITY_CONTEXT_ONLY = "CONTEXT_ONLY"
+ROLE_DOCUMENT_BODY = "DOCUMENT_BODY"
+ROLE_OWNER_QUESTION = "OWNER_QUESTION"
+ROLE_EXPERT_ANSWER = "EXPERT_ANSWER"
+
+AUTHORITY_BY_ROLE = {
+    ROLE_DOCUMENT_BODY: {"authority": AUTHORITY_DIRECT,
+                         "citation_allowed": True, "retrieval_allowed": True},
+    ROLE_EXPERT_ANSWER: {"authority": AUTHORITY_DIRECT,
+                         "citation_allowed": True, "retrieval_allowed": True},
+    # 견주 발화는 사용자 사례 맥락이지 훈련 권고가 아니다. 검색은 되되 인용은
+    # 금지 — 견주가 "해봤는데 효과 없었다"고 적은 방법이 권고로 인용되면 안 된다.
+    ROLE_OWNER_QUESTION: {"authority": AUTHORITY_CONTEXT_ONLY,
+                          "citation_allowed": False, "retrieval_allowed": True},
+}
 
 # Same length contract as the video chunking (scripts/chunking_config.py), so the
 # combined corpus is one corpus rather than two with different chunk sizes silently
@@ -440,8 +488,22 @@ def split_chars(text: str, settings: dict[str, int] = CHUNKING, reserved: int = 
     return [c for c in chunks if c.strip()]
 
 
-def chunk_id_for(text: str) -> str:
-    return "docchunk-" + hashlib.sha256(text.encode("utf-8")).hexdigest()
+def chunk_id_for(payload: dict[str, Any]) -> str:
+    """정체성 payload를 정규화해 해시한다 (v2).
+
+    영상 청커의 `make_chunk_id`와 같은 규약이다 — 키 순서를 고정해 정규화하고
+    해시한다. payload에 키를 더하거나 순서를 바꾸면 모든 id가 바뀌므로,
+    `CHUNK_ID_PAYLOAD_KEYS`를 단일 출처로 두고 여기서만 조립한다.
+    """
+    ordered = {key: payload[key] for key in CHUNK_ID_PAYLOAD_KEYS}
+    canonical = json.dumps(
+        ordered, ensure_ascii=False, separators=(",", ":"), sort_keys=False
+    ).encode("utf-8")
+    return "docchunk-" + hashlib.sha256(canonical).hexdigest()
+
+
+def text_sha256(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
 def build_chunks(
@@ -486,9 +548,24 @@ def build_chunks(
         pieces = split_chars(body, reserved=len(breadcrumb) + 1) if body else [""]
         for piece in pieces:
             text = f"{breadcrumb}\n{piece}".strip()
+            # Q&A 소스가 아닌 일반 문서는 전부 DOCUMENT_BODY다. 역할이 갈리는
+            # 것은 견주 질문과 훈련사 답변이 한 문서에 섞이는 Q&A뿐이다.
+            role = entry.get("segment_role", ROLE_DOCUMENT_BODY)
+            qa_id = entry.get("qa_id")
+            authority = AUTHORITY_BY_ROLE[role]
+            payload = {
+                "schema_version": CHUNK_SCHEMA_VERSION,
+                "doc_id": entry["doc_id"],
+                "chunk_index": index,
+                "qa_id": qa_id,
+                "segment_role": role,
+                "text_sha256": text_sha256(text),
+                **{k: CHUNKING[k] for k in
+                   ("target_chars", "min_chars", "max_chars", "overlap_segments")},
+            }
             records.append({
                 "schema_version": CHUNK_SCHEMA_VERSION,
-                "chunk_id": chunk_id_for(text),
+                "chunk_id": chunk_id_for(payload),
                 "doc_id": entry["doc_id"],
                 "chunk_index": index,
                 "source_url": entry["source_url"],
@@ -499,6 +576,10 @@ def build_chunks(
                 "char_count": len(text),
                 "embedding_eligible": True,
                 "chunking": dict(CHUNKING),
+                # 권위 계약. 이 필드를 읽는 코드는 변경 2·3에서 붙는다.
+                "qa_id": qa_id,
+                "segment_role": role,
+                **authority,
             })
             index += 1
         outline.append("{}{} [{}청크]".format(

@@ -26,11 +26,11 @@
     "documents": {
       "chunks": 219,
       "documents": 17,
-      "fingerprint": "sha256:544ed101e11830278584652b9f2ad9fff95bbf7ddd8bb6010b750d8680bfafbb"
+      "fingerprint": "sha256:a1b43672c13f61e38c8d6ef2d9722a27ed5ea9c685853ae9246a11252b2e7e2b"
     },
     "combined": {
       "chunks": 245,
-      "fingerprint": "sha256:35733cac84152ec0895da6399afaaa7d55b392bf1a3863e1a219cb5b5ebd3fc6"
+      "fingerprint": "sha256:3085d09cd6c9406f2069d97f489e9dc131e72cc1404652580d1c2f6e2e2ebc03"
     }
   },
   "owner_fixtures": [
@@ -55,7 +55,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-539af55e418e772065ba32ec4d49ba53f716122e2e878432a9d474c221a28d2c",
+          "chunk_id": "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
           "score": 0.889065,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -64,7 +64,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-21c4782f347a2eb3e9a72f90d575c79b891b729199c8cfe005f411c7daefc5d2",
+          "chunk_id": "docchunk-6140a4a30712ec6bd122269e8a8405852319722593272a6fcc3eb7c86df58738",
           "score": 0.884568,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -73,7 +73,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-37de749b2cfb629e80ee8cc4e3e94f6f4c3e15109f7a24080c5e31010283f139",
+          "chunk_id": "docchunk-7f10c283d4a52da2dead853f2c25af83f5ef09494db074dda0bd14d011d7d83e",
           "score": 0.879279,
           "source_kind": "document",
           "where": "문서 · 일상의 일부로 만든다",
@@ -82,7 +82,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6",
+          "chunk_id": "docchunk-861118c3272c47057b32fe8b66e118ce4936216facbf387ebf9a203b77779fc1",
           "score": 0.877883,
           "source_kind": "document",
           "where": "문서 · 일상의 일부로 만든다",
@@ -91,7 +91,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-7b2139812a0f6e19fa13809cc4e55dd2a302401f316ee1aafa1da9330dc446a2",
+          "chunk_id": "docchunk-fe7ebb7b3b24482ce73f8e2469dce699b31557445fc9b010e26e516a384f4e43",
           "score": 0.877758,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -101,11 +101,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-539af55e418e772065ba32ec4d49ba53f716122e2e878432a9d474c221a28d2c",
-        "docchunk-21c4782f347a2eb3e9a72f90d575c79b891b729199c8cfe005f411c7daefc5d2",
-        "docchunk-37de749b2cfb629e80ee8cc4e3e94f6f4c3e15109f7a24080c5e31010283f139",
-        "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6",
-        "docchunk-7b2139812a0f6e19fa13809cc4e55dd2a302401f316ee1aafa1da9330dc446a2"
+        "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
+        "docchunk-6140a4a30712ec6bd122269e8a8405852319722593272a6fcc3eb7c86df58738",
+        "docchunk-7f10c283d4a52da2dead853f2c25af83f5ef09494db074dda0bd14d011d7d83e",
+        "docchunk-861118c3272c47057b32fe8b66e118ce4936216facbf387ebf9a203b77779fc1",
+        "docchunk-fe7ebb7b3b24482ce73f8e2469dce699b31557445fc9b010e26e516a384f4e43"
       ]
     },
     {
@@ -147,7 +147,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
+          "chunk_id": "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
           "score": 0.855429,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -177,7 +177,7 @@
       "evidence_chunk_ids": [
         "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742",
         "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
-        "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
+        "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
         "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
         "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452"
       ]
@@ -203,7 +203,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-33a5803d57f47c2febd95ac372869344bb9661b7aa911b121693efd20418bc52",
+          "chunk_id": "docchunk-771047a9fda139f19928ac0b318e8d610e8028811b2c2c7524b8ab11021137bb",
           "score": 0.825325,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -212,7 +212,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98",
+          "chunk_id": "docchunk-18ce0f43de97cb2bd8058e4e51ed0dc79aae687557c8f65deb0b081c3f124006",
           "score": 0.820597,
           "source_kind": "document",
           "where": "문서 · 일상의 일부로 만든다",
@@ -221,7 +221,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6",
+          "chunk_id": "docchunk-861118c3272c47057b32fe8b66e118ce4936216facbf387ebf9a203b77779fc1",
           "score": 0.819523,
           "source_kind": "document",
           "where": "문서 · 일상의 일부로 만든다",
@@ -249,9 +249,9 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-33a5803d57f47c2febd95ac372869344bb9661b7aa911b121693efd20418bc52",
-        "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98",
-        "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6",
+        "docchunk-771047a9fda139f19928ac0b318e8d610e8028811b2c2c7524b8ab11021137bb",
+        "docchunk-18ce0f43de97cb2bd8058e4e51ed0dc79aae687557c8f65deb0b081c3f124006",
+        "docchunk-861118c3272c47057b32fe8b66e118ce4936216facbf387ebf9a203b77779fc1",
         "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
         "chunk-a947b4aaf9d03885d164275edcc69cbe90fcb5dfafcc2b2c0cfbeb024dd1f4f7"
       ]
@@ -313,7 +313,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-1dc41704f31fee559e8226fba33637cc768df4243215ea35b59d133826d15cd0",
+          "chunk_id": "docchunk-b81d07c3d180bc8ca1303790b48505234f6dce24b990792c11363c9ebc280356",
           "score": 0.826606,
           "source_kind": "document",
           "where": "문서 · [6개월 이후] 훈련 효과가 높아요",
@@ -327,7 +327,7 @@
         "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
         "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747",
         "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
-        "docchunk-1dc41704f31fee559e8226fba33637cc768df4243215ea35b59d133826d15cd0"
+        "docchunk-b81d07c3d180bc8ca1303790b48505234f6dce24b990792c11363c9ebc280356"
       ]
     },
     {
@@ -425,7 +425,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6",
+          "chunk_id": "docchunk-861118c3272c47057b32fe8b66e118ce4936216facbf387ebf9a203b77779fc1",
           "score": 0.885299,
           "source_kind": "document",
           "where": "문서 · 일상의 일부로 만든다",
@@ -434,7 +434,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-539af55e418e772065ba32ec4d49ba53f716122e2e878432a9d474c221a28d2c",
+          "chunk_id": "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
           "score": 0.867077,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -443,7 +443,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-44f50e951d01466d24d8cc73d8c749c1c81f19f7223d4e73261900d48a6c1a8d",
+          "chunk_id": "docchunk-f151d305b129c2cc7318a658045ecb89cd97c2720ab878df230e4d37a6d4c60e",
           "score": 0.866775,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -452,7 +452,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-710fb14b0022832669bf308448e80c43ee9253c0b50a92c20089ba1fc10283e8",
+          "chunk_id": "docchunk-74849a2fb6a57756497fb400ba289ecc6f9283ce6b16b5fed7319b87cf564cbd",
           "score": 0.865684,
           "source_kind": "document",
           "where": "문서 · 크레이트 고르는 법",
@@ -461,7 +461,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6",
+          "chunk_id": "docchunk-eb5615c42e9b38eb477e3a83bbf0fb0e8c1f5f5477009228e99d4ed73af6d35a",
           "score": 0.862317,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -471,11 +471,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6",
-        "docchunk-539af55e418e772065ba32ec4d49ba53f716122e2e878432a9d474c221a28d2c",
-        "docchunk-44f50e951d01466d24d8cc73d8c749c1c81f19f7223d4e73261900d48a6c1a8d",
-        "docchunk-710fb14b0022832669bf308448e80c43ee9253c0b50a92c20089ba1fc10283e8",
-        "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6"
+        "docchunk-861118c3272c47057b32fe8b66e118ce4936216facbf387ebf9a203b77779fc1",
+        "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
+        "docchunk-f151d305b129c2cc7318a658045ecb89cd97c2720ab878df230e4d37a6d4c60e",
+        "docchunk-74849a2fb6a57756497fb400ba289ecc6f9283ce6b16b5fed7319b87cf564cbd",
+        "docchunk-eb5615c42e9b38eb477e3a83bbf0fb0e8c1f5f5477009228e99d4ed73af6d35a"
       ]
     },
     {
@@ -499,7 +499,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-d1964d5be54b743d8f7654479cb339422b04e70195be21599ac7356b981cd721",
+          "chunk_id": "docchunk-66c3537dbc619c6deb5310cdaa1ea0076bf465b30abc13127782095f3fddb28a",
           "score": 0.842314,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -508,7 +508,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-9dcdc298f787eaacac3f2a35c1c97a7e80bbc40012f55a352d90424c0c986106",
+          "chunk_id": "docchunk-d65c6079c2bf634309b67b75711369ec8966ef4b10102fa86430670fc02d0c73",
           "score": 0.839678,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -517,7 +517,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-5c44c7b8ff02b4440433ba943c303e95faf633c9ebdb4f539bd41af211793a83",
+          "chunk_id": "docchunk-d21ada7e88ba53057eb56587dfbcbd900aeb7521789903d6e00d120b06d6f780",
           "score": 0.838741,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -526,7 +526,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-694e43c05a1be8519c04230fbb73b10742e1417d77a5944672e68a257868f3d4",
+          "chunk_id": "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
           "score": 0.836704,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -535,7 +535,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-dde431d926a4f650abd9e969ffeaba827e82929bcbe41867e760e3872d68f072",
+          "chunk_id": "docchunk-79d36f5564bb1fe92a6f029e92b5207f20964b9c0acc31784fefb78decb99548",
           "score": 0.836189,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -545,11 +545,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-d1964d5be54b743d8f7654479cb339422b04e70195be21599ac7356b981cd721",
-        "docchunk-9dcdc298f787eaacac3f2a35c1c97a7e80bbc40012f55a352d90424c0c986106",
-        "docchunk-5c44c7b8ff02b4440433ba943c303e95faf633c9ebdb4f539bd41af211793a83",
-        "docchunk-694e43c05a1be8519c04230fbb73b10742e1417d77a5944672e68a257868f3d4",
-        "docchunk-dde431d926a4f650abd9e969ffeaba827e82929bcbe41867e760e3872d68f072"
+        "docchunk-66c3537dbc619c6deb5310cdaa1ea0076bf465b30abc13127782095f3fddb28a",
+        "docchunk-d65c6079c2bf634309b67b75711369ec8966ef4b10102fa86430670fc02d0c73",
+        "docchunk-d21ada7e88ba53057eb56587dfbcbd900aeb7521789903d6e00d120b06d6f780",
+        "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
+        "docchunk-79d36f5564bb1fe92a6f029e92b5207f20964b9c0acc31784fefb78decb99548"
       ]
     },
     {
@@ -573,7 +573,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06",
+          "chunk_id": "docchunk-a412c0682a94675684654c322a820885493a16c7ad059a0445c386fe64104eef",
           "score": 0.8568,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -591,7 +591,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
+          "chunk_id": "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
           "score": 0.847259,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -600,7 +600,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-a701db09a1c01edb236c778fb993c6df4813f5e3a2cc55aa7820bb672aa397e0",
+          "chunk_id": "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
           "score": 0.845247,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -619,10 +619,10 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06",
+        "docchunk-a412c0682a94675684654c322a820885493a16c7ad059a0445c386fe64104eef",
         "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
-        "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
-        "docchunk-a701db09a1c01edb236c778fb993c6df4813f5e3a2cc55aa7820bb672aa397e0",
+        "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
+        "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
         "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd"
       ]
     },
@@ -647,7 +647,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-1dc41704f31fee559e8226fba33637cc768df4243215ea35b59d133826d15cd0",
+          "chunk_id": "docchunk-b81d07c3d180bc8ca1303790b48505234f6dce24b990792c11363c9ebc280356",
           "score": 0.845991,
           "source_kind": "document",
           "where": "문서 · [6개월 이후] 훈련 효과가 높아요",
@@ -656,7 +656,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-65e7a6b9a21e7a3d8b339f03815c5fd4478dab16ad2e1c8a8d2964b2c420031c",
+          "chunk_id": "docchunk-f2c07ace40e9986431a21c69c4fd2e717b0b2d1310ecce991937f00fc3050544",
           "score": 0.839599,
           "source_kind": "document",
           "where": "문서 · 나이대별 강아지 배변 훈련 효과 > [3개월 이하] 시작하기 딱 좋아요",
@@ -674,7 +674,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-7fc08d8acad9d6886d13f5d611d346f392fc56eb43d7081d4ccd1bc636dd6708",
+          "chunk_id": "docchunk-d36129d75535ea9e8460c493dd1fa6c9873fa0f945e754f440aa34689d2de131",
           "score": 0.835623,
           "source_kind": "document",
           "where": "문서 · 강아지 배변훈련 실패 이유",
@@ -683,7 +683,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd",
+          "chunk_id": "docchunk-9f4127a448f3055499260547d5211ac3cec11599eee392a1995793882c569435",
           "score": 0.833856,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -693,11 +693,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-1dc41704f31fee559e8226fba33637cc768df4243215ea35b59d133826d15cd0",
-        "docchunk-65e7a6b9a21e7a3d8b339f03815c5fd4478dab16ad2e1c8a8d2964b2c420031c",
+        "docchunk-b81d07c3d180bc8ca1303790b48505234f6dce24b990792c11363c9ebc280356",
+        "docchunk-f2c07ace40e9986431a21c69c4fd2e717b0b2d1310ecce991937f00fc3050544",
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
-        "docchunk-7fc08d8acad9d6886d13f5d611d346f392fc56eb43d7081d4ccd1bc636dd6708",
-        "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd"
+        "docchunk-d36129d75535ea9e8460c493dd1fa6c9873fa0f945e754f440aa34689d2de131",
+        "docchunk-9f4127a448f3055499260547d5211ac3cec11599eee392a1995793882c569435"
       ]
     },
     {
@@ -721,7 +721,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-e5596113f50cf19a3102dc628633c845eb2a3727ee1e428468d2dfd0c082c4d8",
+          "chunk_id": "docchunk-13c1c7c40ad90883f86e4327f5cb77cc821e7f9325a53240565edf21c1322e44",
           "score": 0.848702,
           "source_kind": "document",
           "where": "문서 · 울타리 훈련 > 으로 새끼 강아지의 안전을 확보하세요!",
@@ -730,7 +730,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-dde431d926a4f650abd9e969ffeaba827e82929bcbe41867e760e3872d68f072",
+          "chunk_id": "docchunk-79d36f5564bb1fe92a6f029e92b5207f20964b9c0acc31784fefb78decb99548",
           "score": 0.846027,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -739,7 +739,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-d1964d5be54b743d8f7654479cb339422b04e70195be21599ac7356b981cd721",
+          "chunk_id": "docchunk-66c3537dbc619c6deb5310cdaa1ea0076bf465b30abc13127782095f3fddb28a",
           "score": 0.845424,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -748,7 +748,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-8b464f14545b728243f5204ac197683f2b2fba648c31f0d9086383ad08540f28",
+          "chunk_id": "docchunk-efba5ad44087db14df45c017b1e988a4902acb1d6bd561227e9678ab272b520a",
           "score": 0.844562,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -757,7 +757,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-7fc08d8acad9d6886d13f5d611d346f392fc56eb43d7081d4ccd1bc636dd6708",
+          "chunk_id": "docchunk-d36129d75535ea9e8460c493dd1fa6c9873fa0f945e754f440aa34689d2de131",
           "score": 0.843956,
           "source_kind": "document",
           "where": "문서 · 강아지 배변훈련 실패 이유",
@@ -767,11 +767,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-e5596113f50cf19a3102dc628633c845eb2a3727ee1e428468d2dfd0c082c4d8",
-        "docchunk-dde431d926a4f650abd9e969ffeaba827e82929bcbe41867e760e3872d68f072",
-        "docchunk-d1964d5be54b743d8f7654479cb339422b04e70195be21599ac7356b981cd721",
-        "docchunk-8b464f14545b728243f5204ac197683f2b2fba648c31f0d9086383ad08540f28",
-        "docchunk-7fc08d8acad9d6886d13f5d611d346f392fc56eb43d7081d4ccd1bc636dd6708"
+        "docchunk-13c1c7c40ad90883f86e4327f5cb77cc821e7f9325a53240565edf21c1322e44",
+        "docchunk-79d36f5564bb1fe92a6f029e92b5207f20964b9c0acc31784fefb78decb99548",
+        "docchunk-66c3537dbc619c6deb5310cdaa1ea0076bf465b30abc13127782095f3fddb28a",
+        "docchunk-efba5ad44087db14df45c017b1e988a4902acb1d6bd561227e9678ab272b520a",
+        "docchunk-d36129d75535ea9e8460c493dd1fa6c9873fa0f945e754f440aa34689d2de131"
       ]
     },
     {
@@ -795,7 +795,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-694e43c05a1be8519c04230fbb73b10742e1417d77a5944672e68a257868f3d4",
+          "chunk_id": "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
           "score": 0.872346,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -804,7 +804,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-d1964d5be54b743d8f7654479cb339422b04e70195be21599ac7356b981cd721",
+          "chunk_id": "docchunk-66c3537dbc619c6deb5310cdaa1ea0076bf465b30abc13127782095f3fddb28a",
           "score": 0.871294,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -822,7 +822,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-dde431d926a4f650abd9e969ffeaba827e82929bcbe41867e760e3872d68f072",
+          "chunk_id": "docchunk-79d36f5564bb1fe92a6f029e92b5207f20964b9c0acc31784fefb78decb99548",
           "score": 0.867199,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -831,7 +831,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-9dcdc298f787eaacac3f2a35c1c97a7e80bbc40012f55a352d90424c0c986106",
+          "chunk_id": "docchunk-d65c6079c2bf634309b67b75711369ec8966ef4b10102fa86430670fc02d0c73",
           "score": 0.866557,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -841,11 +841,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-694e43c05a1be8519c04230fbb73b10742e1417d77a5944672e68a257868f3d4",
-        "docchunk-d1964d5be54b743d8f7654479cb339422b04e70195be21599ac7356b981cd721",
+        "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
+        "docchunk-66c3537dbc619c6deb5310cdaa1ea0076bf465b30abc13127782095f3fddb28a",
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
-        "docchunk-dde431d926a4f650abd9e969ffeaba827e82929bcbe41867e760e3872d68f072",
-        "docchunk-9dcdc298f787eaacac3f2a35c1c97a7e80bbc40012f55a352d90424c0c986106"
+        "docchunk-79d36f5564bb1fe92a6f029e92b5207f20964b9c0acc31784fefb78decb99548",
+        "docchunk-d65c6079c2bf634309b67b75711369ec8966ef4b10102fa86430670fc02d0c73"
       ]
     },
     {
@@ -878,7 +878,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-694e43c05a1be8519c04230fbb73b10742e1417d77a5944672e68a257868f3d4",
+          "chunk_id": "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
           "score": 0.870763,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -887,7 +887,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-63eb16f6333f3c04adfe37185ff569c638ebff803125f9fb6d2a204cf4c1a174",
+          "chunk_id": "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc",
           "score": 0.870672,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -905,7 +905,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-7fc08d8acad9d6886d13f5d611d346f392fc56eb43d7081d4ccd1bc636dd6708",
+          "chunk_id": "docchunk-d36129d75535ea9e8460c493dd1fa6c9873fa0f945e754f440aa34689d2de131",
           "score": 0.864019,
           "source_kind": "document",
           "where": "문서 · 강아지 배변훈련 실패 이유",
@@ -916,10 +916,10 @@
       "graph_top_k": [],
       "evidence_chunk_ids": [
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
-        "docchunk-694e43c05a1be8519c04230fbb73b10742e1417d77a5944672e68a257868f3d4",
-        "docchunk-63eb16f6333f3c04adfe37185ff569c638ebff803125f9fb6d2a204cf4c1a174",
+        "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
+        "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc",
         "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742",
-        "docchunk-7fc08d8acad9d6886d13f5d611d346f392fc56eb43d7081d4ccd1bc636dd6708"
+        "docchunk-d36129d75535ea9e8460c493dd1fa6c9873fa0f945e754f440aa34689d2de131"
       ]
     },
     {
@@ -943,7 +943,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
+          "chunk_id": "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
           "score": 0.881598,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -952,7 +952,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6",
+          "chunk_id": "docchunk-eb5615c42e9b38eb477e3a83bbf0fb0e8c1f5f5477009228e99d4ed73af6d35a",
           "score": 0.880309,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -961,7 +961,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-44f50e951d01466d24d8cc73d8c749c1c81f19f7223d4e73261900d48a6c1a8d",
+          "chunk_id": "docchunk-f151d305b129c2cc7318a658045ecb89cd97c2720ab878df230e4d37a6d4c60e",
           "score": 0.876901,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -970,7 +970,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-a701db09a1c01edb236c778fb993c6df4813f5e3a2cc55aa7820bb672aa397e0",
+          "chunk_id": "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
           "score": 0.876812,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -979,7 +979,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170",
+          "chunk_id": "docchunk-06e67f937db4f8b636c85a940e9dee8b09d703de95e7a70a1ca5a7a75c823578",
           "score": 0.872852,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -989,11 +989,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
-        "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6",
-        "docchunk-44f50e951d01466d24d8cc73d8c749c1c81f19f7223d4e73261900d48a6c1a8d",
-        "docchunk-a701db09a1c01edb236c778fb993c6df4813f5e3a2cc55aa7820bb672aa397e0",
-        "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170"
+        "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
+        "docchunk-eb5615c42e9b38eb477e3a83bbf0fb0e8c1f5f5477009228e99d4ed73af6d35a",
+        "docchunk-f151d305b129c2cc7318a658045ecb89cd97c2720ab878df230e4d37a6d4c60e",
+        "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
+        "docchunk-06e67f937db4f8b636c85a940e9dee8b09d703de95e7a70a1ca5a7a75c823578"
       ]
     },
     {
@@ -1118,7 +1118,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-4f5e7db5992f879434ac36d6b17e417c8fd40eeb6ff70e9dd7331d6c42262a08",
+          "chunk_id": "docchunk-3a39dce505b6f9974410722d795ebda7c32a8626d24f831784f23d9534266f18",
           "score": 0.853491,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1127,7 +1127,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-63eb16f6333f3c04adfe37185ff569c638ebff803125f9fb6d2a204cf4c1a174",
+          "chunk_id": "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc",
           "score": 0.852567,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1140,8 +1140,8 @@
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
         "chunk-b024a7eaae215d7f6532aeed7485bcaa81821c441e5468e7b24d9316ea83f99c",
-        "docchunk-4f5e7db5992f879434ac36d6b17e417c8fd40eeb6ff70e9dd7331d6c42262a08",
-        "docchunk-63eb16f6333f3c04adfe37185ff569c638ebff803125f9fb6d2a204cf4c1a174"
+        "docchunk-3a39dce505b6f9974410722d795ebda7c32a8626d24f831784f23d9534266f18",
+        "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc"
       ]
     },
     {
@@ -1165,7 +1165,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-2a6104ae06d867a69373f0727ca85b8671e393c506fb76a255c276d79da8b94a",
+          "chunk_id": "docchunk-fb959e043750051c41db5fba6b1bfb324a48cc94bc915f9ddadf7192213218ac",
           "score": 0.903011,
           "source_kind": "document",
           "where": "문서 · 보호자가 할 수 있는 관리 방법",
@@ -1174,7 +1174,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-59c3017ccc220d45c3b14a8b9bd971ea41e10f87d52295479956b76948bf81ec",
+          "chunk_id": "docchunk-9a5b05e9a843a1130e1fc66e9ae341b2b0da4294960cf2581766f00e913e9c84",
           "score": 0.902061,
           "source_kind": "document",
           "where": "문서 · 3단계",
@@ -1183,7 +1183,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-fbde6fdc407c702150a81419b34e5b5c4cee3647e7eb4c383305e4019ba2d0fb",
+          "chunk_id": "docchunk-8efdffe0db64c821088c94e330ad77cea669fbb1d0854bf9c7ab548e827b03fb",
           "score": 0.900947,
           "source_kind": "document",
           "where": "문서 · 보호자가 할 수 있는 관리 방법",
@@ -1192,7 +1192,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-5fbd497052d884174eb47e5c4e91eb64299e6777dd8f201b72cd6b6bb18b51e7",
+          "chunk_id": "docchunk-b4a5e4f8a6e62cac36d77ab2f3d89449027a4861df35582e703eec424664b59f",
           "score": 0.899942,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1201,7 +1201,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-70175c6b19abb30489603690916f9209266e8e308abde7de6f215ab198a2be94",
+          "chunk_id": "docchunk-fdf2776359922fe35db8fff62d816e03218f3b44c025660704a4d4de40bfb676",
           "score": 0.898555,
           "source_kind": "document",
           "where": "문서 · 2단계",
@@ -1211,11 +1211,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-2a6104ae06d867a69373f0727ca85b8671e393c506fb76a255c276d79da8b94a",
-        "docchunk-59c3017ccc220d45c3b14a8b9bd971ea41e10f87d52295479956b76948bf81ec",
-        "docchunk-fbde6fdc407c702150a81419b34e5b5c4cee3647e7eb4c383305e4019ba2d0fb",
-        "docchunk-5fbd497052d884174eb47e5c4e91eb64299e6777dd8f201b72cd6b6bb18b51e7",
-        "docchunk-70175c6b19abb30489603690916f9209266e8e308abde7de6f215ab198a2be94"
+        "docchunk-fb959e043750051c41db5fba6b1bfb324a48cc94bc915f9ddadf7192213218ac",
+        "docchunk-9a5b05e9a843a1130e1fc66e9ae341b2b0da4294960cf2581766f00e913e9c84",
+        "docchunk-8efdffe0db64c821088c94e330ad77cea669fbb1d0854bf9c7ab548e827b03fb",
+        "docchunk-b4a5e4f8a6e62cac36d77ab2f3d89449027a4861df35582e703eec424664b59f",
+        "docchunk-fdf2776359922fe35db8fff62d816e03218f3b44c025660704a4d4de40bfb676"
       ]
     },
     {
@@ -1248,7 +1248,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-3ee1358c7514b68f8c38c4a55388d758f0be64acaf27fe255201e410714606c1",
+          "chunk_id": "docchunk-c708cd58ae612acd55a7ed1b5ea25ff50a4701d78db2af2a969cfcadcb5fbe2f",
           "score": 0.844634,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1257,7 +1257,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-039fed74173d7b681185534d88895d3d57f4e24adf20310d50d89e46ac25bc59",
+          "chunk_id": "docchunk-54154e848cafe09276a321ac632615f43f90539b6323d0290e350d8e06f584e2",
           "score": 0.842756,
           "source_kind": "document",
           "where": "문서 · 알레르기성 피부병",
@@ -1266,7 +1266,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-5859fa6cb53f5fa9ccaad9953b96fb0a516d92c1155721ad4051c8a7f89fcca2",
+          "chunk_id": "docchunk-aaf503a048fba2ac7f68b72d4825e57d763d1d0c2389ed711fa30a0c3c01f969",
           "score": 0.84236,
           "source_kind": "document",
           "where": "문서 · 외이염 예방 및 관리 방법",
@@ -1275,7 +1275,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6",
+          "chunk_id": "docchunk-b8cd546469bbf2ca32a2fdcda5ea0d02be4f0b2c866c99d6803a49d47d66753d",
           "score": 0.841768,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1286,10 +1286,10 @@
       "graph_top_k": [],
       "evidence_chunk_ids": [
         "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
-        "docchunk-3ee1358c7514b68f8c38c4a55388d758f0be64acaf27fe255201e410714606c1",
-        "docchunk-039fed74173d7b681185534d88895d3d57f4e24adf20310d50d89e46ac25bc59",
-        "docchunk-5859fa6cb53f5fa9ccaad9953b96fb0a516d92c1155721ad4051c8a7f89fcca2",
-        "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6"
+        "docchunk-c708cd58ae612acd55a7ed1b5ea25ff50a4701d78db2af2a969cfcadcb5fbe2f",
+        "docchunk-54154e848cafe09276a321ac632615f43f90539b6323d0290e350d8e06f584e2",
+        "docchunk-aaf503a048fba2ac7f68b72d4825e57d763d1d0c2389ed711fa30a0c3c01f969",
+        "docchunk-b8cd546469bbf2ca32a2fdcda5ea0d02be4f0b2c866c99d6803a49d47d66753d"
       ]
     },
     {
@@ -1313,7 +1313,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
+          "chunk_id": "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
           "score": 0.848071,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1340,7 +1340,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170",
+          "chunk_id": "docchunk-06e67f937db4f8b636c85a940e9dee8b09d703de95e7a70a1ca5a7a75c823578",
           "score": 0.845326,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1349,7 +1349,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa",
+          "chunk_id": "docchunk-3545a572927ebe33a07db8ad9d0fb8fcda5e44467f137dc625bbfb961cc0e36a",
           "score": 0.842046,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1359,11 +1359,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
+        "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
         "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
         "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
-        "docchunk-9e824833ad0b585e7e642db888ae01ab961c394a69230c70fe15e0def760a170",
-        "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa"
+        "docchunk-06e67f937db4f8b636c85a940e9dee8b09d703de95e7a70a1ca5a7a75c823578",
+        "docchunk-3545a572927ebe33a07db8ad9d0fb8fcda5e44467f137dc625bbfb961cc0e36a"
       ]
     },
     {
@@ -1387,7 +1387,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6",
+          "chunk_id": "docchunk-eb5615c42e9b38eb477e3a83bbf0fb0e8c1f5f5477009228e99d4ed73af6d35a",
           "score": 0.855177,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1396,7 +1396,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-37cf02b107b0523cf0691bc43f5632364b5c609ec6ea5a000843cefeac52b233",
+          "chunk_id": "docchunk-80bcc43dcc046b55f9106746d990da69441b4252bcaa918b9ab28145d9451ab0",
           "score": 0.852111,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1405,7 +1405,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-a701db09a1c01edb236c778fb993c6df4813f5e3a2cc55aa7820bb672aa397e0",
+          "chunk_id": "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
           "score": 0.852007,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1423,7 +1423,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
+          "chunk_id": "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
           "score": 0.851955,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1433,11 +1433,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6",
-        "docchunk-37cf02b107b0523cf0691bc43f5632364b5c609ec6ea5a000843cefeac52b233",
-        "docchunk-a701db09a1c01edb236c778fb993c6df4813f5e3a2cc55aa7820bb672aa397e0",
+        "docchunk-eb5615c42e9b38eb477e3a83bbf0fb0e8c1f5f5477009228e99d4ed73af6d35a",
+        "docchunk-80bcc43dcc046b55f9106746d990da69441b4252bcaa918b9ab28145d9451ab0",
+        "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
-        "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56"
+        "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622"
       ]
     },
     {
@@ -1461,7 +1461,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-779e5e0f6021e187d9388312c96578a14c7563adda9467ca0eda39beef6d19e3",
+          "chunk_id": "docchunk-52f1261b2bf7a01828694d4ea6e730b9b73b4d4f28b950adf566c4df46fe06b1",
           "score": 0.868077,
           "source_kind": "document",
           "where": "문서 · 강아지 배변훈련 시기와 기간 > [시기] 생후 8주는 지나야 해요",
@@ -1470,7 +1470,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-1dc41704f31fee559e8226fba33637cc768df4243215ea35b59d133826d15cd0",
+          "chunk_id": "docchunk-b81d07c3d180bc8ca1303790b48505234f6dce24b990792c11363c9ebc280356",
           "score": 0.865717,
           "source_kind": "document",
           "where": "문서 · [6개월 이후] 훈련 효과가 높아요",
@@ -1479,7 +1479,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-d31384d3934be8a9cad882fa296899ab04cf5f16fe76942c7c3b3aff21025e25",
+          "chunk_id": "docchunk-d09a78b03b1a44724ef9a3de961838eaed41aa47f807336b7ea6ec363a8d23f0",
           "score": 0.862541,
           "source_kind": "document",
           "where": "문서 · 언제부터 강아지 울타리 훈련을 시작하나요?",
@@ -1488,7 +1488,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-f4bb30ad8b524f92c20b86ef1eb4220eadd1e5b6911dd6e1354f3694f4290859",
+          "chunk_id": "docchunk-20e3afe8685ae3c0fe9c9a5cdcf286714fa0aa54e637f2eaf8e3a56d1b4b1afd",
           "score": 0.862456,
           "source_kind": "document",
           "where": "문서 · [기간] 최대 6개월은 지켜봐 주세요",
@@ -1497,7 +1497,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-e5596113f50cf19a3102dc628633c845eb2a3727ee1e428468d2dfd0c082c4d8",
+          "chunk_id": "docchunk-13c1c7c40ad90883f86e4327f5cb77cc821e7f9325a53240565edf21c1322e44",
           "score": 0.859088,
           "source_kind": "document",
           "where": "문서 · 울타리 훈련 > 으로 새끼 강아지의 안전을 확보하세요!",
@@ -1507,11 +1507,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-779e5e0f6021e187d9388312c96578a14c7563adda9467ca0eda39beef6d19e3",
-        "docchunk-1dc41704f31fee559e8226fba33637cc768df4243215ea35b59d133826d15cd0",
-        "docchunk-d31384d3934be8a9cad882fa296899ab04cf5f16fe76942c7c3b3aff21025e25",
-        "docchunk-f4bb30ad8b524f92c20b86ef1eb4220eadd1e5b6911dd6e1354f3694f4290859",
-        "docchunk-e5596113f50cf19a3102dc628633c845eb2a3727ee1e428468d2dfd0c082c4d8"
+        "docchunk-52f1261b2bf7a01828694d4ea6e730b9b73b4d4f28b950adf566c4df46fe06b1",
+        "docchunk-b81d07c3d180bc8ca1303790b48505234f6dce24b990792c11363c9ebc280356",
+        "docchunk-d09a78b03b1a44724ef9a3de961838eaed41aa47f807336b7ea6ec363a8d23f0",
+        "docchunk-20e3afe8685ae3c0fe9c9a5cdcf286714fa0aa54e637f2eaf8e3a56d1b4b1afd",
+        "docchunk-13c1c7c40ad90883f86e4327f5cb77cc821e7f9325a53240565edf21c1322e44"
       ]
     },
     {
@@ -1535,7 +1535,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-b51715a1467cf4b9f1a04b7d1765a420ecde8669e50b1ae2991db523f8624475",
+          "chunk_id": "docchunk-f21a1135d7c09b7a70bb00945e8a385134220399cb25336364fb0f1e6a557a7e",
           "score": 0.919905,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1544,7 +1544,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-ad736da79578bcd6d09028a54c0d10a2aa32a66fbf687a779488b18517bcbb7e",
+          "chunk_id": "docchunk-ff0ac1e8087a5d1935f9abb1a80fc898b14cd27ab51b327cad3d1c66b941317c",
           "score": 0.908913,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1553,7 +1553,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
+          "chunk_id": "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
           "score": 0.898792,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1562,7 +1562,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-63eb16f6333f3c04adfe37185ff569c638ebff803125f9fb6d2a204cf4c1a174",
+          "chunk_id": "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc",
           "score": 0.896961,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1571,7 +1571,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-1536a77452ad1b17788e20f6c74142cb15f1daa1d6812b8ed3aef49bdf967c0c",
+          "chunk_id": "docchunk-12837d97eaa9a02327f072800d87f6cf0528a54c422bdb27293fc892592e4d88",
           "score": 0.886129,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1581,11 +1581,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-b51715a1467cf4b9f1a04b7d1765a420ecde8669e50b1ae2991db523f8624475",
-        "docchunk-ad736da79578bcd6d09028a54c0d10a2aa32a66fbf687a779488b18517bcbb7e",
-        "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
-        "docchunk-63eb16f6333f3c04adfe37185ff569c638ebff803125f9fb6d2a204cf4c1a174",
-        "docchunk-1536a77452ad1b17788e20f6c74142cb15f1daa1d6812b8ed3aef49bdf967c0c"
+        "docchunk-f21a1135d7c09b7a70bb00945e8a385134220399cb25336364fb0f1e6a557a7e",
+        "docchunk-ff0ac1e8087a5d1935f9abb1a80fc898b14cd27ab51b327cad3d1c66b941317c",
+        "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
+        "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc",
+        "docchunk-12837d97eaa9a02327f072800d87f6cf0528a54c422bdb27293fc892592e4d88"
       ]
     },
     {
@@ -1609,7 +1609,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-e5596113f50cf19a3102dc628633c845eb2a3727ee1e428468d2dfd0c082c4d8",
+          "chunk_id": "docchunk-13c1c7c40ad90883f86e4327f5cb77cc821e7f9325a53240565edf21c1322e44",
           "score": 0.884075,
           "source_kind": "document",
           "where": "문서 · 울타리 훈련 > 으로 새끼 강아지의 안전을 확보하세요!",
@@ -1618,7 +1618,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-bf45602b94b89b5e98e6e5aba95fcc4154e748899b89131971a61b9fec16941a",
+          "chunk_id": "docchunk-28fa63929e8a0615dacd07e839bdea1573a2bba0c320a18d01723dd88606b137",
           "score": 0.879707,
           "source_kind": "document",
           "where": "문서 · 강아지 울타리 훈련 시, 주의 사항",
@@ -1627,7 +1627,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-b5494b89cc9cdf5fe175bfd1c272a6854c7b8e48b3c8d8f6dbbbb6fa27628233",
+          "chunk_id": "docchunk-9c7ee1a7b7412c647d626681a505ae3d247203964479a4d0460dc59ebb4de5f1",
           "score": 0.87798,
           "source_kind": "document",
           "where": "문서 · 강아지 울타리 훈련 방법 > 1. 울타리 안 공간 설정하기",
@@ -1636,7 +1636,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-0b1cabecebad8ee89e431fea1f18c47eff757fd6e385ab4658aab755180ca6bd",
+          "chunk_id": "docchunk-18c7f5ea913582c59d9d4e763ffb54fb95f14e6e105f223c8aa7addcd1585769",
           "score": 0.876926,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1645,7 +1645,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-d31384d3934be8a9cad882fa296899ab04cf5f16fe76942c7c3b3aff21025e25",
+          "chunk_id": "docchunk-d09a78b03b1a44724ef9a3de961838eaed41aa47f807336b7ea6ec363a8d23f0",
           "score": 0.873714,
           "source_kind": "document",
           "where": "문서 · 언제부터 강아지 울타리 훈련을 시작하나요?",
@@ -1655,11 +1655,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-e5596113f50cf19a3102dc628633c845eb2a3727ee1e428468d2dfd0c082c4d8",
-        "docchunk-bf45602b94b89b5e98e6e5aba95fcc4154e748899b89131971a61b9fec16941a",
-        "docchunk-b5494b89cc9cdf5fe175bfd1c272a6854c7b8e48b3c8d8f6dbbbb6fa27628233",
-        "docchunk-0b1cabecebad8ee89e431fea1f18c47eff757fd6e385ab4658aab755180ca6bd",
-        "docchunk-d31384d3934be8a9cad882fa296899ab04cf5f16fe76942c7c3b3aff21025e25"
+        "docchunk-13c1c7c40ad90883f86e4327f5cb77cc821e7f9325a53240565edf21c1322e44",
+        "docchunk-28fa63929e8a0615dacd07e839bdea1573a2bba0c320a18d01723dd88606b137",
+        "docchunk-9c7ee1a7b7412c647d626681a505ae3d247203964479a4d0460dc59ebb4de5f1",
+        "docchunk-18c7f5ea913582c59d9d4e763ffb54fb95f14e6e105f223c8aa7addcd1585769",
+        "docchunk-d09a78b03b1a44724ef9a3de961838eaed41aa47f807336b7ea6ec363a8d23f0"
       ]
     },
     {
@@ -1683,7 +1683,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-779e5e0f6021e187d9388312c96578a14c7563adda9467ca0eda39beef6d19e3",
+          "chunk_id": "docchunk-52f1261b2bf7a01828694d4ea6e730b9b73b4d4f28b950adf566c4df46fe06b1",
           "score": 0.926004,
           "source_kind": "document",
           "where": "문서 · 강아지 배변훈련 시기와 기간 > [시기] 생후 8주는 지나야 해요",
@@ -1692,7 +1692,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-f4bb30ad8b524f92c20b86ef1eb4220eadd1e5b6911dd6e1354f3694f4290859",
+          "chunk_id": "docchunk-20e3afe8685ae3c0fe9c9a5cdcf286714fa0aa54e637f2eaf8e3a56d1b4b1afd",
           "score": 0.912258,
           "source_kind": "document",
           "where": "문서 · [기간] 최대 6개월은 지켜봐 주세요",
@@ -1701,7 +1701,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-65e7a6b9a21e7a3d8b339f03815c5fd4478dab16ad2e1c8a8d2964b2c420031c",
+          "chunk_id": "docchunk-f2c07ace40e9986431a21c69c4fd2e717b0b2d1310ecce991937f00fc3050544",
           "score": 0.904392,
           "source_kind": "document",
           "where": "문서 · 나이대별 강아지 배변 훈련 효과 > [3개월 이하] 시작하기 딱 좋아요",
@@ -1710,7 +1710,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-1dc41704f31fee559e8226fba33637cc768df4243215ea35b59d133826d15cd0",
+          "chunk_id": "docchunk-b81d07c3d180bc8ca1303790b48505234f6dce24b990792c11363c9ebc280356",
           "score": 0.901242,
           "source_kind": "document",
           "where": "문서 · [6개월 이후] 훈련 효과가 높아요",
@@ -1719,7 +1719,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-7fc08d8acad9d6886d13f5d611d346f392fc56eb43d7081d4ccd1bc636dd6708",
+          "chunk_id": "docchunk-d36129d75535ea9e8460c493dd1fa6c9873fa0f945e754f440aa34689d2de131",
           "score": 0.88966,
           "source_kind": "document",
           "where": "문서 · 강아지 배변훈련 실패 이유",
@@ -1729,11 +1729,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-779e5e0f6021e187d9388312c96578a14c7563adda9467ca0eda39beef6d19e3",
-        "docchunk-f4bb30ad8b524f92c20b86ef1eb4220eadd1e5b6911dd6e1354f3694f4290859",
-        "docchunk-65e7a6b9a21e7a3d8b339f03815c5fd4478dab16ad2e1c8a8d2964b2c420031c",
-        "docchunk-1dc41704f31fee559e8226fba33637cc768df4243215ea35b59d133826d15cd0",
-        "docchunk-7fc08d8acad9d6886d13f5d611d346f392fc56eb43d7081d4ccd1bc636dd6708"
+        "docchunk-52f1261b2bf7a01828694d4ea6e730b9b73b4d4f28b950adf566c4df46fe06b1",
+        "docchunk-20e3afe8685ae3c0fe9c9a5cdcf286714fa0aa54e637f2eaf8e3a56d1b4b1afd",
+        "docchunk-f2c07ace40e9986431a21c69c4fd2e717b0b2d1310ecce991937f00fc3050544",
+        "docchunk-b81d07c3d180bc8ca1303790b48505234f6dce24b990792c11363c9ebc280356",
+        "docchunk-d36129d75535ea9e8460c493dd1fa6c9873fa0f945e754f440aa34689d2de131"
       ]
     },
     {
@@ -1757,7 +1757,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-5efc211762fb4c2f923c811b8102338fdaa3c45a9162262f309b8691fc4a1256",
+          "chunk_id": "docchunk-f1a529afff1321b0d6f897ec30f8afcbe2c93248c5f6258f00fee21ce7c36802",
           "score": 0.860271,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1766,7 +1766,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
+          "chunk_id": "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
           "score": 0.854385,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1784,7 +1784,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-a147f251d826d7f03a8f8ab66d476106081fec371df034bc5d123deee335e233",
+          "chunk_id": "docchunk-8cadb93091cc5f5ff60f416639e1180fe89ebdc1cb7b79b2fea94a7cc849ea3d",
           "score": 0.842498,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1803,10 +1803,10 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-5efc211762fb4c2f923c811b8102338fdaa3c45a9162262f309b8691fc4a1256",
-        "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
+        "docchunk-f1a529afff1321b0d6f897ec30f8afcbe2c93248c5f6258f00fee21ce7c36802",
+        "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
         "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
-        "docchunk-a147f251d826d7f03a8f8ab66d476106081fec371df034bc5d123deee335e233",
+        "docchunk-8cadb93091cc5f5ff60f416639e1180fe89ebdc1cb7b79b2fea94a7cc849ea3d",
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f"
       ]
     },
@@ -1831,7 +1831,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-5c44c7b8ff02b4440433ba943c303e95faf633c9ebdb4f539bd41af211793a83",
+          "chunk_id": "docchunk-d21ada7e88ba53057eb56587dfbcbd900aeb7521789903d6e00d120b06d6f780",
           "score": 0.902207,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1840,7 +1840,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-9dcdc298f787eaacac3f2a35c1c97a7e80bbc40012f55a352d90424c0c986106",
+          "chunk_id": "docchunk-d65c6079c2bf634309b67b75711369ec8966ef4b10102fa86430670fc02d0c73",
           "score": 0.893693,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1849,7 +1849,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-dde431d926a4f650abd9e969ffeaba827e82929bcbe41867e760e3872d68f072",
+          "chunk_id": "docchunk-79d36f5564bb1fe92a6f029e92b5207f20964b9c0acc31784fefb78decb99548",
           "score": 0.880153,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1858,7 +1858,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-d1964d5be54b743d8f7654479cb339422b04e70195be21599ac7356b981cd721",
+          "chunk_id": "docchunk-66c3537dbc619c6deb5310cdaa1ea0076bf465b30abc13127782095f3fddb28a",
           "score": 0.876082,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1867,7 +1867,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-694e43c05a1be8519c04230fbb73b10742e1417d77a5944672e68a257868f3d4",
+          "chunk_id": "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
           "score": 0.875294,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1877,11 +1877,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-5c44c7b8ff02b4440433ba943c303e95faf633c9ebdb4f539bd41af211793a83",
-        "docchunk-9dcdc298f787eaacac3f2a35c1c97a7e80bbc40012f55a352d90424c0c986106",
-        "docchunk-dde431d926a4f650abd9e969ffeaba827e82929bcbe41867e760e3872d68f072",
-        "docchunk-d1964d5be54b743d8f7654479cb339422b04e70195be21599ac7356b981cd721",
-        "docchunk-694e43c05a1be8519c04230fbb73b10742e1417d77a5944672e68a257868f3d4"
+        "docchunk-d21ada7e88ba53057eb56587dfbcbd900aeb7521789903d6e00d120b06d6f780",
+        "docchunk-d65c6079c2bf634309b67b75711369ec8966ef4b10102fa86430670fc02d0c73",
+        "docchunk-79d36f5564bb1fe92a6f029e92b5207f20964b9c0acc31784fefb78decb99548",
+        "docchunk-66c3537dbc619c6deb5310cdaa1ea0076bf465b30abc13127782095f3fddb28a",
+        "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126"
       ]
     },
     {
@@ -1905,7 +1905,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6",
+          "chunk_id": "docchunk-861118c3272c47057b32fe8b66e118ce4936216facbf387ebf9a203b77779fc1",
           "score": 0.889496,
           "source_kind": "document",
           "where": "문서 · 일상의 일부로 만든다",
@@ -1914,7 +1914,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98",
+          "chunk_id": "docchunk-18ce0f43de97cb2bd8058e4e51ed0dc79aae687557c8f65deb0b081c3f124006",
           "score": 0.865252,
           "source_kind": "document",
           "where": "문서 · 일상의 일부로 만든다",
@@ -1923,7 +1923,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-539af55e418e772065ba32ec4d49ba53f716122e2e878432a9d474c221a28d2c",
+          "chunk_id": "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
           "score": 0.86098,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1932,7 +1932,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-37de749b2cfb629e80ee8cc4e3e94f6f4c3e15109f7a24080c5e31010283f139",
+          "chunk_id": "docchunk-7f10c283d4a52da2dead853f2c25af83f5ef09494db074dda0bd14d011d7d83e",
           "score": 0.85544,
           "source_kind": "document",
           "where": "문서 · 일상의 일부로 만든다",
@@ -1941,7 +1941,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-50191eee95a0d93872307e080c1db7ccdc5e01c7641109d6f23ff890f1dd8fa0",
+          "chunk_id": "docchunk-40ce275fe053b52cb4162d3175aa0fc25f6a0f7f38f4b6eaa8127e258fcda533",
           "score": 0.848911,
           "source_kind": "document",
           "where": "문서 · 일상의 일부로 만든다",
@@ -1951,11 +1951,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6",
-        "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98",
-        "docchunk-539af55e418e772065ba32ec4d49ba53f716122e2e878432a9d474c221a28d2c",
-        "docchunk-37de749b2cfb629e80ee8cc4e3e94f6f4c3e15109f7a24080c5e31010283f139",
-        "docchunk-50191eee95a0d93872307e080c1db7ccdc5e01c7641109d6f23ff890f1dd8fa0"
+        "docchunk-861118c3272c47057b32fe8b66e118ce4936216facbf387ebf9a203b77779fc1",
+        "docchunk-18ce0f43de97cb2bd8058e4e51ed0dc79aae687557c8f65deb0b081c3f124006",
+        "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
+        "docchunk-7f10c283d4a52da2dead853f2c25af83f5ef09494db074dda0bd14d011d7d83e",
+        "docchunk-40ce275fe053b52cb4162d3175aa0fc25f6a0f7f38f4b6eaa8127e258fcda533"
       ]
     },
     {
@@ -1988,7 +1988,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-2f800c9b596e93fd293857cdf6cd0295ca4f8796e8c47b4ad6d905d0d0f178fa",
+          "chunk_id": "docchunk-b107a0e599f7325c58bf98c045f8769b65c658f6915d76e42c94488b9fb81278",
           "score": 0.865383,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -1997,7 +1997,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6",
+          "chunk_id": "docchunk-eb5615c42e9b38eb477e3a83bbf0fb0e8c1f5f5477009228e99d4ed73af6d35a",
           "score": 0.858143,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2006,7 +2006,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
+          "chunk_id": "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
           "score": 0.857279,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2015,7 +2015,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06",
+          "chunk_id": "docchunk-a412c0682a94675684654c322a820885493a16c7ad059a0445c386fe64104eef",
           "score": 0.856234,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2026,10 +2026,10 @@
       "graph_top_k": [],
       "evidence_chunk_ids": [
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
-        "docchunk-2f800c9b596e93fd293857cdf6cd0295ca4f8796e8c47b4ad6d905d0d0f178fa",
-        "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6",
-        "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
-        "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06"
+        "docchunk-b107a0e599f7325c58bf98c045f8769b65c658f6915d76e42c94488b9fb81278",
+        "docchunk-eb5615c42e9b38eb477e3a83bbf0fb0e8c1f5f5477009228e99d4ed73af6d35a",
+        "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
+        "docchunk-a412c0682a94675684654c322a820885493a16c7ad059a0445c386fe64104eef"
       ]
     },
     {
@@ -2053,7 +2053,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-9700c2bece12eb8ede2f3c916b09b482068b030f3f64b92fc3291bb8eef90711",
+          "chunk_id": "docchunk-7ab6549a95ea3ab6fec7d79ea66aaa8069621977e85cc684a43dba1b403459f7",
           "score": 0.917623,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2062,7 +2062,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-f8654b50063ce1979b9ae87a51f536edceaa6d252e6643d6be613a1ac0ccb956",
+          "chunk_id": "docchunk-90a175603f6b63c97d1d523ab9bd94462fc6f1817401b5a9d3b898bc50ac8f85",
           "score": 0.915658,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2071,7 +2071,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-21df4a1fd8f3efab7fd1838caf4514e0687ce9fb254c5629a3d2b82694d17423",
+          "chunk_id": "docchunk-16b585e37c8758903704738aa469fcbf26a72cb0be2bad538c9be39d4e2dbc03",
           "score": 0.885294,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2080,7 +2080,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-a701db09a1c01edb236c778fb993c6df4813f5e3a2cc55aa7820bb672aa397e0",
+          "chunk_id": "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
           "score": 0.884497,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2089,7 +2089,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
+          "chunk_id": "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
           "score": 0.877877,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2099,11 +2099,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-9700c2bece12eb8ede2f3c916b09b482068b030f3f64b92fc3291bb8eef90711",
-        "docchunk-f8654b50063ce1979b9ae87a51f536edceaa6d252e6643d6be613a1ac0ccb956",
-        "docchunk-21df4a1fd8f3efab7fd1838caf4514e0687ce9fb254c5629a3d2b82694d17423",
-        "docchunk-a701db09a1c01edb236c778fb993c6df4813f5e3a2cc55aa7820bb672aa397e0",
-        "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56"
+        "docchunk-7ab6549a95ea3ab6fec7d79ea66aaa8069621977e85cc684a43dba1b403459f7",
+        "docchunk-90a175603f6b63c97d1d523ab9bd94462fc6f1817401b5a9d3b898bc50ac8f85",
+        "docchunk-16b585e37c8758903704738aa469fcbf26a72cb0be2bad538c9be39d4e2dbc03",
+        "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
+        "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622"
       ]
     },
     {
@@ -2127,7 +2127,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-21df4a1fd8f3efab7fd1838caf4514e0687ce9fb254c5629a3d2b82694d17423",
+          "chunk_id": "docchunk-16b585e37c8758903704738aa469fcbf26a72cb0be2bad538c9be39d4e2dbc03",
           "score": 0.898337,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2136,7 +2136,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-fce8f0fe461c7ec4d6ca183c75339626b6d52a27f5b6580f4eb427f150e82822",
+          "chunk_id": "docchunk-640cbda11d690ec4dd0c21172f506010014f5a0ca2455f61726fa7a37a917575",
           "score": 0.895839,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2145,7 +2145,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-a701db09a1c01edb236c778fb993c6df4813f5e3a2cc55aa7820bb672aa397e0",
+          "chunk_id": "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
           "score": 0.859643,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2154,7 +2154,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-188901e23f7041bd0b86637d7af9a34f397de3b8b2ba47ff31320846138dc0d2",
+          "chunk_id": "docchunk-3226ad8248be9bfc802dde4121051995d93948aa8f119c98059a5966b7a1260b",
           "score": 0.85923,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2163,7 +2163,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
+          "chunk_id": "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
           "score": 0.856313,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2173,11 +2173,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-21df4a1fd8f3efab7fd1838caf4514e0687ce9fb254c5629a3d2b82694d17423",
-        "docchunk-fce8f0fe461c7ec4d6ca183c75339626b6d52a27f5b6580f4eb427f150e82822",
-        "docchunk-a701db09a1c01edb236c778fb993c6df4813f5e3a2cc55aa7820bb672aa397e0",
-        "docchunk-188901e23f7041bd0b86637d7af9a34f397de3b8b2ba47ff31320846138dc0d2",
-        "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56"
+        "docchunk-16b585e37c8758903704738aa469fcbf26a72cb0be2bad538c9be39d4e2dbc03",
+        "docchunk-640cbda11d690ec4dd0c21172f506010014f5a0ca2455f61726fa7a37a917575",
+        "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
+        "docchunk-3226ad8248be9bfc802dde4121051995d93948aa8f119c98059a5966b7a1260b",
+        "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622"
       ]
     },
     {
@@ -2284,7 +2284,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-2f800c9b596e93fd293857cdf6cd0295ca4f8796e8c47b4ad6d905d0d0f178fa",
+          "chunk_id": "docchunk-b107a0e599f7325c58bf98c045f8769b65c658f6915d76e42c94488b9fb81278",
           "score": 0.830994,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2302,7 +2302,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6",
+          "chunk_id": "docchunk-b8cd546469bbf2ca32a2fdcda5ea0d02be4f0b2c866c99d6803a49d47d66753d",
           "score": 0.829092,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2311,7 +2311,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd",
+          "chunk_id": "docchunk-9f4127a448f3055499260547d5211ac3cec11599eee392a1995793882c569435",
           "score": 0.828003,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2322,10 +2322,10 @@
       "graph_top_k": [],
       "evidence_chunk_ids": [
         "chunk-22e38bb46d7ec534e15b2d6fbdbc0be670fccd33291c126e2b7ba2ccb7f6f7be",
-        "docchunk-2f800c9b596e93fd293857cdf6cd0295ca4f8796e8c47b4ad6d905d0d0f178fa",
+        "docchunk-b107a0e599f7325c58bf98c045f8769b65c658f6915d76e42c94488b9fb81278",
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
-        "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6",
-        "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd"
+        "docchunk-b8cd546469bbf2ca32a2fdcda5ea0d02be4f0b2c866c99d6803a49d47d66753d",
+        "docchunk-9f4127a448f3055499260547d5211ac3cec11599eee392a1995793882c569435"
       ]
     },
     {
@@ -2385,7 +2385,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06",
+          "chunk_id": "docchunk-a412c0682a94675684654c322a820885493a16c7ad059a0445c386fe64104eef",
           "score": 0.830289,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2399,7 +2399,7 @@
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
         "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
-        "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06"
+        "docchunk-a412c0682a94675684654c322a820885493a16c7ad059a0445c386fe64104eef"
       ]
     },
     {
@@ -2432,7 +2432,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6",
+          "chunk_id": "docchunk-b8cd546469bbf2ca32a2fdcda5ea0d02be4f0b2c866c99d6803a49d47d66753d",
           "score": 0.852053,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2470,7 +2470,7 @@
       "graph_top_k": [],
       "evidence_chunk_ids": [
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
-        "docchunk-38dc06bbcf98a0fc3ee3805fa8c418578ab8da717816e712c8bb345b802852d6",
+        "docchunk-b8cd546469bbf2ca32a2fdcda5ea0d02be4f0b2c866c99d6803a49d47d66753d",
         "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
         "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
         "chunk-b024a7eaae215d7f6532aeed7485bcaa81821c441e5468e7b24d9316ea83f99c"
@@ -2497,7 +2497,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-e5596113f50cf19a3102dc628633c845eb2a3727ee1e428468d2dfd0c082c4d8",
+          "chunk_id": "docchunk-13c1c7c40ad90883f86e4327f5cb77cc821e7f9325a53240565edf21c1322e44",
           "score": 0.856556,
           "source_kind": "document",
           "where": "문서 · 울타리 훈련 > 으로 새끼 강아지의 안전을 확보하세요!",
@@ -2506,7 +2506,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-539af55e418e772065ba32ec4d49ba53f716122e2e878432a9d474c221a28d2c",
+          "chunk_id": "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
           "score": 0.851953,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2515,7 +2515,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-8b464f14545b728243f5204ac197683f2b2fba648c31f0d9086383ad08540f28",
+          "chunk_id": "docchunk-efba5ad44087db14df45c017b1e988a4902acb1d6bd561227e9678ab272b520a",
           "score": 0.851763,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2524,7 +2524,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-21c4782f347a2eb3e9a72f90d575c79b891b729199c8cfe005f411c7daefc5d2",
+          "chunk_id": "docchunk-6140a4a30712ec6bd122269e8a8405852319722593272a6fcc3eb7c86df58738",
           "score": 0.849718,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2533,7 +2533,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-7b2139812a0f6e19fa13809cc4e55dd2a302401f316ee1aafa1da9330dc446a2",
+          "chunk_id": "docchunk-fe7ebb7b3b24482ce73f8e2469dce699b31557445fc9b010e26e516a384f4e43",
           "score": 0.849504,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2543,11 +2543,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-e5596113f50cf19a3102dc628633c845eb2a3727ee1e428468d2dfd0c082c4d8",
-        "docchunk-539af55e418e772065ba32ec4d49ba53f716122e2e878432a9d474c221a28d2c",
-        "docchunk-8b464f14545b728243f5204ac197683f2b2fba648c31f0d9086383ad08540f28",
-        "docchunk-21c4782f347a2eb3e9a72f90d575c79b891b729199c8cfe005f411c7daefc5d2",
-        "docchunk-7b2139812a0f6e19fa13809cc4e55dd2a302401f316ee1aafa1da9330dc446a2"
+        "docchunk-13c1c7c40ad90883f86e4327f5cb77cc821e7f9325a53240565edf21c1322e44",
+        "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
+        "docchunk-efba5ad44087db14df45c017b1e988a4902acb1d6bd561227e9678ab272b520a",
+        "docchunk-6140a4a30712ec6bd122269e8a8405852319722593272a6fcc3eb7c86df58738",
+        "docchunk-fe7ebb7b3b24482ce73f8e2469dce699b31557445fc9b010e26e516a384f4e43"
       ]
     },
     {
@@ -2654,7 +2654,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
+          "chunk_id": "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
           "score": 0.875936,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2663,7 +2663,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-63eb16f6333f3c04adfe37185ff569c638ebff803125f9fb6d2a204cf4c1a174",
+          "chunk_id": "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc",
           "score": 0.870831,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2672,7 +2672,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-ad736da79578bcd6d09028a54c0d10a2aa32a66fbf687a779488b18517bcbb7e",
+          "chunk_id": "docchunk-ff0ac1e8087a5d1935f9abb1a80fc898b14cd27ab51b327cad3d1c66b941317c",
           "score": 0.867574,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2681,7 +2681,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-b51715a1467cf4b9f1a04b7d1765a420ecde8669e50b1ae2991db523f8624475",
+          "chunk_id": "docchunk-f21a1135d7c09b7a70bb00945e8a385134220399cb25336364fb0f1e6a557a7e",
           "score": 0.86176,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2692,10 +2692,10 @@
       "graph_top_k": [],
       "evidence_chunk_ids": [
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
-        "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
-        "docchunk-63eb16f6333f3c04adfe37185ff569c638ebff803125f9fb6d2a204cf4c1a174",
-        "docchunk-ad736da79578bcd6d09028a54c0d10a2aa32a66fbf687a779488b18517bcbb7e",
-        "docchunk-b51715a1467cf4b9f1a04b7d1765a420ecde8669e50b1ae2991db523f8624475"
+        "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
+        "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc",
+        "docchunk-ff0ac1e8087a5d1935f9abb1a80fc898b14cd27ab51b327cad3d1c66b941317c",
+        "docchunk-f21a1135d7c09b7a70bb00945e8a385134220399cb25336364fb0f1e6a557a7e"
       ]
     },
     {
@@ -2719,7 +2719,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa",
+          "chunk_id": "docchunk-3545a572927ebe33a07db8ad9d0fb8fcda5e44467f137dc625bbfb961cc0e36a",
           "score": 0.905094,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2728,7 +2728,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd",
+          "chunk_id": "docchunk-9f4127a448f3055499260547d5211ac3cec11599eee392a1995793882c569435",
           "score": 0.90395,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2737,7 +2737,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-919402fbfa48101c5502496768c1ab1a58a547ec0da92b88e5b9b66761a794d9",
+          "chunk_id": "docchunk-90af3c6130e3b7b22198de01cecfc3d203e70372c42ab1863725522c2abdc46f",
           "score": 0.900398,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2746,7 +2746,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
+          "chunk_id": "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
           "score": 0.898652,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2755,7 +2755,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6",
+          "chunk_id": "docchunk-eb5615c42e9b38eb477e3a83bbf0fb0e8c1f5f5477009228e99d4ed73af6d35a",
           "score": 0.894792,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2765,11 +2765,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa",
-        "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd",
-        "docchunk-919402fbfa48101c5502496768c1ab1a58a547ec0da92b88e5b9b66761a794d9",
-        "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
-        "docchunk-f5ae4e721bedd25a4e172fbdee8ee671cb4d9c4f6c50c41c38a2d571190ebca6"
+        "docchunk-3545a572927ebe33a07db8ad9d0fb8fcda5e44467f137dc625bbfb961cc0e36a",
+        "docchunk-9f4127a448f3055499260547d5211ac3cec11599eee392a1995793882c569435",
+        "docchunk-90af3c6130e3b7b22198de01cecfc3d203e70372c42ab1863725522c2abdc46f",
+        "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
+        "docchunk-eb5615c42e9b38eb477e3a83bbf0fb0e8c1f5f5477009228e99d4ed73af6d35a"
       ]
     },
     {
@@ -2793,7 +2793,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa",
+          "chunk_id": "docchunk-3545a572927ebe33a07db8ad9d0fb8fcda5e44467f137dc625bbfb961cc0e36a",
           "score": 0.849174,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2811,7 +2811,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-caa8012eed7daca69984fd805164cf32ddbaebf8753217e13b9a6ca2e91907f9",
+          "chunk_id": "docchunk-fa67fc76647bca64f51e03dbedfcf2aba49a3eb2bd74a2f552403114ac6ca971",
           "score": 0.845775,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2820,7 +2820,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d",
+          "chunk_id": "docchunk-b95f5d2e8122bac534c1f19f4316f4ad0f10eb8ea9c5f24be94002f338e8d007",
           "score": 0.844336,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2829,7 +2829,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd",
+          "chunk_id": "docchunk-9f4127a448f3055499260547d5211ac3cec11599eee392a1995793882c569435",
           "score": 0.844036,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2839,11 +2839,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa",
+        "docchunk-3545a572927ebe33a07db8ad9d0fb8fcda5e44467f137dc625bbfb961cc0e36a",
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
-        "docchunk-caa8012eed7daca69984fd805164cf32ddbaebf8753217e13b9a6ca2e91907f9",
-        "docchunk-5284a5920b76ee91de52ba8cf8c045cea35a45adda61b8a53cfff7af6a43b77d",
-        "docchunk-b0d393c0b017427f16c76030d1305585e98db552af5ca147512001742f9693cd"
+        "docchunk-fa67fc76647bca64f51e03dbedfcf2aba49a3eb2bd74a2f552403114ac6ca971",
+        "docchunk-b95f5d2e8122bac534c1f19f4316f4ad0f10eb8ea9c5f24be94002f338e8d007",
+        "docchunk-9f4127a448f3055499260547d5211ac3cec11599eee392a1995793882c569435"
       ]
     },
     {
@@ -2867,7 +2867,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-9dcdc298f787eaacac3f2a35c1c97a7e80bbc40012f55a352d90424c0c986106",
+          "chunk_id": "docchunk-d65c6079c2bf634309b67b75711369ec8966ef4b10102fa86430670fc02d0c73",
           "score": 0.892579,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2876,7 +2876,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-694e43c05a1be8519c04230fbb73b10742e1417d77a5944672e68a257868f3d4",
+          "chunk_id": "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
           "score": 0.891998,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2885,7 +2885,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-dde431d926a4f650abd9e969ffeaba827e82929bcbe41867e760e3872d68f072",
+          "chunk_id": "docchunk-79d36f5564bb1fe92a6f029e92b5207f20964b9c0acc31784fefb78decb99548",
           "score": 0.886107,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2894,7 +2894,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-3215f9e297183bfa328163cd0a21b531ed7b44e94990e90377d25deab1b1c252",
+          "chunk_id": "docchunk-3f557b989553c5f95d26a6ddb76065f0b5f968b5d4dfdd11113d6dc0a648c8d8",
           "score": 0.88524,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2903,7 +2903,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-5c44c7b8ff02b4440433ba943c303e95faf633c9ebdb4f539bd41af211793a83",
+          "chunk_id": "docchunk-d21ada7e88ba53057eb56587dfbcbd900aeb7521789903d6e00d120b06d6f780",
           "score": 0.881181,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2913,11 +2913,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-9dcdc298f787eaacac3f2a35c1c97a7e80bbc40012f55a352d90424c0c986106",
-        "docchunk-694e43c05a1be8519c04230fbb73b10742e1417d77a5944672e68a257868f3d4",
-        "docchunk-dde431d926a4f650abd9e969ffeaba827e82929bcbe41867e760e3872d68f072",
-        "docchunk-3215f9e297183bfa328163cd0a21b531ed7b44e94990e90377d25deab1b1c252",
-        "docchunk-5c44c7b8ff02b4440433ba943c303e95faf633c9ebdb4f539bd41af211793a83"
+        "docchunk-d65c6079c2bf634309b67b75711369ec8966ef4b10102fa86430670fc02d0c73",
+        "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
+        "docchunk-79d36f5564bb1fe92a6f029e92b5207f20964b9c0acc31784fefb78decb99548",
+        "docchunk-3f557b989553c5f95d26a6ddb76065f0b5f968b5d4dfdd11113d6dc0a648c8d8",
+        "docchunk-d21ada7e88ba53057eb56587dfbcbd900aeb7521789903d6e00d120b06d6f780"
       ]
     },
     {
@@ -2941,7 +2941,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-4f5e7db5992f879434ac36d6b17e417c8fd40eeb6ff70e9dd7331d6c42262a08",
+          "chunk_id": "docchunk-3a39dce505b6f9974410722d795ebda7c32a8626d24f831784f23d9534266f18",
           "score": 0.884931,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2950,7 +2950,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-37de749b2cfb629e80ee8cc4e3e94f6f4c3e15109f7a24080c5e31010283f139",
+          "chunk_id": "docchunk-7f10c283d4a52da2dead853f2c25af83f5ef09494db074dda0bd14d011d7d83e",
           "score": 0.883249,
           "source_kind": "document",
           "where": "문서 · 일상의 일부로 만든다",
@@ -2959,7 +2959,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6",
+          "chunk_id": "docchunk-861118c3272c47057b32fe8b66e118ce4936216facbf387ebf9a203b77779fc1",
           "score": 0.876322,
           "source_kind": "document",
           "where": "문서 · 일상의 일부로 만든다",
@@ -2968,7 +2968,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-539af55e418e772065ba32ec4d49ba53f716122e2e878432a9d474c221a28d2c",
+          "chunk_id": "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
           "score": 0.874216,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -2977,7 +2977,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98",
+          "chunk_id": "docchunk-18ce0f43de97cb2bd8058e4e51ed0dc79aae687557c8f65deb0b081c3f124006",
           "score": 0.873778,
           "source_kind": "document",
           "where": "문서 · 일상의 일부로 만든다",
@@ -2987,11 +2987,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-4f5e7db5992f879434ac36d6b17e417c8fd40eeb6ff70e9dd7331d6c42262a08",
-        "docchunk-37de749b2cfb629e80ee8cc4e3e94f6f4c3e15109f7a24080c5e31010283f139",
-        "docchunk-7f889386dc09028f9df56f32e861ab3a7d9c341dd3735906b295aa662ea56bb6",
-        "docchunk-539af55e418e772065ba32ec4d49ba53f716122e2e878432a9d474c221a28d2c",
-        "docchunk-7b297d74f8f99e2aabb225e3fa2a569a20121a5a2433b5bce453d4709885df98"
+        "docchunk-3a39dce505b6f9974410722d795ebda7c32a8626d24f831784f23d9534266f18",
+        "docchunk-7f10c283d4a52da2dead853f2c25af83f5ef09494db074dda0bd14d011d7d83e",
+        "docchunk-861118c3272c47057b32fe8b66e118ce4936216facbf387ebf9a203b77779fc1",
+        "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
+        "docchunk-18ce0f43de97cb2bd8058e4e51ed0dc79aae687557c8f65deb0b081c3f124006"
       ]
     },
     {
@@ -3051,7 +3051,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-63eb16f6333f3c04adfe37185ff569c638ebff803125f9fb6d2a204cf4c1a174",
+          "chunk_id": "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc",
           "score": 0.848471,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3065,7 +3065,7 @@
         "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747",
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
         "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
-        "docchunk-63eb16f6333f3c04adfe37185ff569c638ebff803125f9fb6d2a204cf4c1a174"
+        "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc"
       ]
     },
     {
@@ -3107,7 +3107,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-694e43c05a1be8519c04230fbb73b10742e1417d77a5944672e68a257868f3d4",
+          "chunk_id": "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
           "score": 0.847336,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3116,7 +3116,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-34ec5e46f4ab67633657aaf0cf52e7c664347cb515f084b88da16131ade35082",
+          "chunk_id": "docchunk-5737646131b0178e74d9fbe66a76ee71432be553126db3f055846ce8ca9d0c63",
           "score": 0.844709,
           "source_kind": "document",
           "where": "문서 · 강아지 외이염 치료법",
@@ -3137,8 +3137,8 @@
       "evidence_chunk_ids": [
         "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
         "chunk-97db9179eb4efbbe2441b327ffe32855b0aa0dec8c44a290fe8004a289c27ab8",
-        "docchunk-694e43c05a1be8519c04230fbb73b10742e1417d77a5944672e68a257868f3d4",
-        "docchunk-34ec5e46f4ab67633657aaf0cf52e7c664347cb515f084b88da16131ade35082",
+        "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
+        "docchunk-5737646131b0178e74d9fbe66a76ee71432be553126db3f055846ce8ca9d0c63",
         "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742"
       ]
     },
@@ -3163,7 +3163,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-b51715a1467cf4b9f1a04b7d1765a420ecde8669e50b1ae2991db523f8624475",
+          "chunk_id": "docchunk-f21a1135d7c09b7a70bb00945e8a385134220399cb25336364fb0f1e6a557a7e",
           "score": 0.888886,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3172,7 +3172,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-63eb16f6333f3c04adfe37185ff569c638ebff803125f9fb6d2a204cf4c1a174",
+          "chunk_id": "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc",
           "score": 0.883305,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3181,7 +3181,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
+          "chunk_id": "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
           "score": 0.875662,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3190,7 +3190,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-ad736da79578bcd6d09028a54c0d10a2aa32a66fbf687a779488b18517bcbb7e",
+          "chunk_id": "docchunk-ff0ac1e8087a5d1935f9abb1a80fc898b14cd27ab51b327cad3d1c66b941317c",
           "score": 0.874369,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3199,7 +3199,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-1536a77452ad1b17788e20f6c74142cb15f1daa1d6812b8ed3aef49bdf967c0c",
+          "chunk_id": "docchunk-12837d97eaa9a02327f072800d87f6cf0528a54c422bdb27293fc892592e4d88",
           "score": 0.87167,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3209,11 +3209,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-b51715a1467cf4b9f1a04b7d1765a420ecde8669e50b1ae2991db523f8624475",
-        "docchunk-63eb16f6333f3c04adfe37185ff569c638ebff803125f9fb6d2a204cf4c1a174",
-        "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
-        "docchunk-ad736da79578bcd6d09028a54c0d10a2aa32a66fbf687a779488b18517bcbb7e",
-        "docchunk-1536a77452ad1b17788e20f6c74142cb15f1daa1d6812b8ed3aef49bdf967c0c"
+        "docchunk-f21a1135d7c09b7a70bb00945e8a385134220399cb25336364fb0f1e6a557a7e",
+        "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc",
+        "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
+        "docchunk-ff0ac1e8087a5d1935f9abb1a80fc898b14cd27ab51b327cad3d1c66b941317c",
+        "docchunk-12837d97eaa9a02327f072800d87f6cf0528a54c422bdb27293fc892592e4d88"
       ]
     },
     {
@@ -3246,7 +3246,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-694e43c05a1be8519c04230fbb73b10742e1417d77a5944672e68a257868f3d4",
+          "chunk_id": "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
           "score": 0.847,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3284,7 +3284,7 @@
       "graph_top_k": [],
       "evidence_chunk_ids": [
         "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742",
-        "docchunk-694e43c05a1be8519c04230fbb73b10742e1417d77a5944672e68a257868f3d4",
+        "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
         "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747",
         "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f"
@@ -3311,7 +3311,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06",
+          "chunk_id": "docchunk-a412c0682a94675684654c322a820885493a16c7ad059a0445c386fe64104eef",
           "score": 0.844092,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3329,7 +3329,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-2f800c9b596e93fd293857cdf6cd0295ca4f8796e8c47b4ad6d905d0d0f178fa",
+          "chunk_id": "docchunk-b107a0e599f7325c58bf98c045f8769b65c658f6915d76e42c94488b9fb81278",
           "score": 0.836087,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3357,9 +3357,9 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-890bc4cc3f00994b69f9e8b957ef7b50208c2358e04f01a3c241d2c9ffed8a06",
+        "docchunk-a412c0682a94675684654c322a820885493a16c7ad059a0445c386fe64104eef",
         "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
-        "docchunk-2f800c9b596e93fd293857cdf6cd0295ca4f8796e8c47b4ad6d905d0d0f178fa",
+        "docchunk-b107a0e599f7325c58bf98c045f8769b65c658f6915d76e42c94488b9fb81278",
         "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f"
       ]
@@ -3403,7 +3403,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-a147f251d826d7f03a8f8ab66d476106081fec371df034bc5d123deee335e233",
+          "chunk_id": "docchunk-8cadb93091cc5f5ff60f416639e1180fe89ebdc1cb7b79b2fea94a7cc849ea3d",
           "score": 0.850795,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3412,7 +3412,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-1dc41704f31fee559e8226fba33637cc768df4243215ea35b59d133826d15cd0",
+          "chunk_id": "docchunk-b81d07c3d180bc8ca1303790b48505234f6dce24b990792c11363c9ebc280356",
           "score": 0.85045,
           "source_kind": "document",
           "where": "문서 · [6개월 이후] 훈련 효과가 높아요",
@@ -3433,8 +3433,8 @@
       "evidence_chunk_ids": [
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
         "chunk-97db9179eb4efbbe2441b327ffe32855b0aa0dec8c44a290fe8004a289c27ab8",
-        "docchunk-a147f251d826d7f03a8f8ab66d476106081fec371df034bc5d123deee335e233",
-        "docchunk-1dc41704f31fee559e8226fba33637cc768df4243215ea35b59d133826d15cd0",
+        "docchunk-8cadb93091cc5f5ff60f416639e1180fe89ebdc1cb7b79b2fea94a7cc849ea3d",
+        "docchunk-b81d07c3d180bc8ca1303790b48505234f6dce24b990792c11363c9ebc280356",
         "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da"
       ]
     },
@@ -3459,7 +3459,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-e5596113f50cf19a3102dc628633c845eb2a3727ee1e428468d2dfd0c082c4d8",
+          "chunk_id": "docchunk-13c1c7c40ad90883f86e4327f5cb77cc821e7f9325a53240565edf21c1322e44",
           "score": 0.866832,
           "source_kind": "document",
           "where": "문서 · 울타리 훈련 > 으로 새끼 강아지의 안전을 확보하세요!",
@@ -3468,7 +3468,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-bf45602b94b89b5e98e6e5aba95fcc4154e748899b89131971a61b9fec16941a",
+          "chunk_id": "docchunk-28fa63929e8a0615dacd07e839bdea1573a2bba0c320a18d01723dd88606b137",
           "score": 0.862406,
           "source_kind": "document",
           "where": "문서 · 강아지 울타리 훈련 시, 주의 사항",
@@ -3477,7 +3477,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-b5494b89cc9cdf5fe175bfd1c272a6854c7b8e48b3c8d8f6dbbbb6fa27628233",
+          "chunk_id": "docchunk-9c7ee1a7b7412c647d626681a505ae3d247203964479a4d0460dc59ebb4de5f1",
           "score": 0.859332,
           "source_kind": "document",
           "where": "문서 · 강아지 울타리 훈련 방법 > 1. 울타리 안 공간 설정하기",
@@ -3486,7 +3486,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-0b1cabecebad8ee89e431fea1f18c47eff757fd6e385ab4658aab755180ca6bd",
+          "chunk_id": "docchunk-18c7f5ea913582c59d9d4e763ffb54fb95f14e6e105f223c8aa7addcd1585769",
           "score": 0.858205,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3495,7 +3495,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-539af55e418e772065ba32ec4d49ba53f716122e2e878432a9d474c221a28d2c",
+          "chunk_id": "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
           "score": 0.858001,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3505,11 +3505,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-e5596113f50cf19a3102dc628633c845eb2a3727ee1e428468d2dfd0c082c4d8",
-        "docchunk-bf45602b94b89b5e98e6e5aba95fcc4154e748899b89131971a61b9fec16941a",
-        "docchunk-b5494b89cc9cdf5fe175bfd1c272a6854c7b8e48b3c8d8f6dbbbb6fa27628233",
-        "docchunk-0b1cabecebad8ee89e431fea1f18c47eff757fd6e385ab4658aab755180ca6bd",
-        "docchunk-539af55e418e772065ba32ec4d49ba53f716122e2e878432a9d474c221a28d2c"
+        "docchunk-13c1c7c40ad90883f86e4327f5cb77cc821e7f9325a53240565edf21c1322e44",
+        "docchunk-28fa63929e8a0615dacd07e839bdea1573a2bba0c320a18d01723dd88606b137",
+        "docchunk-9c7ee1a7b7412c647d626681a505ae3d247203964479a4d0460dc59ebb4de5f1",
+        "docchunk-18c7f5ea913582c59d9d4e763ffb54fb95f14e6e105f223c8aa7addcd1585769",
+        "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875"
       ]
     },
     {
@@ -3533,7 +3533,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-f55a2d5d49162f03498ddf95b3f62aadb2f1053d19557c4d4124eec51493f568",
+          "chunk_id": "docchunk-4592a9ce833a4188a1b75ac2f6f9e90c45bf6b0a26cb9b04489dcb90c026257f",
           "score": 0.821968,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3542,7 +3542,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-fd98be8526bf986babd73d64186f56b01f55fbdc0b8ff73ff2628d11fad062fd",
+          "chunk_id": "docchunk-4c6a6b0d2a69b75a229e0d3e912bd34f20114aa0cd79e823360aba9ae78b41d7",
           "score": 0.819222,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3551,7 +3551,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-56a1a70af4cb044f16a25306d68ed9233c4abe89a2ac90e7f3bf9c4d6206e09c",
+          "chunk_id": "docchunk-d3d995e954952b399529b2af3f260ae5d3ada5bf9e88a86540a065f0107c2cc7",
           "score": 0.816174,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3560,7 +3560,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-27b8403b65923a8d1cd1cf678ab8fe410b07594ea60a7c4eaf4a6d0eb9a88001",
+          "chunk_id": "docchunk-a393377e3f1dd92a32159cdf90cd9e2e72e3d34df3cf44106d28c7f43aea24d4",
           "score": 0.813992,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3569,7 +3569,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-8cd3beb3867a8feb20a3459a637f7df4c63effc8076479e55c5ccff61353b235",
+          "chunk_id": "docchunk-3089becea07ac79103d69d9dda775f090586e2aff216db326a0f00afb2bed0af",
           "score": 0.813466,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3579,11 +3579,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-f55a2d5d49162f03498ddf95b3f62aadb2f1053d19557c4d4124eec51493f568",
-        "docchunk-fd98be8526bf986babd73d64186f56b01f55fbdc0b8ff73ff2628d11fad062fd",
-        "docchunk-56a1a70af4cb044f16a25306d68ed9233c4abe89a2ac90e7f3bf9c4d6206e09c",
-        "docchunk-27b8403b65923a8d1cd1cf678ab8fe410b07594ea60a7c4eaf4a6d0eb9a88001",
-        "docchunk-8cd3beb3867a8feb20a3459a637f7df4c63effc8076479e55c5ccff61353b235"
+        "docchunk-4592a9ce833a4188a1b75ac2f6f9e90c45bf6b0a26cb9b04489dcb90c026257f",
+        "docchunk-4c6a6b0d2a69b75a229e0d3e912bd34f20114aa0cd79e823360aba9ae78b41d7",
+        "docchunk-d3d995e954952b399529b2af3f260ae5d3ada5bf9e88a86540a065f0107c2cc7",
+        "docchunk-a393377e3f1dd92a32159cdf90cd9e2e72e3d34df3cf44106d28c7f43aea24d4",
+        "docchunk-3089becea07ac79103d69d9dda775f090586e2aff216db326a0f00afb2bed0af"
       ]
     }
   ],
@@ -3695,7 +3695,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-37de749b2cfb629e80ee8cc4e3e94f6f4c3e15109f7a24080c5e31010283f139",
+          "chunk_id": "docchunk-7f10c283d4a52da2dead853f2c25af83f5ef09494db074dda0bd14d011d7d83e",
           "score": 0.832855,
           "source_kind": "document",
           "where": "문서 · 일상의 일부로 만든다",
@@ -3704,7 +3704,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
+          "chunk_id": "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
           "score": 0.832812,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3713,7 +3713,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-63eb16f6333f3c04adfe37185ff569c638ebff803125f9fb6d2a204cf4c1a174",
+          "chunk_id": "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc",
           "score": 0.831988,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3725,9 +3725,9 @@
       "evidence_chunk_ids": [
         "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
         "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452",
-        "docchunk-37de749b2cfb629e80ee8cc4e3e94f6f4c3e15109f7a24080c5e31010283f139",
-        "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
-        "docchunk-63eb16f6333f3c04adfe37185ff569c638ebff803125f9fb6d2a204cf4c1a174"
+        "docchunk-7f10c283d4a52da2dead853f2c25af83f5ef09494db074dda0bd14d011d7d83e",
+        "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
+        "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc"
       ]
     },
     {
@@ -3757,7 +3757,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-a701db09a1c01edb236c778fb993c6df4813f5e3a2cc55aa7820bb672aa397e0",
+          "chunk_id": "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
           "score": 0.853034,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3766,7 +3766,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-33a5803d57f47c2febd95ac372869344bb9661b7aa911b121693efd20418bc52",
+          "chunk_id": "docchunk-771047a9fda139f19928ac0b318e8d610e8028811b2c2c7524b8ab11021137bb",
           "score": 0.853015,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3775,7 +3775,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-50191eee95a0d93872307e080c1db7ccdc5e01c7641109d6f23ff890f1dd8fa0",
+          "chunk_id": "docchunk-40ce275fe053b52cb4162d3175aa0fc25f6a0f7f38f4b6eaa8127e258fcda533",
           "score": 0.852868,
           "source_kind": "document",
           "where": "문서 · 일상의 일부로 만든다",
@@ -3784,7 +3784,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
+          "chunk_id": "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
           "score": 0.852566,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3795,10 +3795,10 @@
       "graph_top_k": [],
       "evidence_chunk_ids": [
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
-        "docchunk-a701db09a1c01edb236c778fb993c6df4813f5e3a2cc55aa7820bb672aa397e0",
-        "docchunk-33a5803d57f47c2febd95ac372869344bb9661b7aa911b121693efd20418bc52",
-        "docchunk-50191eee95a0d93872307e080c1db7ccdc5e01c7641109d6f23ff890f1dd8fa0",
-        "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4"
+        "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
+        "docchunk-771047a9fda139f19928ac0b318e8d610e8028811b2c2c7524b8ab11021137bb",
+        "docchunk-40ce275fe053b52cb4162d3175aa0fc25f6a0f7f38f4b6eaa8127e258fcda533",
+        "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9"
       ]
     },
     {
@@ -3819,7 +3819,7 @@
       "top_k": [
         {
           "rank": 1,
-          "chunk_id": "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
+          "chunk_id": "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
           "score": 0.859087,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3828,7 +3828,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-539af55e418e772065ba32ec4d49ba53f716122e2e878432a9d474c221a28d2c",
+          "chunk_id": "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
           "score": 0.858308,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3837,7 +3837,7 @@
         },
         {
           "rank": 3,
-          "chunk_id": "docchunk-a701db09a1c01edb236c778fb993c6df4813f5e3a2cc55aa7820bb672aa397e0",
+          "chunk_id": "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
           "score": 0.858231,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3855,7 +3855,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-f8654b50063ce1979b9ae87a51f536edceaa6d252e6643d6be613a1ac0ccb956",
+          "chunk_id": "docchunk-90a175603f6b63c97d1d523ab9bd94462fc6f1817401b5a9d3b898bc50ac8f85",
           "score": 0.856131,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3865,11 +3865,11 @@
       ],
       "graph_top_k": [],
       "evidence_chunk_ids": [
-        "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
-        "docchunk-539af55e418e772065ba32ec4d49ba53f716122e2e878432a9d474c221a28d2c",
-        "docchunk-a701db09a1c01edb236c778fb993c6df4813f5e3a2cc55aa7820bb672aa397e0",
+        "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
+        "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
+        "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
         "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452",
-        "docchunk-f8654b50063ce1979b9ae87a51f536edceaa6d252e6643d6be613a1ac0ccb956"
+        "docchunk-90a175603f6b63c97d1d523ab9bd94462fc6f1817401b5a9d3b898bc50ac8f85"
       ]
     },
     {
@@ -3970,7 +3970,7 @@
         },
         {
           "rank": 2,
-          "chunk_id": "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
+          "chunk_id": "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
           "score": 0.852,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3988,7 +3988,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-f9051e5b0be3e6b3d3bcd896f37c5a41f389a6a545696a28794a6345b2ee7c1c",
+          "chunk_id": "docchunk-b05bd231c91bf633e9022d809bc194405e256ab91ea8bb26ddea4a3336f2c471",
           "score": 0.849862,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -3997,7 +3997,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa",
+          "chunk_id": "docchunk-3545a572927ebe33a07db8ad9d0fb8fcda5e44467f137dc625bbfb961cc0e36a",
           "score": 0.849244,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -4008,10 +4008,10 @@
       "graph_top_k": [],
       "evidence_chunk_ids": [
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
-        "docchunk-1257459eec296bd004856ad23a9362584a831e780ed20b92504957d35da160f4",
+        "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
         "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
-        "docchunk-f9051e5b0be3e6b3d3bcd896f37c5a41f389a6a545696a28794a6345b2ee7c1c",
-        "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa"
+        "docchunk-b05bd231c91bf633e9022d809bc194405e256ab91ea8bb26ddea4a3336f2c471",
+        "docchunk-3545a572927ebe33a07db8ad9d0fb8fcda5e44467f137dc625bbfb961cc0e36a"
       ]
     },
     {
@@ -4059,7 +4059,7 @@
         },
         {
           "rank": 4,
-          "chunk_id": "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
+          "chunk_id": "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
           "score": 0.841415,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -4068,7 +4068,7 @@
         },
         {
           "rank": 5,
-          "chunk_id": "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa",
+          "chunk_id": "docchunk-3545a572927ebe33a07db8ad9d0fb8fcda5e44467f137dc625bbfb961cc0e36a",
           "score": 0.841227,
           "source_kind": "document",
           "where": "문서 · (도입부)",
@@ -4081,8 +4081,8 @@
         "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
         "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b",
         "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452",
-        "docchunk-9d1e367a367ca382056a6b5b290fd38aaccbcc4083be791772880a3ccec8df56",
-        "docchunk-2dc55dd4434a124af1b3c1d5fac6c6bf308ca42e12c47bf5a65c6d75aee718fa"
+        "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
+        "docchunk-3545a572927ebe33a07db8ad9d0fb8fcda5e44467f137dc625bbfb961cc0e36a"
       ]
     },
     {

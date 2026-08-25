@@ -15,7 +15,16 @@ measured *worse* on the same harness (Hit@1 0.667 -> 0.5, MRR@5 0.708 -> 0.590),
 so v3 stays. See reports/chunking_v4_experiment_0825.md for the full comparison.
 
 Changing any value here re-chunks (re-hashes) the entire corpus on the next run
-of either chunker — `chunk_id` hashes these settings.
+of either chunker — both chunkers put these settings in the `chunk_id` hash.
+
+That was only half true until 2026-08-25. The video chunker always hashed an
+identity payload that includes these settings, but the document chunker hashed
+`sha256(text)` alone — the settings were not in the id, and a document chunk's
+id carried no identity at all, so two chunks with the same text anywhere in the
+corpus collided. document-chunk-v2 moved documents onto the video chunker's
+payload convention (see `ingest_documents.py: CHUNK_ID_PAYLOAD_KEYS`), which is
+what makes the sentence above true for both. The claim is left here because the
+plan that preceded v2 asserted it of both chunkers and it was wrong of one.
 """
 
 TARGET_CHARS = 420
