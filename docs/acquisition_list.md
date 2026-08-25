@@ -1,5 +1,19 @@
 # 문서 조달 명세 (목요일)
 
+> **현재 상태 (2026-08-25 갱신).** 이 문서 아래의 수치는 전부 **측정 시점의
+> 기록**이고, 그 시점 이후 코퍼스가 여러 번 바뀌었습니다. 지금 값은 이렇습니다.
+>
+> - `scripts/ingest_documents.py`의 MANIFEST: **14건** (크롤 11 + 수동 3).
+>   본문 중 "문서 6건"으로 적힌 곳은 2026-08-19 측정 당시의 값입니다.
+> - AVSAB PDF 3건은 `scripts/ingest_pdf_documents.py`가 따로 처리 →
+>   **문서 17건 / 219청크**.
+> - 크롤 풀은 718건이 아니라 **829건**입니다. 풀별 내역과 "수집됐지만
+>   인제스트하지 않은 것"의 사유는 [`docs/SOURCES.md`](SOURCES.md)의
+>   "수집된 블로그 풀 현황" 절.
+>
+> 날짜가 붙은 측정 기록은 고치지 않고 그대로 둡니다. 그때 무엇을 보고
+> 무엇을 판단했는지가 남아야 하기 때문입니다.
+
 커버리지 런에서 코퍼스가 답하지 못한다고 확인된 축을 메우기 위한 조달 목록입니다.
 근거는 [`reports/owner_fixtures_coverage.md`](../reports/owner_fixtures_coverage.md),
 대상 픽스처는 [`data/eval/queries/owner_fixtures.jsonl`](../data/eval/queries/owner_fixtures.jsonl).

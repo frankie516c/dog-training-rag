@@ -168,8 +168,15 @@ def encoding_flags(text: str) -> dict[str, int]:
     }
 
 
-def analyse(rows: Sequence[tuple[str, dict[str, Any]]], vocab: collections.Counter) -> dict[str, Any]:
+def analyse(
+    rows: Sequence[tuple[str, dict[str, Any]]],
+    vocab: collections.Counter,
+    apply_source_policy: bool = True,
+) -> dict[str, Any]:
     # First pass: run the real pipeline, keep everything needed for the second pass.
+    # `apply_source_policy=False` reproduces the pre-P2 behaviour, so the before/after
+    # of ingest_documents.PROMOTION_DISABLED_SOURCES can be measured on one run each
+    # rather than by checking out an old revision.
     parsed: list[dict[str, Any]] = []
     for source, row in rows:
         doc_id = row["doc_id"]
@@ -188,17 +195,19 @@ def analyse(rows: Sequence[tuple[str, dict[str, Any]]], vocab: collections.Count
 
         title = row["title"].strip()
         raw_lines = row["text"].splitlines()
-        kept, dropped = ing.clean(raw_lines)
-        kept = [l for l in kept if l.strip() != title]
-        hard_wrapped = ing.is_hard_wrapped(kept)
-        if hard_wrapped:
-            promoted_lines, promoted_count = list(kept), 0
-        else:
-            promoted_lines, promoted_count = ing.promote_headings(kept)
+        prepared = ing.prepare_lines(
+            title, raw_lines, row.get("source") if apply_source_policy else None
+        )
+        kept = prepared["kept"]
+        dropped = prepared["dropped"]
+        hard_wrapped = prepared["hard_wrapped"]
+        policy_blocked = prepared["policy_blocked"]
+        promoted_lines = prepared["promoted_lines"]
+        promoted_count = prepared["promoted_count"]
 
         try:
             records, outline = ing.build_chunks(
-                entry, title, promoted_lines, promoted_count, hard_wrapped
+                entry, title, promoted_lines, promoted_count, hard_wrapped, policy_blocked
             )
         except Exception as exc:  # noqa: BLE001 - a crash here is itself a finding
             record.update(fatal="exception", detail=f"{type(exc).__name__}: {exc}"[:200])
@@ -221,6 +230,7 @@ def analyse(rows: Sequence[tuple[str, dict[str, Any]]], vocab: collections.Count
                 sum(1 for n in lengths if n <= ing.MAX_HEADING_CHARS) / len(lengths)
             ),
             hard_wrapped=hard_wrapped,
+            policy_blocked=policy_blocked,
             promoted=promoted_count,
             method=records[0]["chunking_method"],
             chunks=len(records),
@@ -477,6 +487,12 @@ def summarise(result: dict[str, Any]) -> str:
     lines.append(f"{'(문서 수)':<26}" + "".join(f"{doc_totals.get(s, 0):>11}" for s in sources)
                  + f"{sum(doc_totals.values()):>9}")
     lines.append("")
+    lines.append(
+        "소스 정책: {} (승격 차단 소스 {})".format(
+            "적용" if result.get("source_policy_applied") else "미적용(P2 이전 동작)",
+            ", ".join(result.get("promotion_disabled_sources", [])) or "없음",
+        )
+    )
     lines.append("chunking_method 분포:")
     for key, n in sorted(result["method_counts"].items()):
         lines.append(f"  {key}: {n}")
@@ -488,6 +504,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--crawl-root", type=Path, default=CRAWL_ROOT)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--limit", type=int, default=0, help="only the first N posts per pool")
+    parser.add_argument(
+        "--ignore-source-policy",
+        action="store_true",
+        help="run promotion on every source, i.e. the behaviour before P2",
+    )
     return parser
 
 
@@ -504,7 +525,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         rows = capped
 
     vocab = build_vocab(rows)
-    result = analyse(rows, vocab)
+    result = analyse(rows, vocab, apply_source_policy=not args.ignore_source_policy)
+    result["source_policy_applied"] = not args.ignore_source_policy
+    result["promotion_disabled_sources"] = sorted(ing.PROMOTION_DISABLED_SOURCES)
     parsed = result.pop("_parsed")
 
     args.out.mkdir(parents=True, exist_ok=True)

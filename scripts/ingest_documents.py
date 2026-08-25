@@ -1,4 +1,4 @@
-"""Ingest the six selected documents into a document corpus alongside the video chunks.
+"""Ingest the documents named in MANIFEST into a document corpus alongside the video chunks.
 
 These are blog articles, not transcribed video. They have no video_id, no timeline
 and no speaker, so the chunk records here do not carry those fields — an empty
@@ -6,14 +6,18 @@ and no speaker, so the chunk records here do not carry those fields — an empty
 and filling it with a placeholder would put a number where there is no measurement.
 The same reasoning the owner fixtures used for their absent gold labels.
 
-Splitting is header-first. Where a document has headings, the section boundary is a
-better chunk boundary than a character count, and `heading_path` records where each
-chunk sits so a parent-child retriever can be attached later without re-chunking.
-Sections longer than the v3 ceiling are then split on characters, so every chunk in
-the combined corpus obeys the same length contract as the video chunks.
+Splitting is header-first *where the source actually has headings*. Where it does, the
+section boundary is a better chunk boundary than a character count and `heading_path`
+records where each chunk sits. Where it does not — see PROMOTION_DISABLED_SOURCES —
+the document goes straight to character chunking. Sections longer than the v3 ceiling
+are then split on characters either way, so every chunk in the combined corpus obeys
+the same length contract as the video chunks.
 
-Only the six documents named in docs/acquisition_list.md are ingested. The crawl pool
-is 718 posts; this is not a bulk load.
+MANIFEST currently names 14 documents (11 crawl + 3 hand-saved); the three AVSAB PDFs
+are ingested separately by `ingest_pdf_documents.py`, for 17 documents and 219 chunks
+in the document corpus as of 2026-08-25. The crawl pool behind it is 829 posts. This
+is a named list, not a bulk load, and the count in this docstring is the count in
+MANIFEST — earlier revisions said "six" long after it had stopped being six.
 
 Usage:
     uv run python scripts/ingest_documents.py
@@ -49,13 +53,17 @@ CHUNKING = dict(_SHARED_CHUNKING)
 
 # --- header promotion -------------------------------------------------------
 #
-# Validated against exactly these six documents. It reads a standalone short line as
-# a heading, which is true of the blogs here and is NOT a general rule: a bulk ingest
-# of the wider crawl pool must re-check it against a fresh sample before trusting it,
-# because a false promotion silently shatters a list into one-line sections and a
-# missed one buries a section boundary. `chunking_method` records whether a chunk's
-# headings were promoted this way, so a corpus can always be filtered back to the
-# documents whose structure a person actually looked at.
+# It reads a standalone short line as a heading, which is NOT a general rule: a false
+# promotion silently shatters a list into one-line sections and a missed one buries a
+# section boundary. `chunking_method` records whether a chunk's headings were promoted
+# this way, so a corpus can always be filtered back to the documents whose structure a
+# person actually looked at.
+#
+# That re-check has now been done. reports/document_parsing_validation_0825.md ran this
+# promotion over all 829 posts in the crawl pool: of the 58 documents that reached it,
+# 57 produced at least one malformed heading, and 304 of the 467 promoted headings were
+# sentence fragments rather than titles. The result is PROMOTION_DISABLED_SOURCES below
+# — the rule is kept for the sources it works on and turned off for the one it does not.
 MAX_HEADING_CHARS = 40
 SENTENCE_ENDINGS = (
     "니다.", "습니다.", "합시다.", "세요.", "됩니다.", "다.", "요.", "죠.", "까?",
@@ -73,6 +81,33 @@ DATE_LINE = re.compile(r"^\d{1,2}월 \d{1,2},? ?\d{0,4}$")
 # character chunking, which is the rule these documents were always going to hit.
 HARD_WRAP_SHORT_SHARE = 0.85
 HARD_WRAP_MEDIAN_CHARS = 30
+
+# --- source policy ----------------------------------------------------------
+#
+# `is_hard_wrapped` is a per-document guess, and on the full crawl pool it catches 93%
+# of the Naver blog posts and lets the rest through: its two conditions are ANDed, so a
+# post at short_share 0.80-0.84 with a median of 14-29 characters is hard-wrapped in
+# every way that matters and still gets promoted. Those 32 leaked documents are where
+# most of the 304 malformed headings came from.
+#
+# Loosening the threshold was the obvious fix and is the wrong one: dropping it to
+# 0.60/34 flips `yd-otitis-externa` — a hand-saved document with 14 headings a person
+# checked — to the fallback and costs it every heading it has. The threshold cannot
+# separate "writer wrapped lines" from "writer wrote headings" across sources because
+# it is not a property of the document, it is a property of the *publisher*.
+#
+# So the decision is made per source instead of per document. Naver blog bodies are
+# hard-wrapped by the editor, not the writer; no post from either blog in the pool has
+# usable headings. generic web sources do (the fitpet posts promote 82 headings with 17
+# flagged, a 21% error rate against 65-69% for the two Naver blogs), and hand-saved
+# documents carry headings a person put there. `chunking_method` records which reason
+# applied, so the corpus can still be filtered back by how each chunk was cut.
+#
+# Consequence, accepted deliberately: for these sources `heading_path` will only ever
+# hold the title, so there is no section tree here for a parent-child retriever to read.
+# That is not a capability given up, it is one that was never present in this material —
+# 93% of the pool has no heading either way. See docs/document_ingest_design.md.
+PROMOTION_DISABLED_SOURCES = {"naver_blog"}
 
 # --- cleaning ---------------------------------------------------------------
 #
@@ -376,6 +411,41 @@ def promote_headings(lines: Sequence[str]) -> tuple[list[str], int]:
     return out, len(promote)
 
 
+def prepare_lines(
+    title: str,
+    raw_lines: Sequence[str],
+    crawl_source: str | None = None,
+) -> dict[str, Any]:
+    """Clean a raw body and decide whether heading promotion may run on it.
+
+    One function rather than the same five steps written out in `ingest()` and again in
+    `validate_document_parsing.py` — the validator exists to measure what this script
+    does, and it can only do that if it is running the same code. Returns everything
+    `build_chunks` needs plus the reasons behind the decision, so both callers report
+    the same `chunking_method` for the same document.
+    """
+    kept, dropped = clean(raw_lines)
+    # The title is repeated as the first body line by the crawler; drop the echo.
+    kept = [l for l in kept if l.strip() != title]
+    hard_wrapped = is_hard_wrapped(kept)
+    policy_blocked = crawl_source in PROMOTION_DISABLED_SOURCES
+    if hard_wrapped or policy_blocked:
+        # Promotion here would read sentence fragments as headings. Measured before the
+        # hard-wrap guard existed, it turned a 2,206-character article into 40 sections
+        # averaging 55 characters, with headings like "그 대처 방법, 나아가 동물병원에 가는 것이".
+        promoted_lines, promoted_count = list(kept), 0
+    else:
+        promoted_lines, promoted_count = promote_headings(kept)
+    return {
+        "kept": kept,
+        "dropped": dropped,
+        "hard_wrapped": hard_wrapped,
+        "policy_blocked": policy_blocked,
+        "promoted_lines": promoted_lines,
+        "promoted_count": promoted_count,
+    }
+
+
 def split_sections(lines: Sequence[str]) -> list[dict[str, Any]]:
     """Split on '## ' headings. The text before the first heading is a lead section."""
     sections: list[dict[str, Any]] = []
@@ -450,13 +520,19 @@ def build_chunks(
     lines: Sequence[str],
     auto_promoted: int,
     hard_wrapped: bool = False,
+    policy_blocked: bool = False,
 ) -> tuple[list[dict[str, Any]], list[str]]:
     sections = split_sections(lines)
     header_sections = [s for s in sections if s["heading"]]
     if header_sections:
         method = "header+char_v3" + ("(auto_promoted)" if auto_promoted else "(manual_headings)")
     elif hard_wrapped:
+        # Checked before policy_blocked on purpose: a document the shape test already
+        # rejects keeps the label it has always had, so turning the source policy on
+        # does not rewrite the chunking_method of anything already in the corpus.
         method = "char_v3_fallback(hard_wrapped)"
+    elif policy_blocked:
+        method = "char_v3_fallback(source_policy)"
     else:
         method = "char_v3_fallback"
 
@@ -539,6 +615,7 @@ def ingest(
     total_chunks = 0
     for entry in MANIFEST:
         entry = dict(entry)
+        crawl_source: str | None = None
         if entry["origin"] == "crawl":
             row = pool.get(entry["crawl_id"])
             if row is None:
@@ -547,6 +624,9 @@ def ingest(
             entry["collected_at"] = row["fetched_at"][:10]
             title = row["title"].strip()
             raw_lines = row["text"].splitlines()
+            # The crawler already records which extractor produced the body; the source
+            # policy keys off that rather than re-deriving the publisher from the URL.
+            crawl_source = row.get("source")
         else:
             meta = read_manual(crawl_root / "manual" / entry["file"])
             entry["source_url"] = meta["source_url"]
@@ -561,19 +641,15 @@ def ingest(
 
         check_url_allowed(entry["source_url"], entry["doc_id"])
 
-        kept, dropped = clean(raw_lines)
-        # The title is repeated as the first body line by the crawler; drop the echo.
-        kept = [l for l in kept if l.strip() != title]
-        hard_wrapped = is_hard_wrapped(kept)
-        if hard_wrapped:
-            # Promotion here would read sentence fragments as headings. Measured before
-            # this guard existed, it turned a 2,206-character article into 40 sections
-            # averaging 55 characters, with headings like "그 대처 방법, 나아가 동물병원에 가는 것이".
-            promoted_lines, promoted_count = list(kept), 0
-        else:
-            promoted_lines, promoted_count = promote_headings(kept)
+        prepared = prepare_lines(title, raw_lines, crawl_source)
+        kept = prepared["kept"]
+        dropped = prepared["dropped"]
+        hard_wrapped = prepared["hard_wrapped"]
+        policy_blocked = prepared["policy_blocked"]
+        promoted_lines = prepared["promoted_lines"]
+        promoted_count = prepared["promoted_count"]
         records, outline = build_chunks(
-            entry, title, promoted_lines, promoted_count, hard_wrapped
+            entry, title, promoted_lines, promoted_count, hard_wrapped, policy_blocked
         )
         if not records:
             raise IngestError(f"{entry['doc_id']}: produced no chunk")
@@ -596,6 +672,8 @@ def ingest(
             "chunking_method": method,
             "auto_promoted_headings": promoted_count,
             "hard_wrapped": hard_wrapped,
+            "promotion_blocked_by_source": policy_blocked,
+            "crawl_source": crawl_source,
             "removed_paragraphs": len(dropped),
             "removed_samples": dropped[:12],
             "chunks": len(records),
