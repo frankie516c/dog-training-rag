@@ -87,6 +87,18 @@ public static class DaengsThemeRenderer
         return inside;
     }
 
+    static bool InFencePost(double x, double y, double centerX, double top, double bottom, double halfWidth)
+    {
+        if (y < top || y > bottom) return false;
+        const double capHeight = .012;
+        double width = halfWidth;
+        if (y < top + capHeight) {
+            double progress = (y - top) / capHeight;
+            width *= .34 + .66 * progress;
+        }
+        return Math.Abs(x - centerX) < width;
+    }
+
     static Color ThemeRoom(Color c, int px, int py, int width, int height, Palette p)
     {
         double x = (double)px / width, y = (double)py / height;
@@ -94,8 +106,35 @@ public static class DaengsThemeRenderer
         bool outdoor = x > .315 && x < .512 && y > .175 && y < .455 && ((h > .12 && h < .72 && s > .22) || l > .91);
         if (outdoor) return c;
         if (x < .205 && y > .365 && y < .675 && h > .12 && h < .36 && s > .18) return Shade(c, p.Accent, .43);
+        // The fence shares its original hue with the floor, so a broad polygon
+        // would tint the floor behind it. Follow the four posts and two rails
+        // instead; the narrow perspective bands preserve their pixel silhouette.
+        bool fencePost =
+            InFencePost(x, y, .509, .874, .988, .025) ||
+            InFencePost(x, y, .663, .807, .915, .023) ||
+            InFencePost(x, y, .774, .766, .863, .022) ||
+            InFencePost(x, y, .932, .704, .798, .021);
+        bool upperRail = x > .523 && x < .914
+            && y > 1.105 - .430 * x
+            && y < 1.135 - .420 * x;
+        bool lowerRail = x > .524 && x < .914
+            && y > 1.150 - .421 * x
+            && y < 1.183 - .417 * x;
+        bool fenceRail = upperRail || lowerRail;
+        bool frontFence = fencePost || fenceRail;
+        if (frontFence) {
+            if (l > .46) return Shade(c, p.AccentSoft, .50);
+            return Shade(c, p.Accent, .43);
+        }
+        // Floor visible through the open rail gaps sits just outside InFloor().
+        // Continue the pastel floor through that narrow perspective band while
+        // the rail and post masks above keep every fence surface in its palette.
+        bool fenceBackdrop = x > .47 && x < .975
+            && y > 1.052 - .398 * x
+            && y < 1.182 - .408 * x
+            && (h < .20 || h > .97) && s > .18;
+        if (fenceBackdrop) return Shade(c, p.Floor, .58);
         if (InFloor(x, y)) {
-            if (x > .47 && y > 1.045 - .35 * x && h > .04 && h < .17 && s > .28) return c; // front fence remains natural wood
             return Shade(c, p.Floor, .58);
         }
         bool roomShell = y < .72 && (x < .57 || y < .54 + (x - .57) * .43);
@@ -109,6 +148,12 @@ public static class DaengsThemeRenderer
 
     static bool IsGreen(double h, double s) { return h > .14 && h < .40 && s > .16; }
     static bool IsWarmNeutral(double h, double s, double l) { return h > .045 && h < .19 && s > .12 && l > .32; }
+    static bool IsBrass(double h, double s, double l) { return h > .075 && h < .14 && s > .58 && l < .68; }
+    static bool InEllipse(double x, double y, double centerX, double centerY, double radiusX, double radiusY)
+    {
+        double dx = (x - centerX) / radiusX, dy = (y - centerY) / radiusY;
+        return dx * dx + dy * dy <= 1;
+    }
 
     static Color ThemeAsset(Color c, int x, int y, int width, int height, string kind, Palette p)
     {
@@ -120,8 +165,25 @@ public static class DaengsThemeRenderer
             if (IsWarmNeutral(h, s, l)) return Shade(c, p.Cream, .82);
         }
         if (kind == "cabinet") {
-            if (IsGreen(h, s)) return Shade(c, p.Accent, .43);
-            if (IsWarmNeutral(h, s, l) && !(h > .075 && h < .14 && s > .58 && l < .68)) return Shade(c, p.Cream, .82);
+            // Assign every opaque cabinet pixel to an intentional surface so
+            // original orange texture cannot leak through the themed finish.
+            // Coordinates follow the canonical cabinet perspective; brass knob
+            // pixels retain their natural material.
+            bool leftDrawers = nx >= .055 && nx < .395
+                && ny > .207 + .494 * nx
+                && ny < .546 + .449 * nx;
+            bool rightDrawers = nx >= .395 && nx < .715
+                && ny > .230 + .444 * nx
+                && ny < .551 + .450 * nx;
+            bool cabinetKnob =
+                InEllipse(nx, ny, .218, .402, .034, .039) ||
+                InEllipse(nx, ny, .218, .548, .034, .039) ||
+                InEllipse(nx, ny, .529, .549, .034, .039) ||
+                InEllipse(nx, ny, .529, .707, .034, .039);
+            if (cabinetKnob && (IsBrass(h, s, l) || l < .34)) return c;
+            if (leftDrawers) return Shade(c, p.Accent, .43);
+            if (rightDrawers) return Shade(c, p.AccentSoft, .55);
+            return Shade(c, p.Cream, .82);
         }
         if (kind == "rug") {
             if (IsGreen(h, s)) return Shade(c, p.AccentSoft, .55);
@@ -169,11 +231,11 @@ public static class DaengsThemeRenderer
 '@
 
 $palettes = @(
-  [DaengsThemeRenderer+Palette]::new("cherry-blossom", "#d7b7bf", "#f4d7df", "#c9958e", "#a95e76", "#d9849b", "#fff3e1", "#dfa1ac"),
-  [DaengsThemeRenderer+Palette]::new("mint", "#b8d4c8", "#d8efe5", "#c4b69a", "#5f9d85", "#83bfa8", "#fff7e8", "#8db9a8"),
-  [DaengsThemeRenderer+Palette]::new("lavender", "#c8bcd6", "#e7dcf2", "#b9a6b8", "#79629a", "#a18bc0", "#fff5e9", "#b6a1cc"),
-  [DaengsThemeRenderer+Palette]::new("sky-blue", "#bdd3e2", "#dceef7", "#b6b8b1", "#4f83aa", "#79add0", "#fff8ec", "#91b9d0"),
-  [DaengsThemeRenderer+Palette]::new("butter", "#d9c997", "#fff0bd", "#d3a866", "#b68737", "#d7ad55", "#fff8de", "#e2c16e")
+  [DaengsThemeRenderer+Palette]::new("cherry-blossom", "#d7b7bf", "#f4d7df", "#d9aab4", "#a95e76", "#d9849b", "#fff3e1", "#dfa1ac"),
+  [DaengsThemeRenderer+Palette]::new("mint", "#b8d4c8", "#d8efe5", "#aecfbe", "#5f9d85", "#83bfa8", "#fff7e8", "#8db9a8"),
+  [DaengsThemeRenderer+Palette]::new("lavender", "#c8bcd6", "#e7dcf2", "#bcaed2", "#79629a", "#a18bc0", "#fff5e9", "#b6a1cc"),
+  [DaengsThemeRenderer+Palette]::new("sky-blue", "#bdd3e2", "#dceef7", "#a9cee5", "#4f83aa", "#79add0", "#fff8ec", "#91b9d0"),
+  [DaengsThemeRenderer+Palette]::new("butter", "#d9c997", "#fff0bd", "#dfc47e", "#b68737", "#d7ad55", "#fff8de", "#e2c16e")
 )
 
 $assetRoot = Join-Path $RepositoryRoot "ui-experiments\main-screen\assets"
