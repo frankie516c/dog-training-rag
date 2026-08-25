@@ -330,37 +330,78 @@ def apply_output_guardrail(
     return classify_output_v2(answer, medical_terms, whitelist_terms, markers)
 
 
+# 화이트리스트가 처방마커 때문에 무효화된 사례를 모은다. 규칙 변경으로 판정이
+# 뒤집히는 자리이므로, 과차단이 실사용에서 나타나는지 관찰할 창구가 필요하다.
+# 텍스트 자체는 담지 않는다 — 상담 원문이 로그로 새면 안 된다. 어떤 용어가
+# 부딪혔는지만 남긴다.
+WHITELIST_REVOKED_LOG: list[dict[str, tuple[str, ...]]] = []
+
+
+def _log_whitelist_revoked(
+    whitelist_hits: tuple[str, ...],
+    disease_hits: tuple[str, ...],
+    marker_hits: tuple[str, ...],
+) -> None:
+    WHITELIST_REVOKED_LOG.append({
+        "whitelist_matched": whitelist_hits,
+        "matched_disease_terms": disease_hits,
+        "matched_prescriptive_markers": marker_hits,
+    })
+
+
 def classify_output_v2(
     answer: str,
     medical_terms: Sequence[str],
     whitelist_terms: Sequence[str],
     markers: Sequence[str] = PRESCRIPTIVE_MARKERS,
 ) -> OutputVerdict:
-    """Whitelist first, v2 dictionary second — same precedence as classify_input_v2.
+    """Whitelist first, v2 dictionary second — but a prescriptive marker revokes it.
 
     A whitelist hit (분리불안/불안/하울링/짖음/배변/산책/사회화, ...) passes the
-    text through unmodified regardless of what else it contains — no disclaimer,
-    no block, even if a v2 term or a prescriptive marker is also present. This is
-    classify_input_v2's already-accepted trade-off (see
-    data/guardrail/training_whitelist_v1.json's known_tradeoff) applied
-    symmetrically here, not a new decision made by this function.
+    text through unmodified — no disclaimer, no block — which is classify_input_v2's
+    already-accepted trade-off (data/guardrail/training_whitelist_v1.json's
+    known_tradeoff) applied symmetrically here.
+
+    **The whitelist no longer wins when a prescriptive marker is present** (added
+    2026-08-25). Q&A sources put an owner's question and a trainer's answer in one
+    retrieval, and when both reach the model the answer can carry training
+    vocabulary from one and drug vocabulary from the other. Measured on synthetic
+    Q&A pairs, a whitelist term from the expert answer neutralised 처방/연고를-class
+    markers that came from the owner's question in 3 of 5 cases — every one of
+    which would otherwise have been blocked. Training advice has no reason to say
+    처방/투약/mg, so the marker is a usable signal for "this stopped being a
+    training answer".
+
+    Known limit: this does not fix the root cause — text from different sources
+    merged into one string, where one source's vocabulary vouches for another's.
+    It uses the marker list as a proxy. A dangerous combination that misses all
+    19 markers bypasses this the same way. If that recurs, the answer is a
+    provenance-aware check, not a longer marker list. See
+    docs/design_qa_authority_retrieval.md.
     """
     whitelist_hits = _find_matches(answer, whitelist_terms)
-    if whitelist_hits:
+    marker_hits = _find_matches(answer, markers)
+    if whitelist_hits and not marker_hits:
         return OutputVerdict(is_blocked=False, text=answer, whitelist_matched=whitelist_hits)
     disease_hits = _find_matches(answer, medical_terms)
-    marker_hits = _find_matches(answer, markers)
     if disease_hits and marker_hits:
+        if whitelist_hits:
+            # 화이트리스트가 있었는데도 차단된 경우 — 규칙 변경으로 판정이
+            # 뒤집힌 자리다. 과차단이 실사용에서 나타나는지 보려면 이 사례가
+            # 눈에 보여야 한다. 판정을 바꾸지는 않고 기록만 한다.
+            _log_whitelist_revoked(whitelist_hits, disease_hits, marker_hits)
         return OutputVerdict(
             is_blocked=True,
             matched_disease_terms=disease_hits,
             matched_prescriptive_markers=marker_hits,
             text=OUTPUT_BLOCKED_MESSAGE,
+            whitelist_matched=whitelist_hits,
         )
     if disease_hits:
         return OutputVerdict(
             is_blocked=False,
             matched_disease_terms=disease_hits,
             text=answer + OUTPUT_DISCLAIMER,
+            whitelist_matched=whitelist_hits,
         )
-    return OutputVerdict(is_blocked=False, text=answer)
+    return OutputVerdict(is_blocked=False, text=answer, whitelist_matched=whitelist_hits)
