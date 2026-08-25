@@ -72,20 +72,41 @@ GATE_THRESHOLD = 0.024
 GATE_PASS = "PASS"
 GATE_REFUSE = "REFUSE"
 
-# Experimental alternatives to score_gap (docs/agenda_0825.md #1 — score_gap loses
-# discriminative power as the corpus grows: PASS 11/20 -> 20/20 across a 26->77
-# chunk expansion, and 20/20 again at 567 chunks in the corpus-expansion trial that
-# was rolled back 2026-08-25). NOT the default; opt in with --gate-signal.
+# DEFAULT SIGNAL CHANGED 2026-08-25: margin_top5, not score_gap.
 #
-# reports/retrieval_gate_redesign_0825.md found neither margin beats a trivial
-# always-REFUSE baseline on the 20-fixture owner set (14 REFUSE / 6 ANSWER, so
-# always-REFUSE already scores 14/20 = 70% by class imbalance alone) — these
-# thresholds are the in-sample optimum on that same 20 rows, not a cross-validated
-# operating point. They exist so the signal can be re-measured as fixtures grow,
-# not because they are ready to replace GATE_THRESHOLD.
+# score_gap (top1 - corpus mean) loses discriminative power as the corpus grows
+# (docs/agenda_0825.md #1): PASS 11/20 -> 20/20 across a 26->77 chunk expansion,
+# 20/20 again at 567 chunks in the corpus-expansion trial rolled back
+# 2026-08-25, and 48/48 at the current 245-chunk corpus with the 48-fixture
+# owner set below — it now passes literally everything regardless of
+# expected_outcome. It matches expected_outcome on only 31-33% of the 48
+# fixtures at either 83 or 245 chunks (reports/retrieval_gate_redesign_retry_0825.md)
+# — worse than always guessing REFUSE (68.75%).
+#
+# margin_top5 (top1 - top5, does not reference the corpus mean) was tried
+# first on 20 fixtures (reports/retrieval_gate_redesign_0825.md, 14 REFUSE / 6
+# ANSWER) and only tied the always-REFUSE baseline there. Once
+# reports/owner_fixtures_expansion_0825.md grew the set to 48 (33 REFUSE / 15
+# ANSWER), reports/retrieval_gate_redesign_retry_0825.md re-ran it and found:
+# (a) 40/48 (83.3%) overall, and on just the 28 fixtures added after this
+# threshold was fit — genuine held-out rows — 26/28 (92.9%), well above that
+# slice's own always-REFUSE baseline (67.9%); (b) checked across corpus sizes
+# by temporarily pulling the 162 chunks added since the last full-corpus
+# report back out, its match rate went 72.9% (83 chunks) -> 83.3% (245
+# chunks) — improving, not degrading, as the corpus tripled, which is the
+# opposite of what score_gap does under the same kind of growth. Three
+# independent checks (held-out fixtures, corpus-size swing, and the trivial
+# baseline) agree, so this file's default switched.
+#
+# generate_answers.py's three-band classify_band() (REFUSE/hedge/ANSWER) is a
+# separate mechanism and still runs on score_gap alone — this switch does not
+# touch it. classify_band has no margin_top5-equivalent thresholds fit for its
+# three bands (only this file's binary PASS/REFUSE was tested), so carrying
+# this decision over there is a distinct piece of work, not a two-line change.
 GATE_SIGNALS = ("score_gap", "margin_top2", "margin_top5")
-GATE_MARGIN_TOP2_THRESHOLD = 0.011  # in-sample optimum: 14/20 match, ties the always-REFUSE baseline
-GATE_MARGIN_TOP5_THRESHOLD = 0.0183  # in-sample optimum: 15/20 match, barely beats the baseline
+GATE_MARGIN_TOP2_THRESHOLD = 0.011  # fit on the original 20 rows; held up 21/28 on the 28 added since
+GATE_MARGIN_TOP5_THRESHOLD = 0.0183  # fit on the original 20 rows; held up 26/28 on the 28 added since
+DEFAULT_GATE_SIGNAL = "margin_top5"
 
 # Fixtures the acquisition was meant to unblock, and the slot that should do it.
 UNBLOCK_TARGETS = {
@@ -187,18 +208,82 @@ def overlap_ms(a0: int, a1: int, b0: int, b1: int) -> int:
     return max(0, min(a1, b1) - max(a0, b0))
 
 
+# 문서 앵커 최소 길이. 짧은 인용문은 다른 문서·다른 문단에 우연히 걸린다.
+MIN_ANCHOR_CHARS = 20
+
+
 def gold_relevant_chunks(
-    query: dict[str, Any], video_chunks: Sequence[dict[str, Any]]
+    query: dict[str, Any],
+    video_chunks: Sequence[dict[str, Any]],
+    document_chunks: Sequence[dict[str, Any]] = (),
 ) -> tuple[str, ...]:
-    """Eligible video chunks whose interval overlaps any gold span of the query."""
-    by_video = [c for c in video_chunks if c["video_id"] == query["video_id"]]
+    """질의의 gold 청크 집합. 영상 span과 문서 앵커의 **합집합**이다.
+
+    두 참조 체계를 병행하는 이유:
+      - 영상은 시간축이 원본의 자연스러운 좌표다. 텍스트 앵커로 옮기면 ASR
+        전사가 바뀔 때마다 깨지는데, 재전사 논의가 아직 열려 있다.
+      - 문서는 타임라인이 없다. 문자 오프셋은 본문이 한 글자만 바뀌어도 전부
+        밀린다(breadcrumb 제거처럼 실제로 일어난다). 인용문 앵커는 그 문장이
+        본문에 남아 있는 한 계속 매칭된다.
+
+    한 질의가 둘 다 가질 수 있다 — 문서 답과 영상 답이 동시에 타당한 질의가
+    실제로 나오며, 한쪽만 gold로 두면 정답인 검색을 오답으로 채점하게 된다.
+
+    앵커가 어느 청크에도 매칭되지 않으면 **오류를 낸다.** gold가 조용히 줄면
+    정답 집합이 작아져 Hit@1이 오히려 올라갈 수 있고, 그것을 개선으로 읽게 된다.
+    """
     found: list[str] = []
-    for span in query["relevant_spans"]:
-        for chunk in by_video:
-            if overlap_ms(span["start_ms"], span["end_ms"], chunk["start_ms"], chunk["end_ms"]) > 0:
-                found.append(chunk["chunk_id"])
+
+    if query.get("video_id") and query.get("relevant_spans"):
+        by_video = [c for c in video_chunks if c["video_id"] == query["video_id"]]
+        for span in query["relevant_spans"]:
+            for chunk in by_video:
+                if overlap_ms(
+                    span["start_ms"], span["end_ms"], chunk["start_ms"], chunk["end_ms"]
+                ) > 0:
+                    found.append(chunk["chunk_id"])
+
+    for anchor in query.get("anchors") or []:
+        quote = anchor["quote"]
+        if len(quote) < MIN_ANCHOR_CHARS:
+            raise EvalError(
+                f"{query['query_id']}/{anchor['anchor_id']}: 앵커가 {len(quote)}자로 "
+                f"최소 {MIN_ANCHOR_CHARS}자 미만 — 짧은 인용문은 우연 매칭이 난다"
+            )
+        in_doc = [c for c in document_chunks if c["doc_id"] == anchor["doc_id"]]
+        if not in_doc:
+            raise EvalError(
+                f"{query['query_id']}/{anchor['anchor_id']}: doc_id "
+                f"{anchor['doc_id']!r}에 해당하는 청크가 코퍼스에 없다"
+            )
+        # 여러 청크에 걸리면 전부 gold다 — 같은 문장이 두 청크에 있다면 어느
+        # 쪽을 검색해도 답이 나오므로 둘 다 정답이 맞다.
+        hits = [c["chunk_id"] for c in in_doc if quote in c["text"]]
+        if not hits:
+            available = ", ".join(f"#{c['chunk_index']}" for c in in_doc[:10])
+            raise EvalError(
+                f"{query['query_id']}/{anchor['anchor_id']}: 앵커 인용문이 "
+                f"{anchor['doc_id']}의 어느 청크에도 없다 — 본문이 편집됐거나 "
+                f"청크 경계를 가로지른다. 해당 문서 청크: {available}"
+            )
+        found.extend(hits)
+
     if not found:
-        raise EvalError(f"{query['query_id']}: gold spans map to no eligible chunk")
+        # coverage: missing은 "코퍼스에 답이 없다"가 정답인 질의다. 거절 경계
+        # 질의가 여기 해당하며, 정답 청크를 정의하는 것 자체가 모순이다 —
+        # 아무것도 검색되지 않는 것이 성공이기 때문이다. 검색 지표에서 빼고
+        # 게이트 판정만 본다(아래 run()의 gold 루프).
+        #
+        # **명시적으로 missing이라고 적힌 질의만** 예외다. 그 표시가 없는데
+        # 매핑이 0건이면 여전히 오류다 — gold가 조용히 줄면 정답 집합이 작아져
+        # Hit@1이 오히려 올라가고, 그것을 개선으로 읽게 된다.
+        if query.get("coverage") == "missing":
+            return ()
+        raise EvalError(
+            f"{query['query_id']}: gold 참조가 어느 청크에도 매핑되지 않는다 "
+            "(relevant_spans·anchors 둘 다 비었거나 해석 실패). 코퍼스에 답이 "
+            "없는 것이 정답인 질의라면 coverage: missing을 명시할 것"
+        )
     return tuple(sorted(dict.fromkeys(found)))
 
 
@@ -247,12 +332,14 @@ def gate(score_gap: float) -> str:
     return GATE_PASS if score_gap >= GATE_THRESHOLD else GATE_REFUSE
 
 
-def gate_verdict(stats: dict[str, Any], signal: str = "score_gap") -> str:
+def gate_verdict(stats: dict[str, Any], signal: str = DEFAULT_GATE_SIGNAL) -> str:
     """Same PASS/REFUSE contract as gate(), generalized over GATE_SIGNALS.
 
-    signal='score_gap' reproduces gate(stats['score_gap']) exactly — this is the
-    default and the only signal wired into the demo path. The margin signals are
-    experimental (see the GATE_SIGNALS comment) and only reachable via --gate-signal.
+    Default is margin_top5 as of 2026-08-25 (see the GATE_SIGNALS comment for
+    why). signal='score_gap' still reproduces gate(stats['score_gap']) exactly
+    for anyone who passes it explicitly or via --gate-signal score_gap — it is
+    also what generate_answers.py's separate classify_band() still uses, since
+    that three-band mechanism was not part of this switch.
     """
     if signal == "score_gap":
         return gate(stats["score_gap"])
@@ -267,6 +354,20 @@ def gate_verdict(stats: dict[str, Any], signal: str = "score_gap") -> str:
     if value is None:  # corpus too small for this rank (e.g. <5 chunks for top5)
         return GATE_PASS
     return GATE_PASS if value >= threshold else GATE_REFUSE
+
+
+def gate_signal_threshold(signal: str) -> float:
+    """The operating threshold for whichever --gate-signal is active.
+
+    build_report()'s prose used to hardcode "score_gap >= {GATE_THRESHOLD}" —
+    wrong as soon as the default stopped being score_gap. Report text should
+    read this instead of the score_gap-specific constant directly.
+    """
+    return {
+        "score_gap": GATE_THRESHOLD,
+        "margin_top2": GATE_MARGIN_TOP2_THRESHOLD,
+        "margin_top5": GATE_MARGIN_TOP5_THRESHOLD,
+    }[signal]
 
 
 def describe(chunk: dict[str, Any]) -> str:
@@ -419,6 +520,93 @@ def hybrid_merge(
     return list(dict.fromkeys(ordered))
 
 
+ROLE_OWNER_QUESTION = "OWNER_QUESTION"
+ROLE_EXPERT_ANSWER = "EXPERT_ANSWER"
+
+# 한 Q&A의 전문가 답변이 여러 청크에 걸칠 때 몇 개까지 근거에 붙일지.
+# 무제한이면 긴 답변 하나가 프롬프트를 통째로 차지한다. 상한을 넘으면 조용히
+# 자르지 않고 몇 개를 버렸는지 기록한다 — 잘린 것을 모르면 커버리지를 과대평가한다.
+#
+# 처음 5로 잡았으나 실데이터에서 작았다 — 훈련사 답변은 6~9청크가 흔했고 6개
+# 질의가 상한에 걸렸다. 답변부는 인용 가능한 유일한 근거이므로 잘리면 권고가
+# 중간에서 끊긴다. 실측 최대(9)를 담고 한 칸 여유를 둔다.
+EXPANSION_MAX_SIBLINGS = 10
+
+
+def build_qa_answer_index(corpus: Sequence[dict[str, Any]]) -> dict[str, list[str]]:
+    """qa_id -> EXPERT_ANSWER chunk_id 목록 (문서 순서).
+
+    답변이 여러 청크로 쪼개졌을 때 순서가 뒤섞이면 절차 설명이 끊기므로
+    chunk_index 오름차순을 유지한다.
+    """
+    grouped: dict[str, list[tuple[int, str]]] = {}
+    for chunk in corpus:
+        if chunk.get("segment_role") != ROLE_EXPERT_ANSWER:
+            continue
+        qa_id = chunk.get("qa_id")
+        if not qa_id:
+            continue
+        grouped.setdefault(qa_id, []).append(
+            (int(chunk.get("chunk_index", 0)), chunk["chunk_id"])
+        )
+    return {
+        qa_id: [cid for _idx, cid in sorted(pairs)]
+        for qa_id, pairs in grouped.items()
+    }
+
+
+def expand_qa_siblings(
+    evidence_ids: Sequence[str],
+    by_id: dict[str, dict[str, Any]],
+    qa_index: dict[str, list[str]],
+) -> tuple[list[str], dict[str, Any]]:
+    """OWNER_QUESTION이 근거에 들어왔으면 같은 qa_id의 EXPERT_ANSWER를 붙인다.
+
+    견주 질문은 citation_allowed=false다 — 사용자 사례 맥락이지 훈련 권고가
+    아니다. 질문만 근거로 남으면 인용할 것이 없는 채로 견주 발화가 노출되므로,
+    인용 가능한 형제 답변을 함께 가져온다.
+
+    **이 함수는 게이트 통계 계산이 끝난 뒤에만 호출해야 한다.** 유사도 분포를
+    건드리면 별도로 검증을 마친 게이트 신호 결정이 무효화된다. 호출 순서는
+    테스트로 고정돼 있다.
+
+    규칙:
+      - 형제 답변은 문서 순서로 **전부** 붙인다(상한 EXPANSION_MAX_SIBLINGS).
+        답변이 여러 청크에 걸칠 때 일부만 주면 권고가 중간에서 잘린다.
+      - 이미 랭킹에 들어와 있는 답변은 다시 붙이지 않는다(순서 유지, 중복 제거).
+      - **형제 답변이 하나도 없는 OWNER_QUESTION은 근거에서 뺀다(fail-closed).**
+        인용 가능한 짝이 없는 견주 발화를 근거로 남기면, 인용 금지 표시가
+        있더라도 모델이 그것만 보고 답을 지어낼 여지가 생긴다.
+    """
+    ordered = list(dict.fromkeys(evidence_ids))
+    appended: list[str] = []
+    dropped_orphans: list[str] = []
+    truncated: dict[str, int] = {}
+
+    for cid in list(ordered):
+        chunk = by_id.get(cid)
+        if not chunk or chunk.get("segment_role") != ROLE_OWNER_QUESTION:
+            continue
+        qa_id = chunk.get("qa_id")
+        siblings = qa_index.get(qa_id or "", [])
+        if not siblings:
+            dropped_orphans.append(cid)
+            continue
+        if len(siblings) > EXPANSION_MAX_SIBLINGS:
+            truncated[qa_id] = len(siblings) - EXPANSION_MAX_SIBLINGS
+            siblings = siblings[:EXPANSION_MAX_SIBLINGS]
+        for sid in siblings:
+            if sid not in ordered and sid not in appended:
+                appended.append(sid)
+
+    result = [cid for cid in ordered if cid not in dropped_orphans] + appended
+    return result, {
+        "appended_answer_chunk_ids": appended,
+        "dropped_orphan_question_chunk_ids": dropped_orphans,
+        "truncated_siblings_by_qa_id": truncated,
+    }
+
+
 def run(
     video_dir: Path,
     doc_dir: Path | None,
@@ -429,7 +617,7 @@ def run(
     graph_extractions: Path = DEFAULT_GRAPH_EXTRACTIONS,
     graph_aliases: Path = DEFAULT_GRAPH_ALIASES,
     graph_off: bool = False,
-    gate_signal: str = "score_gap",
+    gate_signal: str = DEFAULT_GATE_SIGNAL,
 ) -> dict[str, Any]:
     video_all = load_video_chunks(video_dir)
     video = [c for c in video_all if c.get("embedding_eligible")]
@@ -439,6 +627,9 @@ def run(
     corpus = video + documents
     ids = [c["chunk_id"] for c in corpus]
     by_id = {c["chunk_id"]: c for c in corpus}
+    # Q&A 형제 확장용 인덱스. Q&A 소스가 없으면 빈 dict이고 확장은 아무 일도
+    # 하지 않는다 — qa_id 없는 코퍼스에서 동작이 바뀌지 않음을 뜻한다.
+    qa_index = build_qa_answer_index(corpus)
 
     if graph_off:
         graph_nodes: dict = {}
@@ -484,6 +675,11 @@ def run(
             hybrid_merge(ranked, graph_chunks) if verdict == GATE_PASS
             else [cid for cid, _score in ranked]
         )
+        # Q&A 형제 확장은 **여기서**, 게이트 통계(stats)와 판정(verdict)이 모두
+        # 확정된 뒤에 일어난다. 확장이 랭킹이나 유사도 분포에 영향을 주면 게이트
+        # 신호 결정이 무효화되므로, 근거 목록만 손대고 ranked/stats는 건드리지
+        # 않는다. 이 순서는 테스트로 고정돼 있다.
+        evidence_ids, expansion = expand_qa_siblings(evidence_ids, by_id, qa_index)
         fixture_rows.append({
             "query_id": row["query_id"],
             "question": row["question"],
@@ -520,11 +716,14 @@ def run(
                 for chunk in graph_chunks
             ],
             "evidence_chunk_ids": evidence_ids,
+            # 확장이 무엇을 붙이고 무엇을 뺐는지 남긴다. 조용히 자르면
+            # 커버리지를 과대평가하게 된다.
+            "qa_expansion": expansion,
         })
 
     gold_rows = []
     for row in gold:
-        relevant = set(gold_relevant_chunks(row, video))
+        relevant = set(gold_relevant_chunks(row, video, documents))
         ranked, stats = rank_one(str(row["question"]))
         first = next((r for r, (cid, _) in enumerate(ranked, start=1) if cid in relevant), None)
         verdict = gate_verdict(stats, gate_signal)
@@ -533,6 +732,10 @@ def run(
             hybrid_merge(ranked, graph_chunks) if verdict == GATE_PASS
             else [cid for cid, _score in ranked]
         )
+        # 픽스처 경로와 같은 조립 규칙을 쓴다 — 두 경로가 근거를 다르게 모으면
+        # 드리프트가 생긴다. first_relevant_rank는 ranked에서 이미 계산됐으므로
+        # Hit@1/MRR은 확장의 영향을 받지 않는다.
+        evidence_ids, expansion = expand_qa_siblings(evidence_ids, by_id, qa_index)
         gold_rows.append({
             "query_id": row["query_id"],
             "question": row["question"],
@@ -566,16 +769,23 @@ def run(
                 for chunk in graph_chunks
             ],
             "evidence_chunk_ids": evidence_ids,
+            "qa_expansion": expansion,
         })
 
-    hit1 = sum(1 for r in gold_rows if r["first_relevant_rank"] == 1)
-    hit5 = sum(1 for r in gold_rows if r["first_relevant_rank"])
+    # 검색 지표는 정답 청크가 있는 질의로만 낸다. coverage: missing 질의는
+    # 아무것도 검색되지 않는 것이 성공이므로 Hit@1/MRR의 분모에 넣으면 지표가
+    # 뜻을 잃는다 — 게이트 판정(REFUSE인가)으로 따로 본다.
+    scored = [r for r in gold_rows if r["relevant_chunk_count"] > 0]
+    refuse_only = [r for r in gold_rows if r["relevant_chunk_count"] == 0]
+    hit1 = sum(1 for r in scored if r["first_relevant_rank"] == 1)
+    hit5 = sum(1 for r in scored if r["first_relevant_rank"])
     return {
         "schema_version": METRICS_SCHEMA_VERSION,
         "run": {
             "model_name": MODEL_NAME,
             "top_k": TOP_K,
-            "gate_threshold": GATE_THRESHOLD,
+            "gate_signal": gate_signal,
+            "gate_threshold": gate_signal_threshold(gate_signal),
             "query_prefix": QUERY_PREFIX,
             "passage_prefix": PASSAGE_PREFIX,
             "tie_break": "ascending chunk_id",
@@ -605,10 +815,13 @@ def run(
         "gold": gold_rows,
         "gold_summary": {
             "queries": len(gold_rows),
-            "hit@1": serialize_score(hit1 / len(gold_rows)),
-            "hit@5": serialize_score(hit5 / len(gold_rows)),
+            # 분모는 정답 청크가 있는 질의 수다. coverage: missing 질의는 빠진다.
+            "scored_queries": len(scored),
+            "refuse_only_queries": len(refuse_only),
+            "hit@1": serialize_score(hit1 / len(scored)) if scored else None,
+            "hit@5": serialize_score(hit5 / len(scored)) if scored else None,
             "mrr@5": serialize_score(
-                sum(r["reciprocal_rank"] for r in gold_rows) / len(gold_rows)
+                sum(r["reciprocal_rank"] for r in scored) / len(scored) if scored else 0.0
             ),
         },
     }
@@ -672,10 +885,12 @@ def build_report(
     lines.append("| **통합** | **{}** | `{}` |".format(
         corpus["combined"]["chunks"], corpus["combined"]["fingerprint"][:26]))
     lines.append("")
+    active_signal = payload["run"].get("gate_signal", "score_gap")
+    active_threshold = payload["run"].get("gate_threshold", GATE_THRESHOLD)
     lines.append(
-        "gate 임계값은 `score_gap >= {}`로 **조달 전과 동일**합니다. "
-        "코퍼스가 막 바뀐 상태에서 임계값까지 같이 움직이면 두 효과가 한 측정에 섞입니다."
-        .format(GATE_THRESHOLD))
+        "gate 신호는 `{} >= {}`이고 **조달 전과 동일**합니다. "
+        "코퍼스가 막 바뀐 상태에서 신호나 임계값까지 같이 움직이면 두 효과가 한 측정에 섞입니다."
+        .format(active_signal, active_threshold))
 
     lines.extend(_decomposition_section(fixtures, base_fixtures, corpus))
     lines.extend(_unblock_section(fixtures, base_fixtures))
@@ -979,10 +1194,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--graph-aliases", type=Path, default=DEFAULT_GRAPH_ALIASES)
     parser.add_argument("--graph-off", action="store_true",
                         help="vector-only run, no graph search — for the vector-vs-hybrid comparison")
-    parser.add_argument("--gate-signal", choices=GATE_SIGNALS, default="score_gap",
-                        help="experimental (see GATE_SIGNALS comment) — default score_gap is the "
-                             "only signal the demo path uses; margin_top2/margin_top5 are for "
-                             "reports/retrieval_gate_redesign_0825.md-style comparison runs only")
+    parser.add_argument("--gate-signal", choices=GATE_SIGNALS, default=DEFAULT_GATE_SIGNAL,
+                        help="default is margin_top5 as of 2026-08-25 (see the GATE_SIGNALS "
+                             "comment) — score_gap is kept for comparison runs and because "
+                             "generate_answers.py's separate classify_band() still uses it")
     return parser
 
 

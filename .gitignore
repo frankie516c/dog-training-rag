@@ -49,6 +49,16 @@ data/eval/queries/*
 # 나머지 중간 산출물은 추적하지 않는다 — 원문 지문과 재현 좌표를 나르는 통로다.
 # prepare_synthetic_queries.py가 만드는 _synthetic_prompt.md(자막 지문)와
 # _synthetic_mapping.json(chunk_id·video_id·start_ms)은 로컬에서만 둔다.
+
+# 라벨링 작업대는 사람이 쓰는 도구라 추적한다. 같은 폴더의 데이터 번들
+# (gold_workbench_data.js, 굽는 스크립트로 언제든 재생성됨)과 사전계산 결과는
+# 계속 제외한다 — 도구만 남기고 생성물은 두지 않는다.
+#
+# 디렉터리 자체를 먼저 예외로 풀어야 한다: 상위 `data/eval/*`가 이 디렉터리를
+# 통째로 무시하면 그 안의 파일에 대한 음수 패턴이 아예 평가되지 않는다.
+# .html 예외는 아래 전역 `*.html` 규칙 **뒤**에 있어야 한다(나중 규칙이 이긴다).
+!data/eval/labeling/
+data/eval/labeling/*
 *.vtt
 *.srt
 *.wav
@@ -131,6 +141,11 @@ venv_snapshot_*.txt
 
 # 예외: UI 목업은 .md 원본이 없는, HTML 자체가 소스인 산출물이라 추적한다.
 !ui-experiments/**/*.html
+
+# 예외: gold 라벨링 작업대도 HTML 자체가 소스인 도구다. 같은 폴더의 데이터
+# 번들(*.js)과 사전계산 결과(*.json)는 위 data/eval/labeling/* 규칙으로 계속
+# 제외된다 — 굽는 스크립트(scripts/write_gold_labels_batch1.py)로 재생성된다.
+!data/eval/labeling/*.html
 
 # 그래프 동결 스냅샷(frozen/)은 여기서 의도적으로 제외하지 않는다 — LLM 추출이라
 # 재실행마다 결과가 흔들려서(docs/handoff_neo4j.md) 재추출로 재현 불가능한 산출물이다.

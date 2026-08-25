@@ -160,13 +160,50 @@ class ClassifyOutputV2Tests(unittest.TestCase):
         self.assertTrue(verdict.is_blocked)
         self.assertEqual(module.OUTPUT_BLOCKED_MESSAGE, verdict.text)
 
-    def test_known_tradeoff_whitelist_wins_even_with_a_prescriptive_marker_present(self):
-        """Same documented trade-off as classify_input_v2, now on the output side."""
+    def test_prescriptive_marker_revokes_the_whitelist(self):
+        """2026-08-25: the whitelist no longer wins when a marker is present.
+
+        This test previously pinned the opposite — a whitelist hit passed the text
+        through even alongside 처방/투약-class markers, mirroring
+        classify_input_v2's documented trade-off. Q&A sources broke that: an
+        owner's question and a trainer's answer reach the model together, and a
+        training term from the answer was neutralising drug vocabulary from the
+        question. Measured on synthetic Q&A pairs, 3 of 5 cases that should have
+        been blocked passed. Training advice has no reason to say 처방/투약/mg,
+        so the marker revokes the exemption.
+
+        The trade-off is not gone, only narrowed: a whitelist hit still wins when
+        no marker is present (test_whitelist_still_wins_without_a_marker below).
+        """
         answer = "산책 중이라면 처방받은 약을 미리 먹여도 괜찮습니다."
+        verdict = module.classify_output_v2(answer, V2_TERMS, WHITELIST_TERMS)
+        self.assertTrue(verdict.is_blocked)
+        self.assertEqual(module.OUTPUT_BLOCKED_MESSAGE, verdict.text)
+        # 무엇이 무효화됐는지 판정에 남는다 — 과차단 관찰용.
+        self.assertIn("산책", verdict.whitelist_matched)
+        self.assertIn("처방", verdict.matched_prescriptive_markers)
+
+    def test_whitelist_still_wins_without_a_marker(self):
+        """마커가 없으면 기존 트레이드오프가 그대로다 — 좁혔을 뿐 없애지 않았다."""
+        answer = "분리불안이 있으면 병원에 가보는 것도 방법입니다."
         verdict = module.classify_output_v2(answer, V2_TERMS, WHITELIST_TERMS)
         self.assertFalse(verdict.is_blocked)
         self.assertEqual(answer, verdict.text)
-        self.assertIn("산책", verdict.whitelist_matched)
+        self.assertIn("분리불안", verdict.whitelist_matched)
+
+    def test_revoked_whitelist_is_recorded_for_over_blocking_review(self):
+        """규칙 변경으로 판정이 뒤집힌 자리를 관찰할 창구가 있어야 한다."""
+        before = len(module.WHITELIST_REVOKED_LOG)
+        module.classify_output_v2(
+            "산책 중이라면 처방받은 약을 미리 먹여도 괜찮습니다.", V2_TERMS, WHITELIST_TERMS
+        )
+        self.assertEqual(len(module.WHITELIST_REVOKED_LOG), before + 1)
+        entry = module.WHITELIST_REVOKED_LOG[-1]
+        self.assertIn("산책", entry["whitelist_matched"])
+        # 상담 원문이 로그로 새면 안 된다 — 어떤 용어가 부딪혔는지만 남긴다.
+        self.assertEqual(set(entry), {
+            "whitelist_matched", "matched_disease_terms", "matched_prescriptive_markers"
+        })
 
     def test_plain_training_answer_passes_untouched(self):
         answer = "앉기 훈련은 간식을 코 앞에 두고 위로 올리며 유도합니다 [1]."
