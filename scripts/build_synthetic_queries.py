@@ -7,6 +7,12 @@ youtube-eval-query-v1 form so evaluate_youtube_retrieval.py runs unchanged.
 Gold spans come from the source chunk's own start_ms/end_ms. They stay valid
 across re-chunking because they are absolute timestamps, not chunk ids.
 
+The mapping file this reads is no longer tracked (see prepare_synthetic_queries.py
+and .gitignore), so a clean clone cannot rerun this stage without regenerating
+stage 1 first. The output it already produced — data/eval/queries/
+youtube_synthetic_queries.jsonl, 51 human-reviewed queries — is tracked, so the
+eval set itself does not depend on the mapping being present.
+
 Usage:
     uv run python scripts/build_synthetic_queries.py --raw data/eval/queries/_synthetic_raw.json
 """

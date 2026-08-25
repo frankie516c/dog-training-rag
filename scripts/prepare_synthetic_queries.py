@@ -7,6 +7,14 @@ Stage 1 of 2. This script does the sampling (reproducible via --seed) and writes
 The LLM never sees chunk ids or timestamps. It only sees numbered passages, so
 its output cannot leak identifiers that would make the eval trivially easy.
 
+Both files this writes are untracked on purpose, and .gitignore now enforces it.
+The prompt carries the passages verbatim — for the YouTube corpus that is subtitle
+text, which docs/SOURCES.md says the platform's ToS forbids scraping — and the
+mapping carries video_id with start_ms/end_ms, which is the recipe for locating
+that text again. Both were committed and public until 2026-08-25
+(reports/license_premise_audit_0825.md). Regenerate them locally when rerunning
+stage 1; do not add them back to the repository.
+
 Usage:
     uv run python scripts/prepare_synthetic_queries.py --count 20 --per-chunk 3
 """
