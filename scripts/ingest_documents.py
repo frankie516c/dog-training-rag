@@ -132,6 +132,54 @@ PROMO_SUBSTRINGS = (
 HASHTAG = re.compile(r"^\s*(#\S+\s*)+$")
 BLOG_SIGNATURE = ("아프리카동물메디컬센터입니다", "서울 강서구에 위치한")
 
+# --- P1: what the rules above still let through ------------------------------
+#
+# Measured over the whole crawl pool in reports/document_parsing_validation_0825.md:
+# 1,793 of 5,389 chunks (33%) carried a line that recurs across the source's documents,
+# and 33% of lead chunks opened on crawler furniture rather than on the article. The
+# candidate list and its per-rule counts are in reports/p1_boilerplate_candidates_0825.md.
+#
+# Every rule here matches a whole line or a fixed position. None matches a substring:
+# `애견훈련소장` as a substring also catches "경력의 애견훈련소장들이", which is a sentence.
+# The frequency table is a reading aid, not the rule — `그렇기때문에` is the second most
+# repeated line in the largest source (228 documents) and is a conjunction, not furniture.
+
+# Naver's own header block, which the crawler keeps: category / title / display name /
+# timestamp. Anchored on the timestamp because the two lines above it have no shape of
+# their own — a display name is just a short line. DATE_LINE above does not match this
+# format (it is written for "8월 25"), which is why all 124 of them survive today.
+NAVER_META_TIMESTAMP = re.compile(r"^\d{4}\.\s?\d{1,2}\.\s?\d{1,2}\.\s?\d{1,2}:\d{2}$")
+NAVER_META_SCAN_LINES = 6   # a timestamp further in than this is prose, not a header
+NAVER_META_LEAD_LINES = 2   # category + display name
+
+CATEGORY_LABELS = {"훈련/케어/질병", "강아지 공부", "반려견 행동교정 전문가"}
+
+# The clinic's display name, standing alone on a line. Naver truncates it to the column
+# width, so the truncated form is part of the list rather than an error.
+CLINIC_DISPLAY_NAMES = {
+    "아프리카동물메디컬센", "아프리카 동물 메디컬센터", "아프리카동물메디컬센터",
+    "아프리카 동물병원", "아프리카동물메디컬센터입니다",
+    "아프리카 동물 메디컬센터입니다", "아프리카 동물 메디컬센터입니다.",
+    "'아프리카동물메디컬센터'",
+}
+
+# The tail of a greeting the editor's hard wrap split in two. Removed ONLY when the line
+# before it is a clinic display name — i.e. only when it is the second half of a
+# signature this file also removes the first half of.
+#
+# That condition is not caution for its own sake. All 148 occurrences were read (the
+# whole set, not a sample): 90 follow a clinic name and are signature tails, and 58 are
+# the predicate of a real sentence whose subject sits on the line above —
+# "제일 중요한 것은 혼내지 않는 것" / "입니다.". Deleting those 58 would truncate the
+# sentence. A rule keyed on the line alone gets 39% of its matches wrong.
+SPLIT_GREETING_TAIL = {"입니다.", "입니다", "입니다!"}
+
+LINK_PROMPT = re.compile(r"^아래\s?링크")
+POST_TOPIC_LEAD = re.compile(r"^(그래서\s)?오늘의 포스팅\s?주제")
+NAVIGATION_ARROW = re.compile(r"바로\s?가기")
+NAVIGATION_ARROW_MAX_CHARS = 45   # longer than this and it is a sentence, not a button
+DECORATION_ONLY = re.compile(r"^[\s✦▼▶▷●■★☆◆▪♥♡–—\-*=~_.]{1,20}$")
+
 # docs/SOURCES.md > 라이선스·저작권 메모: "robots.txt·ToS로 수집이 금지된 자료,
 # 로그인·유료 구간 자료의 무단 수집"은 공정이용 판단에서 불리해지는 케이스로
 # 명시돼 있다. mypetlife-kennel-training(슬롯 3, `/premium/...`)이 그 정책을
@@ -326,16 +374,55 @@ def read_manual(path: Path) -> dict[str, str]:
     return meta
 
 
+def naver_meta_block(lines: Sequence[str]) -> set[int]:
+    """Indices of Naver's header block: the timestamp line and the two lines above it.
+
+    Returns an empty set when no timestamp sits within the first NAVER_META_SCAN_LINES
+    non-blank lines. The position matters: a date can appear in the body too
+    ("2018. 12. 14. 상담했던 사례"), and this rule deletes the two lines above whatever
+    it matches, so an unanchored version would eat prose.
+    """
+    body = [index for index, line in enumerate(lines) if line.strip()]
+    for position, index in enumerate(body[:NAVER_META_SCAN_LINES]):
+        if NAVER_META_TIMESTAMP.match(lines[index].strip()):
+            lead = body[max(0, position - NAVER_META_LEAD_LINES):position]
+            return set(lead) | {index}
+    return set()
+
+
 def clean(lines: Sequence[str]) -> tuple[list[str], list[str]]:
     """Drop navigation, greetings, promotion and hashtags. Return kept and dropped."""
     kept: list[str] = []
     dropped: list[str] = []
-    for line in lines:
+    meta = naver_meta_block(lines)
+    # The line before this one, kept or dropped. SPLIT_GREETING_TAIL needs to know what
+    # the greeting's first half was even after that half has been dropped.
+    previous = ""
+    for index, line in enumerate(lines):
         text = line.strip()
         if not text:
             kept.append("")
             continue
+        seen, previous = previous, text
+        if index in meta:
+            dropped.append(text)
+            continue
         if text in NAV_EXACT or DATE_LINE.match(text) or HASHTAG.match(text):
+            dropped.append(text)
+            continue
+        if text in CATEGORY_LABELS or text in CLINIC_DISPLAY_NAMES:
+            dropped.append(text)
+            continue
+        if text in SPLIT_GREETING_TAIL and seen.strip("'\"“”‘’ ") in CLINIC_DISPLAY_NAMES:
+            dropped.append(text)
+            continue
+        if LINK_PROMPT.match(text) or POST_TOPIC_LEAD.match(text):
+            dropped.append(text)
+            continue
+        if NAVIGATION_ARROW.search(text) and len(text) < NAVIGATION_ARROW_MAX_CHARS:
+            dropped.append(text)
+            continue
+        if DECORATION_ONLY.match(text):
             dropped.append(text)
             continue
         if any(text.startswith(g) for g in GREETING):
