@@ -15,7 +15,8 @@ Each theme is a complete, material-aware PNG pack rather than a color overlay. A
 ## Material rules
 
 - The room exports recolor plaster, trim, floorboards, and the door separately. Wood grain and pixel shading are preserved.
-- Doghouse shells, patterned cushions, cabinet accent drawers, rugs, balls, toy textiles, bowls, and planter ceramics use their theme's accents.
+- Doghouse shells, patterned cushions, all four cabinet drawer fronts, rugs, balls, toy textiles, bowls, and planter ceramics use their theme's accents.
+- Cabinet drawers use a main-accent/soft-accent pair while retaining natural brass hardware. Foreground fences use main-accent structure and soft-accent faces/highlights instead of unthemed natural wood.
 - Window scenery, plant foliage, soil, food, water, natural wicker, brass hardware, bones, and the dogs' coat colors remain natural.
 - `room.png` is opaque. Decor PNGs preserve their original alpha channel.
 
