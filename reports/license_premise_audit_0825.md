@@ -49,8 +49,8 @@
 |---|---:|---:|---:|
 | `data/eval/results/combined_v4_e5_metrics.json` | 413 | **376자** | **83,278자** |
 | `data/eval/queries/_synthetic_prompt.md` | 20 | 335자 | 4,943자 |
-| `reports/owner_fixtures_coverage.md` | 63 | 115자 | 6,819자 |
-| `reports/combined_corpus_coverage.md` | 40 | 124자 | 4,524자 |
+| `reports/generated/owner_fixtures_coverage.md` | 63 | 115자 | 6,819자 |
+| `reports/generated/combined_corpus_coverage.md` | 40 | 124자 | 4,524자 |
 | `frozen/frozen_stage2_0820.jsonl` | 83 | 104자 | 4,819자 |
 | `docs/acquisition_list.md` | 3 | 216자 | 428자 |
 | `scripts/ingest_pdf_documents.py` | 3 | 69자 | 159자 |
@@ -85,7 +85,7 @@
 
 ### 2-3. 리포트 2건 — 사람이 인용한 게 아니라 하네스가 넣은 것
 
-`reports/owner_fixtures_coverage.md`와 `reports/combined_corpus_coverage.md`는
+`reports/generated/owner_fixtures_coverage.md`와 `reports/generated/combined_corpus_coverage.md`는
 둘 다 머리에 **"이 파일은 `scripts/...`이 생성합니다. 직접 편집하지 마세요"**가
 붙어 있습니다. 인용 블록은 최장 189자·208자이고 **300자 이상은 0개**입니다.
 사람이 장문을 옮긴 것이 아니라, 평가 하네스가 top-k 근거를 리포트에 찍는
@@ -169,10 +169,10 @@ shingle 집합을 **현재 남아 있는** 원자재와 **현행** 코퍼스로 
 | 경로 | blob 버전 | 최장 연속 | 최대 노출량 | 성격 |
 |---|---:|---:|---:|---|
 | `data/eval/results/combined_v4_e5_metrics.json` | **8** | 376자 | **83,278자** | 청크 본문 통째 |
-| `reports/owner_fixtures_coverage.md` | 2 | 115자 | 6,819자 | 하네스 생성 스니펫 |
+| `reports/generated/owner_fixtures_coverage.md` | 2 | 115자 | 6,819자 | 하네스 생성 스니펫 |
 | `data/eval/queries/_synthetic_prompt.md` | 1 | 335자 | 4,943자 | **유튜브 자막 원문** |
 | `frozen/frozen_stage2_0820.jsonl` | 1 | 104자 | 4,819자 | 추출 원문 |
-| `reports/combined_corpus_coverage.md` | 6 | 124자 | 4,524자 | 하네스 생성 스니펫 |
+| `reports/generated/combined_corpus_coverage.md` | 6 | 124자 | 4,524자 | 하네스 생성 스니펫 |
 | `docs/acquisition_list.md` | 4 | 216자 | 428자 | 대부분 URL(오탐) |
 | `docs/data-research/source-audits/pmc7743949-…` | 1 | 97자 | 194자 | 논문 제목(오탐) |
 | `scripts/ingest_pdf_documents.py` | 2 | 69자 | 159자 | AVSAB 제목(오탐) |
@@ -512,7 +512,7 @@ force push 해야 합니다. 다른 방법이 없습니다.**
 ### 15-1. 제가 만든 노출을 고쳤습니다
 
 `docs/SOURCES.md`와 `docs/document_ingest_design.md`에 wayopet 질문자의 부분
-마스킹 실명을 **예시로 적었습니다**(`문*혜` 형태). 그 형태가 익명화가 아니라는
+마스킹 실명을 **예시로 그대로 적었습니다**. 그 형태가 익명화가 아니라는
 것을 지적하려고 쓴 문장인데, 지적하면서 같은 것을 한 번 더 게시한 셈입니다.
 설명으로 바꿨습니다. **두 파일 모두 이미 push된 상태이므로 이력에는 남습니다.**
 
@@ -527,7 +527,7 @@ force push 해야 합니다. 다른 방법이 없습니다.**
   **들어가 있습니다.**
 - 그런데 **스냅샷은 그 전에 재생성됐습니다.** origin tip의
   `combined_v4_e5_metrics.json`은 475,372 bytes · `text` 300개 · **105,326자**이고,
-  그중 29개가 wayopet 유래입니다. **부분 마스킹 실명 `이*주`가 그 안에
+  그중 29개가 wayopet 유래입니다. **부분 마스킹 실명 (마스킹 실명)가 그 안에
   들어 있습니다.**
 
 즉 **코드 가드는 있는데 산출물이 가드보다 먼저 만들어졌습니다.** 다음 전체
@@ -545,8 +545,152 @@ origin 대비 1 ahead / 24 behind입니다. 머지는 푸시 동결이 풀린 �
 
 ### 15-3. 오탐으로 확인한 것
 
-`reports/INDEX.md`·`reports/breed_conditionality_0822.md`의 `각*이`·`제*가`는
-실명이 아니라 마크다운 강조(`*검색 축으로서의 기각*`)가 걸린 것입니다.
-`scripts/import_gold_labels.py`의 `김*수`, `tests/test_split_wayopet_qa.py`의
-`김*이`는 다른 세션이 만든 테스트 픽스처로 보이며 실존 인물 표기가 아닙니다.
-다만 **후자 두 개는 제가 만들지 않은 파일이라 단정하지 않습니다.**
+`reports/INDEX.md`·`reports/breed_conditionality_0822.md`에서 걸린 두 건은
+실명이 아니라 마크다운 강조(`*검색 축으로서의 기각*`)가 패턴에 맞은 것입니다.
+`scripts/import_gold_labels.py`와 `tests/test_split_wayopet_qa.py`에서 걸린 두 건은
+문맥을 확인한 결과 **합성 예시**입니다 — 전자는 "마스킹된 실명 꼴"을 설명하는
+주석이고 후자는 테스트 픽스처입니다. 실존 인물 표기가 아닙니다.
+
+---
+
+# 4차 — 실행 결과 (2026-08-25 밤)
+
+**푸시하지 않았습니다.** private 전환 완료 통보와 푸시 승인 전까지 로컬 커밋만
+유지합니다.
+
+## 16. 머지 — 조건 (a) 확인
+
+`origin/verify/document-parsing-829`을 머지했습니다. 충돌은 `.gitignore` 한 곳
+뿐이었고, 제 허용 목록과 저쪽의 `data/eval/labeling/` 규칙을 둘 다 살렸습니다
+(저쪽의 낡은 `!data/eval/queries/**` 한 줄만 뺐습니다).
+
+**스냅샷은 origin 쪽이 이겼습니다.** 지시대로 확인한 결과입니다.
+
+| 항목 | 로컬(낡음) | **머지 결과** |
+|---|---|---|
+| `corpus.documents` | 6건 / 57청크 | **29건 / 277청크** |
+| `corpus.documents.fingerprint` | `sha256:8863f592…` | **`sha256:dde76461…`** |
+| `gold_summary.hit@1` | 0.666667 | **0.583333** |
+| `text` 필드 | 307개 | **300개** |
+
+`dde76461…`이 origin 값입니다. 낡은 스냅샷은 되살아나지 않았습니다.
+
+## 17. A안 적용 — 두 파일
+
+### 17-1. `combined_v4_e5_metrics.json`
+
+**청크 본문 300개 / 105,326자 제거.** 남은 `text` 필드 0개.
+`top_k[]` 항목에 남은 키: `rank` · `chunk_id` · `score` · `source_kind` ·
+`where` · `slot`. 지표(`hit@1` 0.583333 등)와 게이트 판정은 전부 그대로입니다.
+
+조건 (b)대로 `_redacted` 표식을 넣었습니다 — 시점 · 사유 · 제거된 필드 경로 ·
+개수 · 문자 수 · 보존된 것, 그리고:
+
+> "이 파일은 실행 산출물과 byte-identical하지 않다. 재실행으로 복원되지도 않는다
+> — 이 스냅샷이 측정한 코퍼스는 이미 존재하지 않는다."
+
+**wayopet 질문자의 부분 마스킹 실명도 이 제거로 함께 빠졌습니다.**
+
+### 17-2. `frozen/frozen_stage2_0820.jsonl`
+
+인용처가 10곳이고 `load_graph_neo4j.py --extractions`의 입력이라 삭제하지 않고
+원문만 뺐습니다. **`entities[].evidence` + `relations[].evidence` 490개 /
+16,319자 제거.**
+
+**지운 게 아니라 `evidence_sha256`(sha256 앞 16자)으로 바꿨습니다.** 그 필드의
+존재 이유가 "추출이 청크 안에 실재하는 문장에 근거했는가"를 보증하는 것이라
+(`extract_entities.py`의 `_grounded`), 해시를 남기면 코퍼스를 가진 사람은 검증을
+계속할 수 있고 없는 사람은 원문을 읽을 수 없습니다. **승인 범위를 넘는 추가이니
+불필요하면 되돌리겠습니다.**
+
+헤더 레코드는 넣지 않았습니다 — `load_graph_neo4j.build_graph()`가
+`rec["chunk_id"]`·`rec["entities"]`를 바로 읽으므로 그 키가 없는 줄이 하나라도
+있으면 `KeyError`로 죽습니다. 대신 레코드 83개마다 짧은 `_redacted` 표식을 넣고
+상세는 이 리포트에 뒀습니다. 적재 결과는 바뀌지 않습니다(`evidence`는 Neo4j에
+올라가지 않습니다 — 노드는 `source_chunks`/`aliases`, 엣지는 `source_chunks`).
+
+## 18. `reports/` 경로 분리
+
+`reports/generated/`를 만들고 하네스 산출물 3개를 옮긴 뒤 추적 해제했습니다.
+
+| 파일 | 생성 스크립트 | 원문 |
+|---|---|---:|
+| `owner_fixtures_coverage.md` | `run_owner_fixture_coverage.py` | 6,819자 |
+| `combined_corpus_coverage.md` | `run_combined_retrieval_eval.py` | 4,524자 |
+| `medical_guardrail_v1v2_comparison.md` | `evaluate_medical_guardrail.py` | 0자 |
+
+- `.gitignore`에 `reports/generated/` 추가. `reports/` 바로 아래는 사람이 쓴 글만
+  있는 자리가 됩니다.
+- 세 스크립트의 `DEFAULT_REPORT` 경로를 갱신했습니다.
+- **스니펫 출력 로직은 건드리지 않았습니다.** 지시대로입니다 — 사람이 커버리지를
+  판정하려면 로컬에서 그 발췌를 읽어야 하고, 1차 설계가 그렇게 한 이유가
+  그것입니다. 커밋만 막습니다.
+- 인용 11곳을 문서 7개에서 새 경로로 갱신했습니다
+  (`scripts/medical_guardrail.py` 독스트링 1곳 포함).
+  `docs/mentoring_0822.html`은 추적되지 않는 빌드 산출물이라 두었습니다.
+
+## 19. 규칙 4번 추가 — 실제 코퍼스 데이터를 예시로 쓰지 않는다
+
+`.gitignore` 머리의 규칙 3개 옆에 4번으로 넣었습니다. **같은 실패를 세 번째로
+하고 나서 적는 규칙입니다.**
+
+1차·2차: `docs/SOURCES.md`와 `docs/document_ingest_design.md`에 "이 소스는 질문자
+실명을 부분 마스킹만 해두었다"고 지적하면서 **그 실명을 예시로 그대로 적었고**,
+공유 접두사가 문제라고 쓰면서 **접두사 원문을 붙여넣었습니다.**
+
+3차: 이번 감사 리포트가 그 사실을 기록하면서 **같은 실명을 또 적었습니다.**
+셋 다 고쳤습니다 — 실명은 서술로, 접두사는 "5줄 머리말(플랫폼 고정 문구 · 제목 ·
+질문자 · 날짜 · 섹션 라벨)"이라는 구조 설명으로 바꿨습니다.
+
+규칙에 좋은 예도 같이 적었습니다: `scripts/import_gold_labels.py`의
+"마스킹된 실명(김\*수 꼴)" — 형태만 보여주고 실제 값은 쓰지 않습니다.
+그 파일과 `tests/test_split_wayopet_qa.py`에서 걸린 두 건은 문맥을 확인한 결과
+**합성 예시**였습니다. 그대로 둡니다.
+
+## 20. 불변식 면제 0개
+
+`KNOWN_LEGACY`를 비웠습니다. 마지막 항목이 17-1로 해소됐기 때문입니다.
+주석에 **"항목 추가에는 사람의 승인이 필요하다"**와 그 이유(면제가 경로 기준이라
+같은 경로가 재생성되며 내용이 늘어도 통과한다 — 실제로 그 구멍으로 wayopet 본문이
+스냅샷에 다시 들어왔다)를 적었습니다.
+
+테스트 **324개 전부 통과**(skip 7).
+
+## 21. 최종 대조 — 남은 원문
+
+머지된 트리 전체를 원자재와 40자 shingle로 다시 대조했습니다.
+
+| 상태 | 경로 | 합계 |
+|---|---:|---:|
+| 조치 전 (2차 점검) | 15개 | **105,809자** |
+| **조치 후** | **6개** | **937자** |
+
+남은 937자의 내역입니다.
+
+| 경로 | 합계 | 성격 |
+|---|---:|---|
+| `docs/acquisition_list.md` | 428자 | 퍼센트 인코딩 URL — **오탐** |
+| `scripts/ingest_pdf_documents.py` | 159자 | AVSAB 논문 제목·학회명 — **오탐** |
+| `reports/retrieval_gap_hybrid_vs_vector_0820.md` | 155자 | 분석 문서의 인용(최장 57자) |
+| `data/eval/queries/gold_batch1.jsonl` | 90자 | **gold 라벨의 앵커 발췌(45자)** |
+| `reports/q003_top5_investigation_0820.md` | 60자 | URL 포함 — **오탐** |
+| `scripts/write_gold_labels_batch1.py` | 45자 | **gold 굽는 스크립트의 앵커 발췌** |
+
+오탐 3건(647자)을 빼면 실제 인용은 **290자**입니다. 전부 150자 미만이라 불변식
+테스트를 통과합니다.
+
+**뒤 두 건은 다른 세션의 진행 중인 gold 작업입니다.** 45자짜리 앵커 발췌를
+라벨의 근거로 싣는 구조인데, 규칙 4번의 "예시"가 아니라 **라벨링 페이로드
+자체**라 성격이 다릅니다. 제가 손대면 진행 중인 작업이 깨지므로 **보고만
+합니다.** 판단이 필요하면 그 세션과 함께 정하셔야 할 것 같습니다.
+
+## 22. 이 조치가 하지 않은 것
+
+**전부 HEAD만 바꿨습니다.** 이력의 원문은 그대로입니다 —
+`combined_v4_e5_metrics.json`은 이력에 8개 이상의 버전이 있고,
+`_synthetic_prompt.md`의 자막 6,671자도 과거 커밋에 그대로 있습니다.
+`git show <sha>:<path>` 한 줄로 나옵니다.
+
+이건 이력 재작성으로만 바뀌고, 재작성은 하지 않기로 결정된 상태입니다.
+**따라서 이 조치의 목적은 "지금 clone하는 사람이 받는 트리에서 빼는 것"이며,
+그 이상이 아닙니다.**

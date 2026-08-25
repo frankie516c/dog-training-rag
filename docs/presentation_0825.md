@@ -22,7 +22,7 @@
 
 **핵심 메시지**: 견주 질문 20건을 기존 코퍼스(영상 26청크)에 그대로 통과시켰더니 "완전히 답할 수 있다"고 판정된 질문이 0건이었다 — 이것은 검색 실력이 아니라 코퍼스가 얼마나 좁은지를 재는 측정이다.
 
-**근거 데이터** (`reports/owner_fixtures_coverage.md` "⑤ 사람 커버리지 판정 결과")
+**근거 데이터** (`reports/generated/owner_fixtures_coverage.md` "⑤ 사람 커버리지 판정 결과")
 
 | coverage | 건수 | 질문 |
 |---|---|---|
@@ -43,7 +43,7 @@
 
 **핵심 메시지**: 크롤 풀 718건 중 코퍼스 구멍을 메울 6건만 사람이 골라 넣었고, 그중 2개 픽스처(Q06·Q16)가 완전히 해제됐다.
 
-**근거 데이터** (`docs/acquisition_list.md`, `reports/combined_corpus_coverage.md` ① 절)
+**근거 데이터** (`docs/acquisition_list.md`, `reports/generated/combined_corpus_coverage.md` ① 절)
 
 - 크롤 풀: 718건 (`scripts/ingest_documents.py` — "이 저장소는 대량 로드가 아니다")
 - 선별: 6건 / 57청크 (영상 26 + 문서 57 = 통합 83청크)
@@ -187,7 +187,7 @@
 **근거 데이터**
 
 - **시드 미매칭**: `match_seeds()`는 엔티티 이름·alias의 리터럴 포함만 본다. Q14·Q15 모두 매칭 시드 0개, 그래프가 순회를 시작조차 못 함 (`reports/retrieval_gap_hybrid_vs_vector_0820.md`)
-- **게이트 압축**: `score_gap ≥ 0.024` 임계값이 26청크에서 잡혔는데, 83청크에서는 owner 20건 **전부 PASS**. 20건 중 top1이 실제로 오른 것은 8건뿐, 나머지 12건은 코퍼스 평균이 내려가서 gap만 오른 산술 효과 (`reports/combined_corpus_coverage.md` ⓪절)
+- **게이트 압축**: `score_gap ≥ 0.024` 임계값이 26청크에서 잡혔는데, 83청크에서는 owner 20건 **전부 PASS**. 20건 중 top1이 실제로 오른 것은 8건뿐, 나머지 12건은 코퍼스 평균이 내려가서 gap만 오른 산술 효과 (`reports/generated/combined_corpus_coverage.md` ⓪절)
 - **q003 이탈**: gold 질문 q003의 정답 청크(점수 0.850943, video-only에서 3위)가 통합 코퍼스에서 절대 점수는 그대로인데, 새로 들어온 문서 청크(0.851496)에 **0.000553(≈0.0006) 차이**로 새치기당해 6위로 밀려남 → top-5 밖, Hit@5·MRR@5 하락에 실제로 반영됨 (`reports/q003_top5_investigation_0820.md`)
 
 **발표 노트**

@@ -28,7 +28,7 @@
   함수 단위로 분리해 가져가야 합니다.
 - **`generate_answers.py` 전체** — 프롬프트 빌드, 생성 호출, 밴드 분류, CLI와
   결과 저장이 하나의 대형 실험 스크립트에 혼재되어 있습니다.
-- **`score_gap` gate를 운영 정책으로 사용하는 것** — `reports/combined_corpus_coverage.md`에
+- **`score_gap` gate를 운영 정책으로 사용하는 것** — `reports/generated/combined_corpus_coverage.md`에
   기록된 대로, 코퍼스가 83청크로 확장된 현재 owner 픽스처 20건 중 19건은 PASS,
   1건(Q10)은 REFUSE입니다. Q10은 기대값도 REFUSE라 이 결과가 평가 실패를 뜻하지는
   않습니다. 전체 20건 중 실제 top1 점수가 상승한 것은 8건이며, 나머지 12건은 top1

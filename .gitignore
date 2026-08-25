@@ -13,6 +13,14 @@
 #   2. 예외로 연 경로에 원저작물 텍스트가 실리지 않는지는 신뢰가 아니라 테스트로
 #      확인한다 — tests/test_committed_artifacts_have_no_chunk_text.py.
 #   3. 예외를 넓히는 변경은 그 경로에 무엇이 실릴 수 있는지 먼저 적고 한다.
+#   4. 문서·주석·테스트 픽스처에 **실제 코퍼스 데이터를 예시로 쓰지 않는다.**
+#      합성 예시만 쓴다. 이 규칙이 여기 있는 이유는 두 번 틀렸기 때문이다 —
+#      docs/SOURCES.md와 docs/document_ingest_design.md에 "이 소스는 질문자
+#      실명을 부분 마스킹만 해두었다"고 지적하면서 그 실명을 예시로 그대로
+#      적었고, 공유 접두사가 문제라고 쓰면서 접두사 원문을 붙여넣었다.
+#      지적하는 문장이 지적 대상을 한 번 더 게시하는 형태가 된다.
+#      좋은 예: scripts/import_gold_labels.py의 "마스킹된 실명(김*수 꼴)" —
+#      형태만 보여주고 실제 값은 쓰지 않는다.
 data/*
 !data/reviews/
 data/reviews/*
@@ -146,6 +154,16 @@ venv_snapshot_*.txt
 # 번들(*.js)과 사전계산 결과(*.json)는 위 data/eval/labeling/* 규칙으로 계속
 # 제외된다 — 굽는 스크립트(scripts/write_gold_labels_batch1.py)로 재생성된다.
 !data/eval/labeling/*.html
+
+# 하네스가 만드는 리포트는 reports/generated/ 아래에만 둔다. reports/ 바로 아래는
+# 사람이 쓴 글만 있는 자리다.
+#
+# 둘을 한 디렉터리에 섞어 두었더니 생성물이 커밋됐고, 그 생성물은 top-k 근거를
+# 본문 발췌로 찍는 설계라 원저작물 11,343자를 저장소에 실어 날랐다
+# (owner_fixtures_coverage 6,819자 + combined_corpus_coverage 4,524자).
+# 발췌를 찍는 로직 자체는 그대로 둔다 — 사람이 커버리지를 판정하려면 로컬에서
+# 그 발췌를 읽어야 하고, 1차 설계가 그렇게 한 이유가 그것이다. 커밋만 막는다.
+reports/generated/
 
 # 그래프 동결 스냅샷(frozen/)은 여기서 의도적으로 제외하지 않는다 — LLM 추출이라
 # 재실행마다 결과가 흔들려서(docs/handoff_neo4j.md) 재추출로 재현 불가능한 산출물이다.

@@ -55,7 +55,7 @@ from typing import Any, Callable, Sequence
 
 DEFAULT_OUT_OF_CORPUS = Path("data/eval/queries/out_of_corpus_queries.json")
 DEFAULT_OWNER_FIXTURES = Path("data/eval/queries/owner_fixtures.jsonl")
-DEFAULT_REPORT = Path("reports/medical_guardrail_v1v2_comparison.md")
+DEFAULT_REPORT = Path("reports/generated/medical_guardrail_v1v2_comparison.md")
 
 FLAGGED_FIXTURE_IDS = ("Q17", "Q19")
 

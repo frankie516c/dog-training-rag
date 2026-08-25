@@ -46,7 +46,7 @@ DEFAULT_DOC_CHUNKS = Path("data/processed/documents/chunks")
 DEFAULT_FIXTURES = Path("data/eval/queries/owner_fixtures.jsonl")
 DEFAULT_GOLD = Path("data/eval/queries/youtube_retrieval_queries.jsonl")
 DEFAULT_METRICS = Path("data/eval/results/combined_v4_e5_metrics.json")
-DEFAULT_REPORT = Path("reports/combined_corpus_coverage.md")
+DEFAULT_REPORT = Path("reports/generated/combined_corpus_coverage.md")
 DEFAULT_GRAPH_EXTRACTIONS = Path("data/graph/extractions_stage2.jsonl")
 DEFAULT_GRAPH_ALIASES = Path("data/graph/entity_aliases.json")
 

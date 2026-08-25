@@ -35,13 +35,15 @@ BODY_KEYS = ("text", "chunk_text", "body", "passage", "content")
 # SNIPPET_CHARS(150)와 같은 값 — 리포트가 찍는 발췌는 이 길이를 넘지 않는다.
 SNIPPET_LIMIT = 150
 
-# 이번 정책이 생기기 전에 이미 커밋된 위반. 지우려면 이력 재작성이 필요하고
-# (reports/license_premise_audit_0825.md 8절) 그 결정은 아직 나지 않았다.
-# 목록에 이름으로 남겨 부채가 보이게 한다. **여기에 새 경로를 추가하지 말 것** —
-# 새로 걸리는 파일이 있으면 그건 고칠 대상이지 면제 대상이 아니다.
-KNOWN_LEGACY = {
-    "data/eval/results/combined_v4_e5_metrics.json",
-}
+# 면제는 비어 있다. 2026-08-25에 마지막 항목
+# (data/eval/results/combined_v4_e5_metrics.json, 청크 본문 300개 105,326자)을
+# 리댁션해서 없앴다 — reports/license_premise_audit_0825.md 13절 A안.
+#
+# **여기에 항목을 추가하려면 사람의 승인이 필요하다.** 새로 걸리는 파일은 고칠
+# 대상이지 면제 대상이 아니다. 면제가 경로 기준이라, 한 번 넣어두면 같은 경로가
+# 재생성되며 내용이 늘어도 통과한다 — 실제로 그 구멍으로 wayopet 본문이 스냅샷에
+# 다시 들어왔다.
+KNOWN_LEGACY: set[str] = set()
 
 
 def tracked_files() -> list[str]:

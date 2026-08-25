@@ -15,7 +15,7 @@
 > 무엇을 판단했는지가 남아야 하기 때문입니다.
 
 커버리지 런에서 코퍼스가 답하지 못한다고 확인된 축을 메우기 위한 조달 목록입니다.
-근거는 [`reports/owner_fixtures_coverage.md`](../reports/owner_fixtures_coverage.md),
+근거는 [`reports/generated/owner_fixtures_coverage.md`](../reports/generated/owner_fixtures_coverage.md),
 대상 픽스처는 [`data/eval/queries/owner_fixtures.jsonl`](../data/eval/queries/owner_fixtures.jsonl).
 
 현재 코퍼스는 유튜브 훈련 영상 3편 / embedding_eligible 26청크이고, 훈련 발화만
@@ -223,7 +223,7 @@ eligible 26청크 전체에 `분리불안` 0건, `켄넬`·`크레이트`·`울�
 
 문서 6건 / 51청크가 들어가 코퍼스는 26 → **77청크**가 되었습니다.
 측정은 `scripts/run_combined_retrieval_eval.py`, 리포트는
-[`reports/combined_corpus_coverage.md`](../reports/combined_corpus_coverage.md).
+[`reports/generated/combined_corpus_coverage.md`](../reports/generated/combined_corpus_coverage.md).
 
 | 슬롯 | 겨냥 픽스처 | Δtop1 | 겨냥 슬롯 문서가 top-5에 | 판단 |
 |---|---|---|---|---|

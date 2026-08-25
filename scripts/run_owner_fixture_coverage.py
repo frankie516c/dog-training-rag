@@ -30,7 +30,7 @@ from typing import Any, Sequence
 
 DEFAULT_QUERIES = Path("data/eval/queries/owner_fixtures.jsonl")
 DEFAULT_CHUNK_DIR = Path("data/processed/youtube/chunks")
-DEFAULT_REPORT = Path("reports/owner_fixtures_coverage.md")
+DEFAULT_REPORT = Path("reports/generated/owner_fixtures_coverage.md")
 
 QUERY_SCHEMA_VERSION = "owner-fixture-query-v1"
 

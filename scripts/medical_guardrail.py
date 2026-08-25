@@ -56,7 +56,7 @@ direction — several extracted "증상" entities (짖음, 불안, 분리불안,
 ordinary training vocabulary that a symptom-labeling pass over training-video
 transcripts was always going to produce, because a problem behavior and a
 symptom description overlap heavily in how owners talk. See
-reports/medical_guardrail_v1v2_comparison.md for the measured cost of both
+reports/generated/medical_guardrail_v1v2_comparison.md for the measured cost of both
 failure modes.
 
 v2 (data/guardrail/medical_terms_v2.json) is a hand-authored list of general

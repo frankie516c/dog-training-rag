@@ -26,7 +26,7 @@ flowchart TD
     C --> D["완전 답변 가능 2건<br/>Q06 · Q16"]
 ```
 
-- `reports/owner_fixtures_coverage.md`: coverage 판정 20/20건 — partial 4(Q05·Q09·Q14·Q15), missing 16, **answerable 0**
+- `reports/generated/owner_fixtures_coverage.md`: coverage 판정 20/20건 — partial 4(Q05·Q09·Q14·Q15), missing 16, **answerable 0**
 - gate가 expected_outcome과 갈린 7건(Q01·Q02·Q04·Q11·Q12·Q17·Q19) — **전부 한 방향**(통과시키면 안 될 것을 통과)
 - 조달 6건 = 크롤 자동 3건(1a-1 슬개골탈구 네이버블로그, 2-1 AMC 치매 글, 3-1 베럴독 분리불안 글) + **수동 폴백 3건**(1a-2 YD 슬개골, 1b-1 YD 외이염, 3-3 살구뉴스 켄넬 STEP)
 - 슬롯 1b(외이염): 크롤 풀 **718건 중 관련 언급 10건**이지만 전부 입질교정 글에 스친 한 줄뿐, 귓병 통증의 행동 변화를 다룬 글은 **0건** → 처음부터 수동 수집으로만 채움 (`docs/acquisition_list.md` 문서1b)
@@ -105,7 +105,7 @@ Q13에서 벡터 top-5는 전부 같은 "분리불안 훈련" 문서였습니다
 |---|---|---|
 | 코퍼스 | 근거 문서 자체가 코퍼스에 없음 | Q12 — 그래프 후보 2건을 찾았지만 "서열 훈련" 개념 자체가 코퍼스에 없음 |
 | 시드 매칭 | `match_seeds()`가 리터럴 포함만 봐서 표현이 다르면 그래프가 안 돎 | Q14 — 매칭 시드 0개, 그래프 후보 0건 (`reports/retrieval_gap_hybrid_vs_vector_0820.md`) |
-| 게이트 | 코퍼스 평균이 낮아지며 `score_gap ≥ 0.024`가 대부분 통과됨 | owner 20건 중 19건 PASS·1건(Q10) REFUSE(기대와 일치), top1이 실제로 오른 건 8건뿐, 12건은 산술 효과 (`reports/combined_corpus_coverage.md` ⓪절) |
+| 게이트 | 코퍼스 평균이 낮아지며 `score_gap ≥ 0.024`가 대부분 통과됨 | owner 20건 중 19건 PASS·1건(Q10) REFUSE(기대와 일치), top1이 실제로 오른 건 8건뿐, 12건은 산술 효과 (`reports/generated/combined_corpus_coverage.md` ⓪절) |
 | 벡터 랭킹 | 신규 청크가 근소한 점수 차로 새치기 | q003: 0.000553(≈0.0006) 차이로 top-5 이탈(`reports/q003_top5_investigation_0820.md`); Q15: 겨냥 문서 5위 근소 + 그래프 시드도 0개(이중 실패) |
 
 **발표 노트**

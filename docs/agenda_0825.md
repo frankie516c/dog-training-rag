@@ -13,7 +13,7 @@
 움직이지 않은 산술 효과**. 재보정이 아니라 **신호 교체(리랭커 스코어·상대 마진)**
 검토로 안건을 올립니다.
 
-측정 근거: [`reports/combined_corpus_coverage.md`](../reports/combined_corpus_coverage.md) ⓪ 절.
+측정 근거: [`reports/generated/combined_corpus_coverage.md`](../reports/generated/combined_corpus_coverage.md) ⓪ 절.
 문서 6건(51청크)을 넣어 코퍼스가 26 → 77청크가 되자, 조달과 무관한 질문에서도
 코퍼스 평균이 내려가며 gap이 올랐습니다.
 
@@ -124,7 +124,7 @@ Q14가 어휘 불일치로 막힌 것을 보면 슬롯 1b는 문서를 더 넣�
 같은 단어 "진단"을 포함하지만 의도가 반대입니다. 문자열 매칭은 단어의 존재만 보고 문장
 안에서의 시제·화행(요청인지 서술인지)을 구분하지 못합니다 — 화이트리스트를 아무리
 늘려도 이 축은 못 잡습니다. 상세는
-[`reports/medical_guardrail_v1v2_comparison.md`](../reports/medical_guardrail_v1v2_comparison.md)
+[`reports/generated/medical_guardrail_v1v2_comparison.md`](../reports/generated/medical_guardrail_v1v2_comparison.md)
 Q16 행.
 
 **검토 후보** (아직 측정하지 않음): 문자열 매칭 앞단 또는 뒷단에 의미 기반 분류(경량

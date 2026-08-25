@@ -192,7 +192,7 @@ q003뿐이라는 말을 더 이상 할 수 없습니다: q003은 4위에서 아�
 
 ## dry-run 답변에 대하여
 
-리포트 [`reports/combined_corpus_coverage.md`](../reports/combined_corpus_coverage.md)
+리포트 [`reports/generated/combined_corpus_coverage.md`](../reports/generated/combined_corpus_coverage.md)
 ② 절의 q007·q011 답변은 **Claude가 `grounded-answer-ko-v1` 규칙을 따라 수기로 작성한
 dry-run**입니다. 모델 API를 호출해 받은 생성물이 아닙니다. 원본은
 `data/eval/generation/answers_dryrun_scenario.jsonl`이며 각 레코드의 `produced_by`에
