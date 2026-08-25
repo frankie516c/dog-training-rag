@@ -208,18 +208,71 @@ def overlap_ms(a0: int, a1: int, b0: int, b1: int) -> int:
     return max(0, min(a1, b1) - max(a0, b0))
 
 
+# 문서 앵커 최소 길이. 짧은 인용문은 다른 문서·다른 문단에 우연히 걸린다.
+MIN_ANCHOR_CHARS = 20
+
+
 def gold_relevant_chunks(
-    query: dict[str, Any], video_chunks: Sequence[dict[str, Any]]
+    query: dict[str, Any],
+    video_chunks: Sequence[dict[str, Any]],
+    document_chunks: Sequence[dict[str, Any]] = (),
 ) -> tuple[str, ...]:
-    """Eligible video chunks whose interval overlaps any gold span of the query."""
-    by_video = [c for c in video_chunks if c["video_id"] == query["video_id"]]
+    """질의의 gold 청크 집합. 영상 span과 문서 앵커의 **합집합**이다.
+
+    두 참조 체계를 병행하는 이유:
+      - 영상은 시간축이 원본의 자연스러운 좌표다. 텍스트 앵커로 옮기면 ASR
+        전사가 바뀔 때마다 깨지는데, 재전사 논의가 아직 열려 있다.
+      - 문서는 타임라인이 없다. 문자 오프셋은 본문이 한 글자만 바뀌어도 전부
+        밀린다(breadcrumb 제거처럼 실제로 일어난다). 인용문 앵커는 그 문장이
+        본문에 남아 있는 한 계속 매칭된다.
+
+    한 질의가 둘 다 가질 수 있다 — 문서 답과 영상 답이 동시에 타당한 질의가
+    실제로 나오며, 한쪽만 gold로 두면 정답인 검색을 오답으로 채점하게 된다.
+
+    앵커가 어느 청크에도 매칭되지 않으면 **오류를 낸다.** gold가 조용히 줄면
+    정답 집합이 작아져 Hit@1이 오히려 올라갈 수 있고, 그것을 개선으로 읽게 된다.
+    """
     found: list[str] = []
-    for span in query["relevant_spans"]:
-        for chunk in by_video:
-            if overlap_ms(span["start_ms"], span["end_ms"], chunk["start_ms"], chunk["end_ms"]) > 0:
-                found.append(chunk["chunk_id"])
+
+    if query.get("video_id") and query.get("relevant_spans"):
+        by_video = [c for c in video_chunks if c["video_id"] == query["video_id"]]
+        for span in query["relevant_spans"]:
+            for chunk in by_video:
+                if overlap_ms(
+                    span["start_ms"], span["end_ms"], chunk["start_ms"], chunk["end_ms"]
+                ) > 0:
+                    found.append(chunk["chunk_id"])
+
+    for anchor in query.get("anchors") or []:
+        quote = anchor["quote"]
+        if len(quote) < MIN_ANCHOR_CHARS:
+            raise EvalError(
+                f"{query['query_id']}/{anchor['anchor_id']}: 앵커가 {len(quote)}자로 "
+                f"최소 {MIN_ANCHOR_CHARS}자 미만 — 짧은 인용문은 우연 매칭이 난다"
+            )
+        in_doc = [c for c in document_chunks if c["doc_id"] == anchor["doc_id"]]
+        if not in_doc:
+            raise EvalError(
+                f"{query['query_id']}/{anchor['anchor_id']}: doc_id "
+                f"{anchor['doc_id']!r}에 해당하는 청크가 코퍼스에 없다"
+            )
+        # 여러 청크에 걸리면 전부 gold다 — 같은 문장이 두 청크에 있다면 어느
+        # 쪽을 검색해도 답이 나오므로 둘 다 정답이 맞다.
+        hits = [c["chunk_id"] for c in in_doc if quote in c["text"]]
+        if not hits:
+            available = ", ".join(f"#{c['chunk_index']}" for c in in_doc[:10])
+            raise EvalError(
+                f"{query['query_id']}/{anchor['anchor_id']}: 앵커 인용문이 "
+                f"{anchor['doc_id']}의 어느 청크에도 없다 — 본문이 편집됐거나 "
+                f"청크 경계를 가로지른다. 해당 문서 청크: {available}"
+            )
+        found.extend(hits)
+
     if not found:
-        raise EvalError(f"{query['query_id']}: gold spans map to no eligible chunk")
+        raise EvalError(
+            f"{query['query_id']}: gold 참조가 어느 청크에도 매핑되지 않는다 "
+            "(relevant_spans·anchors 둘 다 비었거나 해석 실패)"
+        )
     return tuple(sorted(dict.fromkeys(found)))
 
 
@@ -631,7 +684,7 @@ def run(
 
     gold_rows = []
     for row in gold:
-        relevant = set(gold_relevant_chunks(row, video))
+        relevant = set(gold_relevant_chunks(row, video, documents))
         ranked, stats = rank_one(str(row["question"]))
         first = next((r for r, (cid, _) in enumerate(ranked, start=1) if cid in relevant), None)
         verdict = gate_verdict(stats, gate_signal)
