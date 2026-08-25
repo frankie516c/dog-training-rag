@@ -226,7 +226,12 @@ function st(qid){
       quality_flag: s.quality_flag || null,
       resolved_at: null,
       gold: [], cause_only: [],
-      anchors: (s.anchors || []).map(a => ({ quote: a.quote, note: a.note, doc_id: null, ok: false })),
+      // doc_id는 bake가 단일 매칭일 때 확정해 둔다. null이면 매칭이 0개거나
+      // 2개 이상이라 사람이 골라야 한다.
+      anchors: (s.anchors || []).map(a => ({
+        quote: a.quote, note: a.note, doc_id: a.doc_id || null, ok: false,
+        baked: !!a.doc_id, match_count_at_bake: a.match_count_at_bake,
+      })),
     };
   }
   return state[qid];
@@ -407,6 +412,10 @@ function renderAnchors(box, q, s){
       <div class="st">${a.quote.length}자 ·
         ${matches.length ? `<span class="hit">${matches.length}개 청크에 매칭</span>`
                          : '<span class="miss">매칭 0 — 앵커를 다시 뽑아야 함</span>'}
+        ${a.baked ? ' · <span class="hit">doc_id 자동 확정</span>'
+                  : ' · <span class="miss">사람이 골라야 함</span>'
+                    + (a.match_count_at_bake !== undefined
+                       ? ` (굽는 시점 매칭 ${a.match_count_at_bake}개)` : "")}
         ${a.note ? " · " + a.note : ""}</div>
       <div style="margin-top:5px">
         <select ${matches.length ? "" : "disabled"}>

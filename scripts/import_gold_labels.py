@@ -21,7 +21,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -41,11 +41,45 @@ def check_anchor(quote: str) -> list[str]:
     return [name for name, pattern in BLOCKERS if pattern.search(quote)]
 
 
+def load_corpus(chunk_dirs: Sequence[Path]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for directory in chunk_dirs:
+        for path in sorted(directory.glob("*.jsonl")):
+            for line in path.read_text(encoding="utf-8").splitlines():
+                if line.strip():
+                    rows.append(json.loads(line))
+    return rows
+
+
+def revalidate_anchor(quote: str, doc_id: str, corpus: Sequence[dict[str, Any]]) -> str | None:
+    """앵커 인용문이 지금 코퍼스에서도 단일 매칭인지 다시 본다.
+
+    굽는 시점의 단일 매칭은 그때의 코퍼스(254청크) 성질이지 영구 보장이 아니다.
+    코퍼스가 커지면 같은 문장이 다른 문서에도 나타날 수 있고, 본문이 편집되면
+    (P1의 clean() 변경처럼) 아예 사라질 수도 있다. 굽는 스크립트를 다시 돌리지
+    않고 gold 파일만 커밋되는 경로가 있으므로, 여기서 독립적으로 확인한다.
+    """
+    hits = [c for c in corpus
+            if quote in c.get("text", "") and c.get("citation_allowed") is not False]
+    if not hits:
+        return "인용문이 코퍼스 어디에도 없다 — 본문이 편집됐거나 앵커를 다시 뽑아야 한다"
+    docs = {c.get("doc_id") for c in hits if c.get("doc_id")}
+    if len(docs) > 1:
+        return f"인용문이 문서 {len(docs)}곳에 매칭된다({', '.join(sorted(docs)[:3])}…) — 앵커를 늘려 좁힐 것"
+    if docs and doc_id not in docs:
+        return f"기록된 doc_id({doc_id})와 실제 매칭 문서({docs.pop()})가 다르다"
+    return None
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--export", type=Path, default=EXPORT)
     ap.add_argument("--gold", type=Path, default=GOLD)
     ap.add_argument("--min-anchor-chars", type=int, default=20)
+    ap.add_argument("--doc-chunks", type=Path, default=Path("data/processed/documents/chunks"))
+    ap.add_argument("--video-chunks", type=Path, default=Path("data/processed/youtube/chunks"))
+    ap.add_argument("--skip-revalidate", action="store_true",
+                    help="코퍼스가 없는 환경에서 앵커 재검증을 건너뛴다")
     args = ap.parse_args()
 
     if not args.export.is_file():
@@ -56,6 +90,14 @@ def main() -> int:
     by_id = {q["query_id"]: q for q in export["queries"]}
 
     rows = [json.loads(l) for l in args.gold.read_text(encoding="utf-8").splitlines() if l.strip()]
+
+    corpus: list[dict[str, Any]] = []
+    if not args.skip_revalidate:
+        dirs = [d for d in (args.doc_chunks, args.video_chunks) if d.is_dir()]
+        corpus = load_corpus(dirs)
+        if not corpus:
+            print("경고: 코퍼스 청크를 찾지 못해 앵커 재검증을 건너뛴다 "
+                  f"({args.doc_chunks}, {args.video_chunks})")
 
     problems: list[str] = []
     approved = skipped = 0
@@ -94,6 +136,10 @@ def main() -> int:
                 problems.append(f"{row['query_id']}: 앵커에 {hit} 포함 — 커밋 불가")
             if not anchor.get("doc_id"):
                 problems.append(f"{row['query_id']}: 앵커 doc_id 미확정")
+            elif corpus:
+                issue = revalidate_anchor(quote, anchor["doc_id"], corpus)
+                if issue:
+                    problems.append(f"{row['query_id']} 앵커 재검증: {issue}")
             if not anchor.get("name_checked"):
                 problems.append(f"{row['query_id']}: 앵커 호칭 확인 미완료")
 

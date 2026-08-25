@@ -113,6 +113,29 @@ SPANS = {
 CAUSE_ONLY = {"g015", "g025", "g026", "g027", "g032"}
 
 
+def resolve_anchor_doc_id(quote: str, candidates: list[dict]) -> tuple[str | None, int]:
+    """앵커 인용문이 가리키는 **문서 식별자**를 확정한다.
+
+    돌려주는 것은 `doc_id`(문서 단위)이지 `chunk_id`가 아니다. 이 구분이
+    중요하다 — 문서 `chunk_id`는 payload에 `text_sha256`이 들어가므로 본문이
+    한 글자만 바뀌어도 전부 재해시된다(P1의 clean() 변경이 실제로 6청크를
+    그렇게 만든다). 청크 단위로 묶으면 재인제스트 때마다 앵커가 같이 깨진다.
+    `doc_id`는 MANIFEST가 정하는 이름이라 본문 편집에 흔들리지 않는다.
+
+    인용 금지 청크(견주 발화)는 후보에서 뺀다 — gold는 인용 가능한 근거여야
+    한다. 매칭이 정확히 1개일 때만 확정하고, 0개나 2개 이상이면 None을
+    돌려줘 사람이 작업대에서 고르게 한다(fail-closed).
+    """
+    hits = [
+        c for c in candidates
+        if quote in c["text"] and c.get("citation_allowed") is not False and c.get("doc_id")
+    ]
+    doc_ids = {c["doc_id"] for c in hits}
+    if len(doc_ids) == 1:
+        return doc_ids.pop(), len(hits)
+    return None, len(hits)
+
+
 def main() -> int:
     bake = json.loads(BAKE.read_text(encoding="utf-8"))
     by_id = {q["query_id"]: q for q in bake["queries"]}
@@ -136,10 +159,19 @@ def main() -> int:
         if quality:
             row["quality_flag"] = quality
         if qid in ANCHORS:
-            row["anchors"] = [
-                {"anchor_id": f"{qid}-a{i}", "doc_id": None, "quote": quote, "note": note}
-                for i, (quote, note) in enumerate(ANCHORS[qid], start=1)
-            ]
+            anchors = []
+            for i, (quote, note) in enumerate(ANCHORS[qid], start=1):
+                doc_id, n_hits = resolve_anchor_doc_id(quote, q["candidates"])
+                anchors.append({
+                    "anchor_id": f"{qid}-a{i}",
+                    "doc_id": doc_id,
+                    "quote": quote,
+                    "note": note,
+                    # 굽는 시점의 매칭 수. 코퍼스가 바뀌면 이 수가 달라질 수
+                    # 있으므로 import·평가 시점에 재검증한다.
+                    "match_count_at_bake": n_hits,
+                })
+            row["anchors"] = anchors
         if qid in CAUSE_ONLY:
             row["cause_only_chunks"] = []   # 사람 확인 단계에서 채운다
         rows.append(row)
