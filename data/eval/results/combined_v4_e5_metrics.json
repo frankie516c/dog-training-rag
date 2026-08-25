@@ -5279,6 +5279,8 @@
   ],
   "gold_summary": {
     "queries": 12,
+    "scored_queries": 12,
+    "refuse_only_queries": 0,
     "hit@1": 0.583333,
     "hit@5": 0.666667,
     "mrr@5": 0.625

@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gold 라벨링 작업대 — 1차 40건</title>
+<style>
+  :root{
+    --bg:#f6f7f9;--panel:#fff;--ink:#1b1d21;--muted:#666c75;--line:#dfe3e8;
+    --accent:#2f6df6;--ok:#0f7b4f;--okbg:#eafaf1;--warn:#b45309;--warnbg:#fff7ed;
+    --bad:#b42318;--badbg:#fef3f2;--ctx:#6941c6;--ctxbg:#f4f0ff;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#15171a;--panel:#1e2126;--ink:#e8eaed;--muted:#9aa2ad;--line:#2e333a;
+      --accent:#5b8cff;--ok:#4ade80;--okbg:#12261c;--warn:#fbbf24;--warnbg:#2a2113;
+      --bad:#f87171;--badbg:#2a1614;--ctx:#c4b5fd;--ctxbg:#221b33;}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:18px 14px 90px;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,"Segoe UI",Roboto,"Malgun Gothic",sans-serif}
+  .wrap{max-width:1080px;margin:0 auto}
+  h1{font-size:21px;margin:0 0 3px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+  code{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+    font:12.5px ui-monospace,Consolas,monospace}
+
+  .bar{position:sticky;top:0;z-index:20;background:var(--panel);border:1px solid var(--line);
+    border-radius:9px;padding:10px 13px;margin-bottom:16px;display:flex;gap:14px;
+    align-items:center;flex-wrap:wrap;font-size:13px}
+  .bar b{font-variant-numeric:tabular-nums}
+  .pill{padding:2px 9px;border-radius:999px;border:1px solid var(--line);background:var(--bg);
+    font-size:12px}
+  .pill.flip{background:var(--warnbg);border-color:var(--warn);color:var(--warn)}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:15px;margin-bottom:15px}
+  .q.done{border-left:4px solid var(--ok)}
+  .qhead{display:flex;gap:9px;align-items:baseline;flex-wrap:wrap;margin-bottom:4px}
+  .qid{font-weight:700}
+  .qtext{font-size:16.5px;font-weight:600;margin:5px 0 8px}
+  .meta{color:var(--muted);font-size:12.5px;display:flex;gap:9px;flex-wrap:wrap}
+  .tag{padding:1px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--line)}
+  .tag.src{background:var(--ctxbg);border-color:var(--ctx);color:var(--ctx)}
+
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:9px 0}
+  .row label{font-size:12.5px;color:var(--muted);min-width:96px}
+  button.opt{border:1px solid var(--line);background:var(--bg);color:var(--ink);
+    border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px}
+  button.opt.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  button.opt.suggested::after{content:" ·제안";font-size:10.5px;opacity:.75}
+
+  .cands{margin-top:11px;border-top:1px solid var(--line);padding-top:10px}
+  .cand{border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin-bottom:7px;
+    background:var(--bg)}
+  .cand.picked{border-color:var(--ok);background:var(--okbg)}
+  .cand.cause{border-color:var(--warn);background:var(--warnbg)}
+  .chead{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:12.5px;
+    color:var(--muted);margin-bottom:5px}
+  .chead .where{color:var(--ink);font-weight:600}
+  .badge{padding:1px 7px;border-radius:999px;border:1px solid var(--line);font-size:11px}
+  .badge.lex{background:var(--ctxbg);border-color:var(--ctx);color:var(--ctx)}
+  .badge.risk{background:var(--warnbg);border-color:var(--warn);color:var(--warn)}
+  .badge.ctxonly{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+  .ctext{font-size:13.5px;white-space:pre-wrap;max-height:5.6em;overflow:hidden;
+    position:relative;cursor:pointer}
+  .ctext.open{max-height:none}
+  .cacts{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
+  .cacts button{font-size:12px;padding:3px 10px;border-radius:5px;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink);cursor:pointer}
+  .cacts button.on{background:var(--ok);border-color:var(--ok);color:#fff}
+  .cacts button.cause.on{background:var(--warn);border-color:var(--warn);color:#fff}
+
+  .anchors{margin-top:9px;padding:9px 11px;border:1px dashed var(--line);border-radius:8px}
+  .anchor{margin-bottom:9px}
+  .anchor .quote{font-size:13px;background:var(--panel);border:1px solid var(--line);
+    border-radius:6px;padding:7px 9px;white-space:pre-wrap}
+  .anchor .st{font-size:12px;color:var(--muted);margin-top:4px}
+  .anchor select{font-size:12.5px;padding:4px;max-width:100%}
+  .miss{color:var(--bad);font-weight:600}
+  .hit{color:var(--ok);font-weight:600}
+
+  .export{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:15px;margin-top:20px}
+  .export button{background:var(--accent);color:#fff;border:0;border-radius:7px;
+    padding:10px 18px;font-size:14px;cursor:pointer;margin:0 8px 8px 0}
+  .export pre{background:var(--bg);border:1px solid var(--line);border-radius:6px;
+    padding:9px 11px;overflow-x:auto;font:12.5px ui-monospace,Consolas,monospace}
+  .note{background:var(--warnbg);border:1px solid var(--warn);border-radius:8px;
+    padding:11px 13px;margin-bottom:15px;font-size:13.5px}
+  .saved{color:var(--ok);font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>gold 라벨링 작업대 — 1차 40건</h1>
+  <div class="sub" id="sub">불러오는 중…</div>
+
+  <div class="note">
+    <b>에이전트 제안이 기본값으로 선택돼 있습니다.</b> 동의하면 넘어가고, 다르면 바꾸세요 —
+    바꾼 건수를 따로 셉니다. 제안과 사람 판정이 얼마나 어긋나는지가 2차 40건에서
+    에이전트에게 얼마나 맡길지의 근거가 됩니다.
+    <br><br>
+    <b>gold 판정 기준</b>: "이 청크를 사용자에게 보여줬을 때 <u>질문에 대한 답이 되는가</u>".
+    주제가 관련 있는지가 아닙니다.
+    절차형은 <u>그 청크만으로 첫 행동을 시작할 수 있으면</u> gold ·
+    감별형은 <u>질의가 요구하는 구분이 성립해야</u> gold ·
+    상황형은 <u>처치가 있어야</u> gold(원인만 있으면 「원인만」으로 표시).
+    <br><br>
+    <b>[호칭확인]</b> 표시는 상담 원문에서 온 청크라는 뜻입니다. 정규식으로 호칭을 찾는 것은
+    실측에서 실패했으므로(거짓 경고만 나옴) <u>앵커로 쓸 문장은 직접 읽고</u> 판단하세요.
+  </div>
+
+  <div class="bar">
+    <span><b id="prog">0</b> / <b id="total">0</b> 판정</span>
+    <span class="pill" id="pflip">제안과 다름 0</span>
+    <span class="pill" id="pcov">—</span>
+    <span class="pill" id="panchor">앵커 0/0</span>
+    <span class="saved" id="savedAt"></span>
+  </div>
+
+  <div id="list"></div>
+
+  <div class="export">
+    <h2 style="font-size:16px;margin:0 0 8px">저장</h2>
+    <button id="btnExport">gold_labels_export.json 내려받기</button>
+    <span class="saved" id="msg"></span>
+    <div id="blockers" class="note" style="display:none;margin:12px 0 0"></div>
+    <ol style="font-size:13.5px;margin:12px 0 0;padding-left:21px">
+      <li>내려받은 파일을 <code>data/eval/labeling/</code> 에 둡니다.</li>
+      <li>워크트리 루트에서 실행:
+        <pre>uv run python scripts/import_gold_labels.py</pre></li>
+      <li>Claude에게 "gold 승인 끝났어"라고 알려주면 최종 분포와
+        <code>resolved_at</code>을 집계합니다.</li>
+    </ol>
+  </div>
+</div>
+
+<script src="gold_workbench_data.js"></script>
+<script>
+const KEY = "dogtrain-gold-batch1-v1";
+const COVERAGE = ["answerable", "partial", "missing"];
+const RESOLVED = ["vector_top5", "vector_top20", "lexical", "missing"];
+
+let BAKE = null, SUGGEST = null, state = {};
+
+function load(){ try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e){ return {}; } }
+function save(){
+  try {
+    localStorage.setItem(KEY, JSON.stringify(state));
+    const t = new Date();
+    document.getElementById("savedAt").textContent = "저장됨 " +
+      [t.getHours(), t.getMinutes(), t.getSeconds()].map(n => String(n).padStart(2,"0")).join(":");
+  } catch(e){ document.getElementById("savedAt").textContent = "⚠ 자동저장 실패 — 내보내기로 백업"; }
+}
+
+function boot(){
+  // file://로 열면 fetch()가 CORS에 막히므로 데이터를 .js 번들로 싣는다
+  // (scripts/write_gold_labels_batch1.py가 굽는다).
+  if (!window.BAKE_DATA || !window.SUGGEST_DATA){
+    document.getElementById("sub").innerHTML =
+      '<span style="color:var(--bad)">gold_workbench_data.js 를 찾지 못했습니다 — '
+      + 'uv run python scripts/write_gold_labels_batch1.py 를 먼저 실행하세요.</span>';
+    return;
+  }
+  const bake = window.BAKE_DATA;
+  BAKE = bake;
+  SUGGEST = {};
+  window.SUGGEST_DATA.forEach(row => { SUGGEST[row.query_id] = row; });
+  state = load();
+  document.getElementById("sub").textContent =
+    `코퍼스 ${bake.corpus.chunks}청크 (영상 ${bake.corpus.video_chunks} / 문서 ${bake.corpus.document_chunks}) · `
+    + `지문 ${bake.corpus.fingerprint.slice(0,20)}… · 벡터풀 ${bake.config.vector_pool} · 앵커 최소 ${bake.config.min_anchor_chars}자`;
+  document.getElementById("total").textContent = bake.queries.length;
+  render();
+}
+
+function st(qid){
+  if (!state[qid]) {
+    const s = SUGGEST[qid] || {};
+    state[qid] = {
+      coverage: s.coverage || null,
+      quality_flag: s.quality_flag || null,
+      resolved_at: null,
+      gold: [], cause_only: [],
+      anchors: (s.anchors || []).map(a => ({ quote: a.quote, note: a.note, doc_id: null, ok: false })),
+      touched: false,
+    };
+  }
+  return state[qid];
+}
+
+function render(){
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+  BAKE.queries.forEach(q => list.appendChild(card(q)));
+  refresh();
+}
+
+function card(q){
+  const s = st(q.query_id), sug = SUGGEST[q.query_id] || {};
+  const el = document.createElement("div");
+  el.className = "q"; el.id = "q-" + q.query_id;
+  el.innerHTML = `
+    <div class="qhead"><span class="qid">${q.query_id}</span>
+      <span class="tag">${q.query_type}</span>
+      <span class="tag src">${q.source}</span>
+      ${q.curriculum_axis ? `<span class="tag">축: ${q.curriculum_axis}</span>` : ""}
+    </div>
+    <div class="qtext">${q.question}</div>
+    <div class="meta">
+      <span>후보 ${q.candidates.length} (벡터 ${q.vector_pool_size} + 어휘 ${q.lexical_extra}/${q.lexical_total})</span>
+      <span>핵심어: ${q.keywords.slice(0,8).join(", ")}</span>
+    </div>
+    <div class="row" data-k="coverage"><label>coverage</label></div>
+    <div class="row" data-k="resolved_at"><label>어디서 찾음</label></div>
+    <div class="row" data-k="quality"><label>전사 품질</label></div>
+    <div class="anchors" data-anchors></div>
+    <div class="cands" data-cands></div>
+  `;
+
+  fill(el.querySelector('[data-k="coverage"]'), COVERAGE, s.coverage, sug.coverage, v => {
+    s.coverage = v; s.touched = true; save(); refresh();
+  });
+  fill(el.querySelector('[data-k="resolved_at"]'), RESOLVED, s.resolved_at, null, v => {
+    s.resolved_at = v; save(); refresh();
+  });
+  fill(el.querySelector('[data-k="quality"]'), ["정상", "unreadable_asr"],
+       s.quality_flag || "정상", sug.quality_flag || "정상", v => {
+    s.quality_flag = (v === "unreadable_asr") ? v : null; s.touched = true; save(); refresh();
+  });
+
+  renderAnchors(el.querySelector("[data-anchors]"), q, s);
+
+  const box = el.querySelector("[data-cands]");
+  q.candidates.forEach(c => box.appendChild(candCard(q, c, s)));
+  return el;
+}
+
+function fill(row, options, current, suggested, on){
+  options.forEach(v => {
+    const b = document.createElement("button");
+    b.className = "opt" + (v === current ? " on" : "") + (v === suggested ? " suggested" : "");
+    b.textContent = v;
+    b.onclick = () => { on(v); };
+    row.appendChild(b);
+  });
+}
+
+function candCard(q, c, s){
+  const el = document.createElement("div");
+  const isGold = s.gold.includes(c.chunk_id), isCause = s.cause_only.includes(c.chunk_id);
+  el.className = "cand" + (isGold ? " picked" : "") + (isCause ? " cause" : "");
+  el.innerHTML = `
+    <div class="chead">
+      <span class="where">${c.where}</span>
+      <span class="badge ${c.found_by === "lexical" ? "lex" : ""}">${c.found_by}${c.score != null ? " " + c.score.toFixed(3) : ""}</span>
+      ${c.name_risk === "known" ? '<span class="badge risk">호칭확인</span>' : ""}
+      ${c.citation_allowed === false ? '<span class="badge ctxonly">인용금지</span>' : ""}
+      ${c.segment_role ? `<span class="badge">${c.segment_role}</span>` : ""}
+    </div>
+    <div class="ctext">${escapeHtml(c.text)}</div>
+    <div class="cacts">
+      <button data-a="gold" class="${isGold ? "on" : ""}">gold</button>
+      <button data-a="cause" class="cause ${isCause ? "on" : ""}">원인만</button>
+    </div>
+  `;
+  el.querySelector(".ctext").onclick = e => e.target.classList.toggle("open");
+  // gold와 「원인만」은 배타다. 같은 청크가 양쪽에 들어가면 "처치가 있다"와
+  // "원인만 있다"를 동시에 주장하는 셈이고, 집계에서 이중 계수된다.
+  el.querySelector('[data-a="gold"]').onclick = () => {
+    toggle(s.gold, c.chunk_id);
+    if (s.gold.includes(c.chunk_id)) remove(s.cause_only, c.chunk_id);
+    s.touched = true; save(); render();
+  };
+  el.querySelector('[data-a="cause"]').onclick = () => {
+    toggle(s.cause_only, c.chunk_id);
+    if (s.cause_only.includes(c.chunk_id)) remove(s.gold, c.chunk_id);
+    s.touched = true; save(); render();
+  };
+  return el;
+}
+
+function toggle(arr, v){
+  const i = arr.indexOf(v);
+  if (i >= 0) arr.splice(i, 1); else arr.push(v);
+}
+function remove(arr, v){
+  const i = arr.indexOf(v);
+  if (i >= 0) arr.splice(i, 1);
+}
+
+/** 내보내기 전에 막아야 할 것들. 미완료 상태로 내려받으면 import가 거절하는데,
+ *  그때는 이미 작업대를 닫은 뒤라 어디가 빈지 찾기 어렵다. 여기서 먼저 알린다. */
+function blockers(){
+  const out = [];
+  BAKE.queries.forEach(q => {
+    const s = st(q.query_id);
+    if (!s.coverage) out.push(`${q.query_id}: coverage 미판정`);
+    if (s.coverage && !s.resolved_at) out.push(`${q.query_id}: '어디서 찾음' 미선택`);
+    if (s.coverage === "answerable" && !s.gold.length && !s.anchors.length)
+      out.push(`${q.query_id}: answerable인데 gold 청크도 앵커도 없음`);
+    s.gold.forEach(id => {
+      if (s.cause_only.includes(id)) out.push(`${q.query_id}: 같은 청크가 gold와 원인만에 동시 지정`);
+    });
+    s.anchors.forEach((a, i) => {
+      if (!a.doc_id) out.push(`${q.query_id} 앵커${i + 1}: doc_id 미확정`);
+      if (!a.ok) out.push(`${q.query_id} 앵커${i + 1}: 호칭 확인 미완료`);
+      if (a.quote.length < (BAKE.config.min_anchor_chars || 20))
+        out.push(`${q.query_id} 앵커${i + 1}: ${a.quote.length}자 — 최소 미달`);
+    });
+  });
+  return [...new Set(out)];
+}
+
+function renderAnchors(box, q, s){
+  if (!s.anchors.length){ box.style.display = "none"; return; }
+  box.innerHTML = "<div style='font-size:12.5px;color:var(--muted);margin-bottom:7px'>"
+    + "앵커 승인 — 인용문이 어느 문서 청크에 있는지 확정하고, 호칭이 없는지 직접 확인하세요."
+    + "</div>";
+  s.anchors.forEach((a, i) => {
+    const matches = q.candidates.filter(c => c.text.includes(a.quote));
+    const div = document.createElement("div");
+    div.className = "anchor";
+    const opts = matches.map(m =>
+      `<option value="${m.doc_id || ""}" ${a.doc_id === m.doc_id ? "selected" : ""}>${m.doc_id || "(문서 아님)"} — ${m.where}</option>`
+    ).join("");
+    div.innerHTML = `
+      <div class="quote">${escapeHtml(a.quote)}</div>
+      <div class="st">${a.quote.length}자 ·
+        ${matches.length ? `<span class="hit">${matches.length}개 청크에 매칭</span>`
+                         : '<span class="miss">매칭 0 — 앵커를 다시 뽑아야 함</span>'}
+        ${a.note ? " · " + a.note : ""}</div>
+      <div style="margin-top:5px">
+        <select ${matches.length ? "" : "disabled"}>
+          <option value="">— doc_id 선택 —</option>${opts}
+        </select>
+        <label style="font-size:12.5px;margin-left:9px">
+          <input type="checkbox" ${a.ok ? "checked" : ""}> 호칭 없음 확인
+        </label>
+      </div>`;
+    div.querySelector("select").onchange = e => { a.doc_id = e.target.value || null; save(); refresh(); };
+    div.querySelector("input").onchange = e => { a.ok = e.target.checked; save(); refresh(); };
+    box.appendChild(div);
+  });
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[ch]));
+}
+
+function refresh(){
+  let done = 0, flipped = 0, anchorsOk = 0, anchorsAll = 0;
+  const cov = { answerable: 0, partial: 0, missing: 0 };
+  BAKE.queries.forEach(q => {
+    const s = st(q.query_id), sug = SUGGEST[q.query_id] || {};
+    if (s.coverage){ done++; cov[s.coverage] = (cov[s.coverage] || 0) + 1; }
+    if (s.coverage && s.coverage !== sug.coverage) flipped++;
+    s.anchors.forEach(a => { anchorsAll++; if (a.doc_id && a.ok) anchorsOk++; });
+    const el = document.getElementById("q-" + q.query_id);
+    if (el) el.classList.toggle("done", !!s.coverage);
+  });
+  document.getElementById("prog").textContent = done;
+  document.getElementById("pcov").textContent =
+    `A ${cov.answerable} · P ${cov.partial} · M ${cov.missing}`;
+  const pf = document.getElementById("pflip");
+  pf.textContent = "제안과 다름 " + flipped;
+  pf.classList.toggle("flip", flipped > 0);
+  document.getElementById("panchor").textContent = `앵커 ${anchorsOk}/${anchorsAll}`;
+}
+
+document.getElementById("btnExport").addEventListener("click", () => {
+  const stop = blockers();
+  const msg = document.getElementById("msg");
+  if (stop.length){
+    msg.innerHTML = `<span style="color:var(--bad)">미완료 ${stop.length}건 — 내려받지 않았습니다</span>`;
+    const box = document.getElementById("blockers");
+    box.style.display = "";
+    box.innerHTML = "<b>먼저 채워야 할 것</b><ul style='margin:6px 0 0;padding-left:20px'>"
+      + stop.slice(0, 40).map(s => `<li>${s}</li>`).join("")
+      + (stop.length > 40 ? `<li>… 외 ${stop.length - 40}건</li>` : "")
+      + "</ul>";
+    box.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  document.getElementById("blockers").style.display = "none";
+  const payload = {
+    schema_version: "gold-labels-export-v1",
+    corpus_fingerprint: BAKE.corpus.fingerprint,
+    labeled_at_local: new Date().toISOString(),
+    queries: BAKE.queries.map(q => {
+      const s = st(q.query_id), sug = SUGGEST[q.query_id] || {};
+      return {
+        query_id: q.query_id,
+        coverage: s.coverage,
+        quality_flag: s.quality_flag,
+        resolved_at: s.resolved_at,
+        gold_chunk_ids: s.gold,
+        cause_only_chunk_ids: s.cause_only,
+        anchors: s.anchors.filter(a => a.doc_id).map(a => ({
+          quote: a.quote, doc_id: a.doc_id, note: a.note, name_checked: a.ok,
+        })),
+        agent_suggested_coverage: sug.coverage || null,
+        differs_from_suggestion: !!(s.coverage && s.coverage !== sug.coverage),
+      };
+    }),
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 1)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "gold_labels_export.json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  document.getElementById("msg").textContent = "내려받았습니다";
+});
+
+window.addEventListener("beforeunload", e => {
+  if (Object.values(state).some(s => s.touched)){ e.preventDefault(); e.returnValue = ""; }
+});
+
+boot();
+</script>
+</body>
+</html>

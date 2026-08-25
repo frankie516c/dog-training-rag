@@ -269,9 +269,20 @@ def gold_relevant_chunks(
         found.extend(hits)
 
     if not found:
+        # coverage: missing은 "코퍼스에 답이 없다"가 정답인 질의다. 거절 경계
+        # 질의가 여기 해당하며, 정답 청크를 정의하는 것 자체가 모순이다 —
+        # 아무것도 검색되지 않는 것이 성공이기 때문이다. 검색 지표에서 빼고
+        # 게이트 판정만 본다(아래 run()의 gold 루프).
+        #
+        # **명시적으로 missing이라고 적힌 질의만** 예외다. 그 표시가 없는데
+        # 매핑이 0건이면 여전히 오류다 — gold가 조용히 줄면 정답 집합이 작아져
+        # Hit@1이 오히려 올라가고, 그것을 개선으로 읽게 된다.
+        if query.get("coverage") == "missing":
+            return ()
         raise EvalError(
             f"{query['query_id']}: gold 참조가 어느 청크에도 매핑되지 않는다 "
-            "(relevant_spans·anchors 둘 다 비었거나 해석 실패)"
+            "(relevant_spans·anchors 둘 다 비었거나 해석 실패). 코퍼스에 답이 "
+            "없는 것이 정답인 질의라면 coverage: missing을 명시할 것"
         )
     return tuple(sorted(dict.fromkeys(found)))
 
@@ -733,8 +744,13 @@ def run(
             "qa_expansion": expansion,
         })
 
-    hit1 = sum(1 for r in gold_rows if r["first_relevant_rank"] == 1)
-    hit5 = sum(1 for r in gold_rows if r["first_relevant_rank"])
+    # 검색 지표는 정답 청크가 있는 질의로만 낸다. coverage: missing 질의는
+    # 아무것도 검색되지 않는 것이 성공이므로 Hit@1/MRR의 분모에 넣으면 지표가
+    # 뜻을 잃는다 — 게이트 판정(REFUSE인가)으로 따로 본다.
+    scored = [r for r in gold_rows if r["relevant_chunk_count"] > 0]
+    refuse_only = [r for r in gold_rows if r["relevant_chunk_count"] == 0]
+    hit1 = sum(1 for r in scored if r["first_relevant_rank"] == 1)
+    hit5 = sum(1 for r in scored if r["first_relevant_rank"])
     return {
         "schema_version": METRICS_SCHEMA_VERSION,
         "run": {
@@ -771,10 +787,13 @@ def run(
         "gold": gold_rows,
         "gold_summary": {
             "queries": len(gold_rows),
-            "hit@1": serialize_score(hit1 / len(gold_rows)),
-            "hit@5": serialize_score(hit5 / len(gold_rows)),
+            # 분모는 정답 청크가 있는 질의 수다. coverage: missing 질의는 빠진다.
+            "scored_queries": len(scored),
+            "refuse_only_queries": len(refuse_only),
+            "hit@1": serialize_score(hit1 / len(scored)) if scored else None,
+            "hit@5": serialize_score(hit5 / len(scored)) if scored else None,
             "mrr@5": serialize_score(
-                sum(r["reciprocal_rank"] for r in gold_rows) / len(gold_rows)
+                sum(r["reciprocal_rank"] for r in scored) / len(scored) if scored else 0.0
             ),
         },
     }
