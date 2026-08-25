@@ -509,6 +509,29 @@ def format_profile_block(profile: dict[str, Any]) -> str:
     )
 
 
+# <사용자사례> 블록이 있을 때만 붙는 규칙. 견주가 "해봤는데 효과 없었다"고 적은
+# 방법이 권고로 인용되는 것을 막는다 — 이 라운드가 존재하는 이유다.
+#
+# 이 블록에는 어떤 타입도 부여하지 않는다. SystemAuthoredText는
+# apply_output_guardrail이 검사를 건너뛰게 하는 출력 측 면제 장치이고, 프롬프트는
+# 그 함수를 거치지 않는다. 부여하면 견주 발화가 출력 검사 면제 권한을 얻어
+# 위험 어휘가 가드레일을 우회한다 — 그 타입이 막으려던 것과 정반대다.
+# 자세한 근거는 docs/design_qa_authority_retrieval.md 참조.
+CONTEXT_ONLY_RULE = (
+    "6. <사용자사례>는 보호자가 상담에서 직접 쓴 글입니다. 전문가의 권고가 아니며 "
+    "근거로 인용하면 안 됩니다. 번호를 붙여 참조하지 마세요. 질문자의 상황을 "
+    "이해하는 데만 쓰고, 답변의 근거는 <자료>에서만 가져오세요. 사용자가 시도했다고 "
+    "적은 방법이 효과적이라는 뜻은 아닙니다."
+)
+
+
+def _context_label(chunk: dict[str, Any]) -> str:
+    """<사용자사례> 항목의 라벨. 인용 번호가 아니라 출처 표시다."""
+    author = chunk.get("author_display") or "보호자"
+    where = chunk.get("doc_id") or chunk.get("qa_id") or "상담"
+    return f"{author} · {where}"
+
+
 def _chunk_header(position: int, chunk: dict[str, Any]) -> str:
     """The "[N] (...)" citation header build_prompt puts above each chunk's text.
 
@@ -548,17 +571,26 @@ def build_prompt(
     rules = list(PROMPT_RULES)
     if band == "hedge":
         rules.append(HEDGE_RULE)
+
+    # 인용 가능한 근거와 맥락 전용 자료를 갈라 놓는다. citation_allowed=False인
+    # 청크(견주 질문 등)는 [N] 번호를 받지 않는다 — 번호가 붙는 순간 규칙 4가
+    # "이걸 인용해도 된다"고 말하는 셈이 되기 때문이다.
+    citable = [c for c in chunks if c.get("citation_allowed", True)]
+    context_only = [c for c in chunks if not c.get("citation_allowed", True)]
+
     sources = [
         f"{_chunk_header(position, chunk)}\n{chunk['text']}"
-        for position, chunk in enumerate(chunks, start=1)
+        for position, chunk in enumerate(citable, start=1)
     ]
     lines = [
         "아래 <자료>만 근거로 질문에 답하세요.",
         "",
         "규칙:",
         *rules,
-        "",
     ]
+    if context_only:
+        lines.append(CONTEXT_ONLY_RULE)
+    lines.append("")
     if profile is not None:
         lines += [format_profile_block(profile), ""]
     lines += [
@@ -567,6 +599,21 @@ def build_prompt(
         "\n\n".join(sources),
         "",
         "</자료>",
+    ]
+    if context_only:
+        # 번호 없이, 그리고 <자료> 바깥에 둔다. 규칙 1이 "<자료>에 적혀 있는
+        # 내용만"이라고 말하므로 블록을 분리하는 것 자체가 인용 금지를 강화한다.
+        lines += [
+            "",
+            "<사용자사례>",
+            "",
+            "\n\n".join(
+                f"({_context_label(chunk)})\n{chunk['text']}" for chunk in context_only
+            ),
+            "",
+            "</사용자사례>",
+        ]
+    lines += [
         "",
         f"질문: {question}",
     ]
