@@ -140,6 +140,7 @@
   const developerToggle = document.querySelector("#developerToggle");
   const developerFloorOverlay = document.querySelector("#developerFloorOverlay");
   const developerPanel = document.querySelector("#developerPanel");
+  const developerThemeGallery = document.querySelector("#developerThemeGallery");
   const dogWalker = document.querySelector("#dogWalker");
   const dogFacing = dogWalker.querySelector(".dog-facing");
   const dogSprite = document.querySelector("#dogSprite");
@@ -381,6 +382,69 @@
     });
   }
 
+  function syncDeveloperThemeGallerySelection() {
+    developerThemeGallery.querySelectorAll(".developer-theme-card").forEach((card) => {
+      const selected = card.dataset.themeId === state.themeId;
+      card.classList.toggle("is-active", selected);
+      card.setAttribute("aria-pressed", String(selected));
+    });
+  }
+
+  function renderDeveloperThemeGallery() {
+    developerThemeGallery.replaceChildren();
+
+    const header = document.createElement("div");
+    header.className = "developer-theme-gallery-header";
+    const title = document.createElement("strong");
+    title.textContent = "PASTEL THEME ASSETS";
+    const help = document.createElement("span");
+    help.textContent = "ROOM + CABINET / CLICK TO APPLY";
+    header.append(title, help);
+
+    const grid = document.createElement("div");
+    grid.className = "developer-theme-grid";
+    THEME_CATALOG.forEach((theme) => {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "developer-theme-card";
+      card.dataset.themeId = theme.id;
+      card.setAttribute("aria-label", `Apply ${theme.label} room theme`);
+
+      const label = document.createElement("span");
+      label.className = "developer-theme-label";
+      const swatch = document.createElement("i");
+      swatch.style.setProperty("--theme-swatch", theme.swatch);
+      const name = document.createElement("b");
+      name.textContent = theme.label;
+      label.append(swatch, name);
+
+      const preview = document.createElement("span");
+      preview.className = "developer-theme-preview";
+      const room = document.createElement("img");
+      room.className = "developer-theme-room";
+      room.src = `../assets/themes/${theme.id}/room.png`;
+      room.alt = "";
+      room.loading = "lazy";
+      const cabinet = document.createElement("img");
+      cabinet.className = "developer-theme-cabinet";
+      cabinet.src = `../assets/themes/${theme.id}/cabinet.png`;
+      cabinet.alt = "";
+      cabinet.loading = "lazy";
+      preview.append(room, cabinet);
+      card.append(label, preview);
+      card.addEventListener("click", () => {
+        applyTheme(theme.id);
+        render();
+        syncDeveloperThemeGallerySelection();
+        showToast(`${theme.label} theme`);
+      });
+      grid.append(card);
+    });
+
+    developerThemeGallery.append(header, grid);
+    syncDeveloperThemeGallerySelection();
+  }
+
   function renderDeveloperOverlay(preview = null) {
     if (!developerMode) return;
     const entries = Object.entries(state.items).map(([id, placement]) => [
@@ -411,10 +475,12 @@
     developerToggle.querySelector("b").textContent = enabled ? "ON" : "OFF";
     if (enabled) {
       renderDeveloperOverlay();
+      renderDeveloperThemeGallery();
       showToast("개발자 모드: 실제 점유 좌표를 표시합니다.");
     } else {
       developerFloorOverlay.replaceChildren();
       developerPanel.replaceChildren();
+      developerThemeGallery.replaceChildren();
     }
   }
 
@@ -670,6 +736,8 @@
   });
   themePicker.addEventListener("change", () => {
     applyTheme(themePicker.value);
+    render();
+    if (developerMode) syncDeveloperThemeGallerySelection();
     showToast(`${roomThemes.get(state.themeId).label} theme`);
   });
   document.addEventListener("keydown", (event) => {
