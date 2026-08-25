@@ -41,6 +41,8 @@
   .meta{color:var(--muted);font-size:12.5px;display:flex;gap:9px;flex-wrap:wrap}
   .tag{padding:1px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--line)}
   .tag.src{background:var(--ctxbg);border-color:var(--ctx);color:var(--ctx)}
+  .reason{margin-top:6px;font-size:12.5px;color:var(--muted);background:var(--bg);
+    border:1px solid var(--line);border-radius:6px;padding:6px 9px}
 
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:9px 0}
   .row label{font-size:12.5px;color:var(--muted);min-width:96px}
@@ -110,9 +112,11 @@
     실측에서 실패했으므로(거짓 경고만 나옴) <u>앵커로 쓸 문장은 직접 읽고</u> 판단하세요.
   </div>
 
+  <div class="note" id="resolvedDoc"></div>
+
   <div class="bar">
-    <span><b id="prog">0</b> / <b id="total">0</b> 판정</span>
-    <span class="pill" id="pflip">제안과 다름 0</span>
+    <span><b id="prog">0</b> / <b id="total">0</b> 완료</span>
+    <span class="pill" id="pflip">coverage 제안과 다름 0</span>
     <span class="pill" id="pcov">—</span>
     <span class="pill" id="panchor">앵커 0/0</span>
     <span class="saved" id="savedAt"></span>
@@ -137,11 +141,40 @@
 
 <script src="gold_workbench_data.js"></script>
 <script>
-const KEY = "dogtrain-gold-batch1-v1";
 const COVERAGE = ["answerable", "partial", "missing"];
 const RESOLVED = ["vector_top5", "vector_top20", "lexical", "missing"];
 
-let BAKE = null, SUGGEST = null, state = {};
+// resolved_at 정의 — 라벨링 중 판단이 갈리지 않도록 화면에도 띄운다.
+const RESOLVED_DOC = {
+  vector_top5:  "검색 상위 5위 안에서 찾음 (현재 TOP_K 설정으로도 잡힘)",
+  vector_top20: "5위 밖 20위 안에서 찾음 — 코퍼스엔 있는데 검색이 묻은 것",
+  lexical:      "벡터가 못 찾아 어휘 검색으로만 찾음 — 검색 실패가 더 큼",
+  missing:      "20위 안에도 어휘 검색에도 없음 — 코퍼스에 답이 없음",
+};
+
+let BAKE = null, SUGGEST = null, state = {}, KEY = null;
+// 세션 dirty. localStorage에 저장하지 않는다 — 저장된 상태에 섞이면 다음에 열
+// 때 "미저장 변경"으로 잘못 뜨고, 데이터가 아니라 UI 상태다.
+let dirty = false;
+
+/** 데이터가 바뀌면 이전 라벨을 이어받지 않도록 키에 지문을 넣는다.
+ *  후보 풀이나 제안이 달라졌는데 옛 라벨이 남아 있으면 무엇에 대한 판정인지
+ *  알 수 없게 된다. BAKE(코퍼스+후보)와 SUGGEST(제안+앵커) 양쪽을 반영한다. */
+function workbenchFingerprint(bake, suggest){
+  const basis = JSON.stringify({
+    corpus: bake.corpus.fingerprint,
+    config: bake.config,
+    queries: bake.queries.map(q => [q.query_id, q.candidates.map(c => c.chunk_id)]),
+    suggest: suggest.map(s => [s.query_id, s.coverage, s.quality_flag || null,
+                               (s.anchors || []).map(a => a.quote)]),
+  });
+  let h = 0x811c9dc5;                       // FNV-1a 32bit
+  for (let i = 0; i < basis.length; i++){
+    h ^= basis.charCodeAt(i) & 0xff;
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(16).padStart(8, "0");
+}
 
 function load(){ try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e){ return {}; } }
 function save(){
@@ -166,12 +199,23 @@ function boot(){
   BAKE = bake;
   SUGGEST = {};
   window.SUGGEST_DATA.forEach(row => { SUGGEST[row.query_id] = row; });
+  const wf = workbenchFingerprint(bake, window.SUGGEST_DATA);
+  KEY = "dogtrain-gold-batch1-" + wf;
   state = load();
   document.getElementById("sub").textContent =
     `코퍼스 ${bake.corpus.chunks}청크 (영상 ${bake.corpus.video_chunks} / 문서 ${bake.corpus.document_chunks}) · `
-    + `지문 ${bake.corpus.fingerprint.slice(0,20)}… · 벡터풀 ${bake.config.vector_pool} · 앵커 최소 ${bake.config.min_anchor_chars}자`;
+    + `지문 ${bake.corpus.fingerprint.slice(0,20)}… · 작업대 ${wf} · `
+    + `벡터풀 ${bake.config.vector_pool} · 앵커 최소 ${bake.config.min_anchor_chars}자`;
   document.getElementById("total").textContent = bake.queries.length;
+  renderResolvedDoc();
   render();
+}
+
+function renderResolvedDoc(){
+  const box = document.getElementById("resolvedDoc");
+  box.innerHTML = "<b>'어디서 찾음'(resolved_at) 정의</b><ul style='margin:6px 0 0;padding-left:20px'>"
+    + RESOLVED.map(k => `<li><code>${k}</code> — ${RESOLVED_DOC[k]}</li>`).join("")
+    + "</ul>";
 }
 
 function st(qid){
@@ -183,10 +227,18 @@ function st(qid){
       resolved_at: null,
       gold: [], cause_only: [],
       anchors: (s.anchors || []).map(a => ({ quote: a.quote, note: a.note, doc_id: null, ok: false })),
-      touched: false,
     };
   }
   return state[qid];
+}
+
+/** 이 질의가 완료됐는가. coverage만으로는 부족하다 — resolved_at이 비었거나
+ *  앵커가 미확정이면 내보내기가 막히는데, 진행률이 100%로 보이면 어디가 빈지
+ *  찾으러 돌아가야 한다. */
+function isComplete(q){
+  const s = st(q.query_id);
+  if (!s.coverage || !s.resolved_at) return false;
+  return s.anchors.every(a => a.doc_id && a.ok);
 }
 
 function render(){
@@ -211,6 +263,7 @@ function card(q){
       <span>후보 ${q.candidates.length} (벡터 ${q.vector_pool_size} + 어휘 ${q.lexical_extra}/${q.lexical_total})</span>
       <span>핵심어: ${q.keywords.slice(0,8).join(", ")}</span>
     </div>
+    ${sug.label_reason ? `<div class="reason"><b>제안 근거</b> · ${escapeHtml(sug.label_reason)}</div>` : ""}
     <div class="row" data-k="coverage"><label>coverage</label></div>
     <div class="row" data-k="resolved_at"><label>어디서 찾음</label></div>
     <div class="row" data-k="quality"><label>전사 품질</label></div>
@@ -219,14 +272,14 @@ function card(q){
   `;
 
   fill(el.querySelector('[data-k="coverage"]'), COVERAGE, s.coverage, sug.coverage, v => {
-    s.coverage = v; s.touched = true; save(); refresh();
+    s.coverage = v; dirty = true; save(); refresh();
   });
   fill(el.querySelector('[data-k="resolved_at"]'), RESOLVED, s.resolved_at, null, v => {
     s.resolved_at = v; save(); refresh();
   });
   fill(el.querySelector('[data-k="quality"]'), ["정상", "unreadable_asr"],
        s.quality_flag || "정상", sug.quality_flag || "정상", v => {
-    s.quality_flag = (v === "unreadable_asr") ? v : null; s.touched = true; save(); refresh();
+    s.quality_flag = (v === "unreadable_asr") ? v : null; dirty = true; save(); refresh();
   });
 
   renderAnchors(el.querySelector("[data-anchors]"), q, s);
@@ -270,12 +323,12 @@ function candCard(q, c, s){
   el.querySelector('[data-a="gold"]').onclick = () => {
     toggle(s.gold, c.chunk_id);
     if (s.gold.includes(c.chunk_id)) remove(s.cause_only, c.chunk_id);
-    s.touched = true; save(); render();
+    dirty = true; save(); render();
   };
   el.querySelector('[data-a="cause"]').onclick = () => {
     toggle(s.cause_only, c.chunk_id);
     if (s.cause_only.includes(c.chunk_id)) remove(s.gold, c.chunk_id);
-    s.touched = true; save(); render();
+    dirty = true; save(); render();
   };
   return el;
 }
@@ -295,12 +348,33 @@ function blockers(){
   const out = [];
   BAKE.queries.forEach(q => {
     const s = st(q.query_id);
-    if (!s.coverage) out.push(`${q.query_id}: coverage 미판정`);
-    if (s.coverage && !s.resolved_at) out.push(`${q.query_id}: '어디서 찾음' 미선택`);
-    if (s.coverage === "answerable" && !s.gold.length && !s.anchors.length)
-      out.push(`${q.query_id}: answerable인데 gold 청크도 앵커도 없음`);
+    const nGold = s.gold.length + s.anchors.filter(a => a.doc_id).length;
+    const nCause = s.cause_only.length;
+
+    if (!s.coverage){ out.push(`${q.query_id}: coverage 미판정`); return; }
+    if (!s.resolved_at){ out.push(`${q.query_id}: '어디서 찾음' 미선택`); }
+
+    // coverage와 근거 지정의 정합성.
+    if (s.coverage === "answerable" && nGold < 1)
+      out.push(`${q.query_id}: answerable인데 gold(청크 또는 앵커)가 0개`);
+    if (s.coverage === "partial" && nGold + nCause < 1)
+      out.push(`${q.query_id}: partial인데 gold도 원인만도 0개`);
+    if (s.coverage === "missing" && (nGold > 0 || nCause > 0))
+      out.push(`${q.query_id}: missing인데 gold ${nGold} / 원인만 ${nCause} 지정됨`);
+
+    // coverage와 resolved_at은 서로를 함의한다. 한쪽만 missing이면 둘 중
+    // 하나가 잘못된 것이고, 그대로 두면 "코퍼스에 없다"와 "검색이 못 찾았다"가
+    // 뒤섞인다 — 이 구분이 resolved_at을 둔 이유다.
+    if (s.resolved_at){
+      if (s.coverage === "missing" && s.resolved_at !== "missing")
+        out.push(`${q.query_id}: coverage=missing인데 resolved_at=${s.resolved_at}`);
+      if (s.coverage !== "missing" && s.resolved_at === "missing")
+        out.push(`${q.query_id}: coverage=${s.coverage}인데 resolved_at=missing`);
+    }
+
     s.gold.forEach(id => {
-      if (s.cause_only.includes(id)) out.push(`${q.query_id}: 같은 청크가 gold와 원인만에 동시 지정`);
+      if (s.cause_only.includes(id))
+        out.push(`${q.query_id}: 같은 청크가 gold와 원인만에 동시 지정`);
     });
     s.anchors.forEach((a, i) => {
       if (!a.doc_id) out.push(`${q.query_id} 앵커${i + 1}: doc_id 미확정`);
@@ -318,7 +392,11 @@ function renderAnchors(box, q, s){
     + "앵커 승인 — 인용문이 어느 문서 청크에 있는지 확정하고, 호칭이 없는지 직접 확인하세요."
     + "</div>";
   s.anchors.forEach((a, i) => {
-    const matches = q.candidates.filter(c => c.text.includes(a.quote));
+    // 인용 금지 청크(견주 발화)는 앵커 대상이 될 수 없다 — gold는 인용 가능한
+    // 근거여야 하고, OWNER_QUESTION은 질문의 재진술이지 답이 아니다.
+    const matches = q.candidates.filter(
+      c => c.text.includes(a.quote) && c.citation_allowed !== false
+    );
     const div = document.createElement("div");
     div.className = "anchor";
     const opts = matches.map(m =>
@@ -353,17 +431,20 @@ function refresh(){
   const cov = { answerable: 0, partial: 0, missing: 0 };
   BAKE.queries.forEach(q => {
     const s = st(q.query_id), sug = SUGGEST[q.query_id] || {};
-    if (s.coverage){ done++; cov[s.coverage] = (cov[s.coverage] || 0) + 1; }
+    // 완료는 coverage만이 아니라 resolved_at·앵커까지 끝난 것을 말한다.
+    const complete = isComplete(q);
+    if (complete) done++;
+    if (s.coverage) cov[s.coverage] = (cov[s.coverage] || 0) + 1;
     if (s.coverage && s.coverage !== sug.coverage) flipped++;
     s.anchors.forEach(a => { anchorsAll++; if (a.doc_id && a.ok) anchorsOk++; });
     const el = document.getElementById("q-" + q.query_id);
-    if (el) el.classList.toggle("done", !!s.coverage);
+    if (el) el.classList.toggle("done", complete);
   });
   document.getElementById("prog").textContent = done;
   document.getElementById("pcov").textContent =
     `A ${cov.answerable} · P ${cov.partial} · M ${cov.missing}`;
   const pf = document.getElementById("pflip");
-  pf.textContent = "제안과 다름 " + flipped;
+  pf.textContent = "coverage 제안과 다름 " + flipped;
   pf.classList.toggle("flip", flipped > 0);
   document.getElementById("panchor").textContent = `앵커 ${anchorsOk}/${anchorsAll}`;
 }
@@ -386,7 +467,7 @@ document.getElementById("btnExport").addEventListener("click", () => {
   const payload = {
     schema_version: "gold-labels-export-v1",
     corpus_fingerprint: BAKE.corpus.fingerprint,
-    labeled_at_local: new Date().toISOString(),
+    labeled_at_utc: new Date().toISOString(),
     queries: BAKE.queries.map(q => {
       const s = st(q.query_id), sug = SUGGEST[q.query_id] || {};
       return {
@@ -413,7 +494,7 @@ document.getElementById("btnExport").addEventListener("click", () => {
 });
 
 window.addEventListener("beforeunload", e => {
-  if (Object.values(state).some(s => s.touched)){ e.preventDefault(); e.returnValue = ""; }
+  if (dirty){ e.preventDefault(); e.returnValue = ""; }
 });
 
 boot();
