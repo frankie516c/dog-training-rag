@@ -162,6 +162,7 @@
 | 2026-08-25 | [wayopet_custom_parser_0825.md](wayopet_custom_parser_0825.md) | wayopet.com 커스텀 파서 구축, 6건 성공(저자 3명) | 진행중 — 실제 인제스트 대기 |
 | 2026-08-25(자동생성) | [combined_corpus_coverage.md](combined_corpus_coverage.md) | 조달 후 통합 코퍼스(245청크·margin_top5 게이트) 커버리지 리포트 | 진행중 — 사람 coverage 재판정 다수 공란 |
 | 2026-08-25 | [gold_import_and_eval_attempt_0825.md](gold_import_and_eval_attempt_0825.md) | gold 승인 40건 반영, resolved_at 분포, 기준선 평가 시도 | 진행중 — 평가는 gold 청크 미기록으로 중단 |
+| 2026-08-26 | [retrieval_baseline_gold6_0826.md](retrieval_baseline_gold6_0826.md) | P1 이전 검색 기준선. **채점 6문항** Hit@1 0.667 / MRR@5 0.764 | 유효(범위 한정) — situation·refuse_boundary 표본 0 |
 
 ---
 

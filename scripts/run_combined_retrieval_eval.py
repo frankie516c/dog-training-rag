@@ -740,7 +740,9 @@ def run(
             "query_id": row["query_id"],
             "question": row["question"],
             "query_type": row["query_type"],
-            "video_id": row["video_id"],
+            # gold-query-v2는 문서도 정답이 될 수 있어 영상 전용 필드가 없는 행이
+            # 있다. 위 gold_relevant_chunks()도 같은 이유로 .get()을 쓴다.
+            "video_id": row.get("video_id"),
             "relevant_chunk_count": len(relevant),
             "first_relevant_rank": first,
             "reciprocal_rank": serialize_score(1 / first) if first else 0.0,
@@ -1146,8 +1148,11 @@ def _gold_section(payload: dict[str, Any], base: dict[str, dict[str, Any]]) -> l
             f"{old.get('score_gap'):.4f}" if old.get("score_gap") is not None else "-",
             row["score_gap"], _delta(row["score_gap"], old.get("score_gap"))))
     lines.append("")
-    lines.append("- Hit@1 **{}** · Hit@5 **{}** · MRR@5 **{}** (12문항)".format(
-        summary["hit@1"], summary["hit@5"], summary["mrr@5"]))
+    # 분모는 하드코딩하지 않는다. gold 셋이 12문항이던 시절의 숫자가 남아 있어
+    # 채점 대상이 6건일 때도 12로 찍혔다 — 지표를 실제보다 넓게 읽게 만든다.
+    lines.append("- Hit@1 **{}** · Hit@5 **{}** · MRR@5 **{}** (채점 {}문항 / gold {}건)".format(
+        summary["hit@1"], summary["hit@5"], summary["mrr@5"],
+        summary["scored_queries"], summary["queries"]))
     if moved:
         lines.append("- 순위가 바뀐 질문: " + ", ".join(
             "{} {}→{}".format(q, o or "미검출", n or "미검출") for q, o, n in moved))
@@ -1238,11 +1243,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     print("corpus: 영상 {} + 문서 {} = {}청크".format(
         corpus["video"]["chunks_eligible"], corpus["documents"]["chunks"],
         corpus["combined"]["chunks"]))
-    print("gold 12: Hit@1 {} · Hit@5 {} · MRR@5 {}".format(
+    print("gold {}건 중 채점 {}문항(거절 전용 {}): Hit@1 {} · Hit@5 {} · MRR@5 {}".format(
+        summary["queries"], summary["scored_queries"], summary["refuse_only_queries"],
         summary["hit@1"], summary["hit@5"], summary["mrr@5"]))
     passed = sum(1 for r in payload["owner_fixtures"] if r["gate_verdict"] == GATE_PASS)
     matched = sum(1 for r in payload["owner_fixtures"] if r["gate_matches_expected"])
-    print("owner 20: gate PASS {} / 기대 일치 {}".format(passed, matched))
+    print("owner {}건: gate PASS {} / 기대 일치 {}".format(
+        len(payload["owner_fixtures"]), passed, matched))
     graph = payload["graph"]
     if graph["enabled"]:
         print("graph: 노드 {} · 엣지 {} (최대 {}홉)".format(
