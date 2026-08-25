@@ -35,6 +35,12 @@ CRAWL_ROOT = Path("../scrapper/data")
 MANUAL_DIR = CRAWL_ROOT / "manual"
 CRAWL_POOLS = ("blog_raw", "blog_raw_africaamc", "blog_raw_newsource_0825", "blog_raw_fitpet")
 
+# Q&A 소스는 견주 질문과 훈련사 답변이 한 페이지에 있어, 원문 그대로 청킹하면
+# 견주가 "해봤는데 효과 없었다"고 적은 방법이 전문가 권고처럼 인용될 수 있다.
+# split_wayopet_qa.py가 역할별로 갈라 놓은 산출물을 읽는다 — raw는 건드리지
+# 않고, 분리 결과만 인제스트 입력으로 쓴다.
+QA_SEGMENT_DIR = Path("data/intermediate/wayopet")
+
 DEFAULT_DOC_DIR = Path("data/raw/documents")
 DEFAULT_CHUNK_DIR = Path("data/processed/documents/chunks")
 DEFAULT_LOG = Path("data/processed/documents/ingest_log.json")
@@ -285,7 +291,62 @@ MANIFEST = [
         "blog": "핏펫(Fitpet)",
         "author": "핏펫",
     },
+    # --- wayopet.com Q&A (2026-08-25) ---
+    #
+    # 확대가 아니라 **권위 계약 검증**이다. qa_id 확장·인용 분기·화이트리스트
+    # 무효화가 지금까지 전부 합성 픽스처로만 검증됐고, 실데이터가 이 계약을
+    # 통과하는 것은 이번이 처음이다.
+    #
+    # 한 Q&A가 두 항목이 된다 — 견주 질문(CONTEXT_ONLY, 인용 금지)과 훈련사
+    # 답변(DIRECT, 인용 가능). 같은 qa_id로 묶여 질문이 검색되면 답변이 함께
+    # 조회된다. 원문은 split_wayopet_qa.py가 갈라 놓은 산출물에서 읽는다.
+    #
+    # 저자는 개별 훈련사 이름이 아니라 플랫폼+역할로 고정한다. 본문에서 실명을
+    # 지우면서 메타데이터에 남기면 제거가 무의미해지기 때문이다.
+    *[
+        entry
+        for slug, qa_id, topic in (
+            ("fear-barking", "https://wayopet.com/trainer/qna/vxk7gfhycftogk1v#qa0",
+             "외부 소리에 짖는 강아지"),
+            ("kennel-fear", "https://wayopet.com/trainer/qna/02lex4hfdxkjgh6s#qa0",
+             "겁이 많은 강아지 켄넬 교육"),
+            ("night-lunging", "https://wayopet.com/trainer/qna/sryjhpaqmdvfy28v#qa0",
+             "특정인에게 달려드는 행동"),
+            ("noise-barking", "https://wayopet.com/trainer/qna/aoeveog0gsdb51og#qa0",
+             "외부 소음에 짖는 행동"),
+            ("walk-lunging", "https://wayopet.com/trainer/qna/mzzejqwpdocmik7h#qa0",
+             "산책 중 다른 강아지에게 달려드는 행동"),
+            ("walk-training", "https://wayopet.com/trainer/qna/qsf79xhviuzawne7#qa0",
+             "강아지 산책 훈련 방법"),
+        )
+        for entry in (
+            {
+                "doc_id": f"wayopet-{slug}-question",
+                "slot": "vector-qa-authority-0825",
+                "origin": "qa_segment",
+                "qa_id": qa_id,
+                "segment_role": ROLE_OWNER_QUESTION,
+                "title": f"{topic} — 보호자 상담 글",
+                "blog": "와요 (wayopet.com)",
+                "author": "와요펫 견주",
+            },
+            {
+                "doc_id": f"wayopet-{slug}-answer",
+                "slot": "vector-qa-authority-0825",
+                "origin": "qa_segment",
+                "qa_id": qa_id,
+                "segment_role": ROLE_EXPERT_ANSWER,
+                "title": f"{topic} — 훈련사 답변",
+                "blog": "와요 (wayopet.com)",
+                "author": "와요펫 훈련사",
+            },
+        )
+    ],
 ]
+
+# qa_segment 항목의 수집일. 개별 게시글 작성일이 아니라 이 저장소가 조달한
+# 날짜다(원 게시일은 본문에 남아 있다).
+COLLECTED_AT_QA = "2026-08-25"
 
 
 def load_crawl_pool(root: Path) -> dict[str, dict[str, Any]]:
@@ -316,6 +377,25 @@ def check_url_allowed(url: str, doc_id: str) -> None:
             "docs/SOURCES.md의 '로그인·유료 구간 자료의 무단 수집' 배제 정책에 걸림. "
             "유료/로그인 구간 콘텐츠는 수집 대상에서 제외할 것."
         )
+
+
+def load_qa_segments(directory: Path = QA_SEGMENT_DIR) -> dict[tuple[str, str], dict[str, Any]]:
+    """split_wayopet_qa.py의 segments.jsonl을 (qa_id, segment_role)로 색인한다.
+
+    이 파일은 커밋되지 않는다(data/ gitignore) — 제거한 boilerplate 원문이
+    들어 있어 public 저장소에 올릴 수 없다. 없으면 빈 dict을 돌려주고, MANIFEST가
+    실제로 그 세그먼트를 요구할 때 명확한 오류를 낸다.
+    """
+    path = directory / "segments.jsonl"
+    if not path.is_file():
+        return {}
+    index: dict[tuple[str, str], dict[str, Any]] = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        index[(row["qa_id"], row["segment_role"])] = row
+    return index
 
 
 def read_manual(path: Path) -> dict[str, str]:
@@ -545,9 +625,23 @@ def build_chunks(
         # a chunk that reads "1단계 ..." without "슬개골 탈구 단계별 증상" above it is
         # not retrievable by anyone asking about the disease.
         breadcrumb = " > ".join(path)
-        pieces = split_chars(body, reserved=len(breadcrumb) + 1) if body else [""]
+        # Q&A 세그먼트는 breadcrumb을 본문에 넣지 않는다.
+        #
+        # 일반 문서에서 breadcrumb을 본문에 싣는 것은 의도된 설계다 — "1단계 …"만
+        # 담긴 청크는 질병명 없이 검색되지 않기 때문이다. 그런데 Q&A에서는 그
+        # breadcrumb이 "<주제> — 훈련사 답변 > 솔루션 제안" 꼴이라, 역할·섹션
+        # 라벨이 모든 청크에 반복해서 박힌다. 실측에서 이 공통 문자열이 훈련
+        # 관련 질의 전반에 걸려 무관한 청크를 상위로 밀어 올렸다(정의를 묻는
+        # 질문이 행동 솔루션 청크에 밀림). 임베딩 대상 텍스트에 수십 청크가
+        # 공유하는 문자열이 들어가는 것 자체가 결함이다.
+        #
+        # 경로는 heading_path에 그대로 남으므로 출처 표시와 프롬프트 헤더는
+        # 영향받지 않는다 — 본문에서만 뺀다.
+        include_breadcrumb = entry.get("origin") != "qa_segment"
+        reserved = len(breadcrumb) + 1 if include_breadcrumb else 0
+        pieces = split_chars(body, reserved=reserved) if body else [""]
         for piece in pieces:
-            text = f"{breadcrumb}\n{piece}".strip()
+            text = f"{breadcrumb}\n{piece}".strip() if include_breadcrumb else piece.strip()
             # Q&A 소스가 아닌 일반 문서는 전부 DOCUMENT_BODY다. 역할이 갈리는
             # 것은 견주 질문과 훈련사 답변이 한 문서에 섞이는 Q&A뿐이다.
             role = entry.get("segment_role", ROLE_DOCUMENT_BODY)
@@ -576,9 +670,13 @@ def build_chunks(
                 "char_count": len(text),
                 "embedding_eligible": True,
                 "chunking": dict(CHUNKING),
-                # 권위 계약. 이 필드를 읽는 코드는 변경 2·3에서 붙는다.
+                # 권위 계약.
                 "qa_id": qa_id,
                 "segment_role": role,
+                # 표시명은 플랫폼+역할로 고정된 값이다. 청크가 이걸 싣지 않으면
+                # 프롬프트 렌더링이 일반 기본값으로 떨어져, 확정한 표시명이
+                # 실제 출력에 나타나지 않는다.
+                "author_display": entry.get("author"),
                 **authority,
             })
             index += 1
@@ -613,6 +711,7 @@ def ingest(
     log_path: Path,
 ) -> dict[str, Any]:
     pool = load_crawl_pool(crawl_root)
+    qa_segments = load_qa_segments()
     doc_dir.mkdir(parents=True, exist_ok=True)
     chunk_dir.mkdir(parents=True, exist_ok=True)
 
@@ -620,7 +719,19 @@ def ingest(
     total_chunks = 0
     for entry in MANIFEST:
         entry = dict(entry)
-        if entry["origin"] == "crawl":
+        if entry["origin"] == "qa_segment":
+            key = (entry["qa_id"], entry["segment_role"])
+            row = qa_segments.get(key)
+            if row is None:
+                raise IngestError(
+                    f"{entry['doc_id']}: {key} not in {QA_SEGMENT_DIR}/segments.jsonl — "
+                    "scripts/split_wayopet_qa.py를 먼저 실행할 것"
+                )
+            entry["source_url"] = row["source_url"]
+            entry["collected_at"] = COLLECTED_AT_QA
+            title = entry["title"]
+            raw_lines = row["text"].splitlines()
+        elif entry["origin"] == "crawl":
             row = pool.get(entry["crawl_id"])
             if row is None:
                 raise IngestError(f"{entry['doc_id']}: {entry['crawl_id']} not in the crawl pool")

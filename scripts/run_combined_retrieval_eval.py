@@ -434,7 +434,11 @@ ROLE_EXPERT_ANSWER = "EXPERT_ANSWER"
 # 한 Q&A의 전문가 답변이 여러 청크에 걸칠 때 몇 개까지 근거에 붙일지.
 # 무제한이면 긴 답변 하나가 프롬프트를 통째로 차지한다. 상한을 넘으면 조용히
 # 자르지 않고 몇 개를 버렸는지 기록한다 — 잘린 것을 모르면 커버리지를 과대평가한다.
-EXPANSION_MAX_SIBLINGS = 5
+#
+# 처음 5로 잡았으나 실데이터에서 작았다 — 훈련사 답변은 6~9청크가 흔했고 6개
+# 질의가 상한에 걸렸다. 답변부는 인용 가능한 유일한 근거이므로 잘리면 권고가
+# 중간에서 끊긴다. 실측 최대(9)를 담고 한 칸 여유를 둔다.
+EXPANSION_MAX_SIBLINGS = 10
 
 
 def build_qa_answer_index(corpus: Sequence[dict[str, Any]]) -> dict[str, list[str]]:
