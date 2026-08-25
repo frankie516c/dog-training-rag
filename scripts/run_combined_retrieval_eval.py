@@ -428,6 +428,89 @@ def hybrid_merge(
     return list(dict.fromkeys(ordered))
 
 
+ROLE_OWNER_QUESTION = "OWNER_QUESTION"
+ROLE_EXPERT_ANSWER = "EXPERT_ANSWER"
+
+# 한 Q&A의 전문가 답변이 여러 청크에 걸칠 때 몇 개까지 근거에 붙일지.
+# 무제한이면 긴 답변 하나가 프롬프트를 통째로 차지한다. 상한을 넘으면 조용히
+# 자르지 않고 몇 개를 버렸는지 기록한다 — 잘린 것을 모르면 커버리지를 과대평가한다.
+EXPANSION_MAX_SIBLINGS = 5
+
+
+def build_qa_answer_index(corpus: Sequence[dict[str, Any]]) -> dict[str, list[str]]:
+    """qa_id -> EXPERT_ANSWER chunk_id 목록 (문서 순서).
+
+    답변이 여러 청크로 쪼개졌을 때 순서가 뒤섞이면 절차 설명이 끊기므로
+    chunk_index 오름차순을 유지한다.
+    """
+    grouped: dict[str, list[tuple[int, str]]] = {}
+    for chunk in corpus:
+        if chunk.get("segment_role") != ROLE_EXPERT_ANSWER:
+            continue
+        qa_id = chunk.get("qa_id")
+        if not qa_id:
+            continue
+        grouped.setdefault(qa_id, []).append(
+            (int(chunk.get("chunk_index", 0)), chunk["chunk_id"])
+        )
+    return {
+        qa_id: [cid for _idx, cid in sorted(pairs)]
+        for qa_id, pairs in grouped.items()
+    }
+
+
+def expand_qa_siblings(
+    evidence_ids: Sequence[str],
+    by_id: dict[str, dict[str, Any]],
+    qa_index: dict[str, list[str]],
+) -> tuple[list[str], dict[str, Any]]:
+    """OWNER_QUESTION이 근거에 들어왔으면 같은 qa_id의 EXPERT_ANSWER를 붙인다.
+
+    견주 질문은 citation_allowed=false다 — 사용자 사례 맥락이지 훈련 권고가
+    아니다. 질문만 근거로 남으면 인용할 것이 없는 채로 견주 발화가 노출되므로,
+    인용 가능한 형제 답변을 함께 가져온다.
+
+    **이 함수는 게이트 통계 계산이 끝난 뒤에만 호출해야 한다.** 유사도 분포를
+    건드리면 별도로 검증을 마친 게이트 신호 결정이 무효화된다. 호출 순서는
+    테스트로 고정돼 있다.
+
+    규칙:
+      - 형제 답변은 문서 순서로 **전부** 붙인다(상한 EXPANSION_MAX_SIBLINGS).
+        답변이 여러 청크에 걸칠 때 일부만 주면 권고가 중간에서 잘린다.
+      - 이미 랭킹에 들어와 있는 답변은 다시 붙이지 않는다(순서 유지, 중복 제거).
+      - **형제 답변이 하나도 없는 OWNER_QUESTION은 근거에서 뺀다(fail-closed).**
+        인용 가능한 짝이 없는 견주 발화를 근거로 남기면, 인용 금지 표시가
+        있더라도 모델이 그것만 보고 답을 지어낼 여지가 생긴다.
+    """
+    ordered = list(dict.fromkeys(evidence_ids))
+    appended: list[str] = []
+    dropped_orphans: list[str] = []
+    truncated: dict[str, int] = {}
+
+    for cid in list(ordered):
+        chunk = by_id.get(cid)
+        if not chunk or chunk.get("segment_role") != ROLE_OWNER_QUESTION:
+            continue
+        qa_id = chunk.get("qa_id")
+        siblings = qa_index.get(qa_id or "", [])
+        if not siblings:
+            dropped_orphans.append(cid)
+            continue
+        if len(siblings) > EXPANSION_MAX_SIBLINGS:
+            truncated[qa_id] = len(siblings) - EXPANSION_MAX_SIBLINGS
+            siblings = siblings[:EXPANSION_MAX_SIBLINGS]
+        for sid in siblings:
+            if sid not in ordered and sid not in appended:
+                appended.append(sid)
+
+    result = [cid for cid in ordered if cid not in dropped_orphans] + appended
+    return result, {
+        "appended_answer_chunk_ids": appended,
+        "dropped_orphan_question_chunk_ids": dropped_orphans,
+        "truncated_siblings_by_qa_id": truncated,
+    }
+
+
 def run(
     video_dir: Path,
     doc_dir: Path | None,
@@ -448,6 +531,9 @@ def run(
     corpus = video + documents
     ids = [c["chunk_id"] for c in corpus]
     by_id = {c["chunk_id"]: c for c in corpus}
+    # Q&A 형제 확장용 인덱스. Q&A 소스가 없으면 빈 dict이고 확장은 아무 일도
+    # 하지 않는다 — qa_id 없는 코퍼스에서 동작이 바뀌지 않음을 뜻한다.
+    qa_index = build_qa_answer_index(corpus)
 
     if graph_off:
         graph_nodes: dict = {}
@@ -493,6 +579,11 @@ def run(
             hybrid_merge(ranked, graph_chunks) if verdict == GATE_PASS
             else [cid for cid, _score in ranked]
         )
+        # Q&A 형제 확장은 **여기서**, 게이트 통계(stats)와 판정(verdict)이 모두
+        # 확정된 뒤에 일어난다. 확장이 랭킹이나 유사도 분포에 영향을 주면 게이트
+        # 신호 결정이 무효화되므로, 근거 목록만 손대고 ranked/stats는 건드리지
+        # 않는다. 이 순서는 테스트로 고정돼 있다.
+        evidence_ids, expansion = expand_qa_siblings(evidence_ids, by_id, qa_index)
         fixture_rows.append({
             "query_id": row["query_id"],
             "question": row["question"],
@@ -529,6 +620,9 @@ def run(
                 for chunk in graph_chunks
             ],
             "evidence_chunk_ids": evidence_ids,
+            # 확장이 무엇을 붙이고 무엇을 뺐는지 남긴다. 조용히 자르면
+            # 커버리지를 과대평가하게 된다.
+            "qa_expansion": expansion,
         })
 
     gold_rows = []
@@ -542,6 +636,10 @@ def run(
             hybrid_merge(ranked, graph_chunks) if verdict == GATE_PASS
             else [cid for cid, _score in ranked]
         )
+        # 픽스처 경로와 같은 조립 규칙을 쓴다 — 두 경로가 근거를 다르게 모으면
+        # 드리프트가 생긴다. first_relevant_rank는 ranked에서 이미 계산됐으므로
+        # Hit@1/MRR은 확장의 영향을 받지 않는다.
+        evidence_ids, expansion = expand_qa_siblings(evidence_ids, by_id, qa_index)
         gold_rows.append({
             "query_id": row["query_id"],
             "question": row["question"],
@@ -575,6 +673,7 @@ def run(
                 for chunk in graph_chunks
             ],
             "evidence_chunk_ids": evidence_ids,
+            "qa_expansion": expansion,
         })
 
     hit1 = sum(1 for r in gold_rows if r["first_relevant_rank"] == 1)

@@ -106,7 +106,12 @@
         "docchunk-7f10c283d4a52da2dead853f2c25af83f5ef09494db074dda0bd14d011d7d83e",
         "docchunk-861118c3272c47057b32fe8b66e118ce4936216facbf387ebf9a203b77779fc1",
         "docchunk-fe7ebb7b3b24482ce73f8e2469dce699b31557445fc9b010e26e516a384f4e43"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q02",
@@ -180,7 +185,12 @@
         "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
         "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
         "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q03",
@@ -254,7 +264,12 @@
         "docchunk-861118c3272c47057b32fe8b66e118ce4936216facbf387ebf9a203b77779fc1",
         "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7",
         "chunk-a947b4aaf9d03885d164275edcc69cbe90fcb5dfafcc2b2c0cfbeb024dd1f4f7"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q04",
@@ -328,7 +343,12 @@
         "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747",
         "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
         "docchunk-b81d07c3d180bc8ca1303790b48505234f6dce24b990792c11363c9ebc280356"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q05",
@@ -402,7 +422,12 @@
         "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
         "chunk-a947b4aaf9d03885d164275edcc69cbe90fcb5dfafcc2b2c0cfbeb024dd1f4f7",
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q06",
@@ -476,7 +501,12 @@
         "docchunk-f151d305b129c2cc7318a658045ecb89cd97c2720ab878df230e4d37a6d4c60e",
         "docchunk-74849a2fb6a57756497fb400ba289ecc6f9283ce6b16b5fed7319b87cf564cbd",
         "docchunk-eb5615c42e9b38eb477e3a83bbf0fb0e8c1f5f5477009228e99d4ed73af6d35a"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q07",
@@ -550,7 +580,12 @@
         "docchunk-d21ada7e88ba53057eb56587dfbcbd900aeb7521789903d6e00d120b06d6f780",
         "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
         "docchunk-79d36f5564bb1fe92a6f029e92b5207f20964b9c0acc31784fefb78decb99548"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q08",
@@ -624,7 +659,12 @@
         "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
         "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
         "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q09",
@@ -698,7 +738,12 @@
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
         "docchunk-d36129d75535ea9e8460c493dd1fa6c9873fa0f945e754f440aa34689d2de131",
         "docchunk-9f4127a448f3055499260547d5211ac3cec11599eee392a1995793882c569435"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q10",
@@ -772,7 +817,12 @@
         "docchunk-66c3537dbc619c6deb5310cdaa1ea0076bf465b30abc13127782095f3fddb28a",
         "docchunk-efba5ad44087db14df45c017b1e988a4902acb1d6bd561227e9678ab272b520a",
         "docchunk-d36129d75535ea9e8460c493dd1fa6c9873fa0f945e754f440aa34689d2de131"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q11",
@@ -846,7 +896,12 @@
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
         "docchunk-79d36f5564bb1fe92a6f029e92b5207f20964b9c0acc31784fefb78decb99548",
         "docchunk-d65c6079c2bf634309b67b75711369ec8966ef4b10102fa86430670fc02d0c73"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q12",
@@ -920,7 +975,12 @@
         "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc",
         "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742",
         "docchunk-d36129d75535ea9e8460c493dd1fa6c9873fa0f945e754f440aa34689d2de131"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q13",
@@ -994,7 +1054,12 @@
         "docchunk-f151d305b129c2cc7318a658045ecb89cd97c2720ab878df230e4d37a6d4c60e",
         "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
         "docchunk-06e67f937db4f8b636c85a940e9dee8b09d703de95e7a70a1ca5a7a75c823578"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q14",
@@ -1068,7 +1133,12 @@
         "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
         "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q15",
@@ -1142,7 +1212,12 @@
         "chunk-b024a7eaae215d7f6532aeed7485bcaa81821c441e5468e7b24d9316ea83f99c",
         "docchunk-3a39dce505b6f9974410722d795ebda7c32a8626d24f831784f23d9534266f18",
         "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q16",
@@ -1216,7 +1291,12 @@
         "docchunk-8efdffe0db64c821088c94e330ad77cea669fbb1d0854bf9c7ab548e827b03fb",
         "docchunk-b4a5e4f8a6e62cac36d77ab2f3d89449027a4861df35582e703eec424664b59f",
         "docchunk-fdf2776359922fe35db8fff62d816e03218f3b44c025660704a4d4de40bfb676"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q17",
@@ -1290,7 +1370,12 @@
         "docchunk-54154e848cafe09276a321ac632615f43f90539b6323d0290e350d8e06f584e2",
         "docchunk-aaf503a048fba2ac7f68b72d4825e57d763d1d0c2389ed711fa30a0c3c01f969",
         "docchunk-b8cd546469bbf2ca32a2fdcda5ea0d02be4f0b2c866c99d6803a49d47d66753d"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q18",
@@ -1364,7 +1449,12 @@
         "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da",
         "docchunk-06e67f937db4f8b636c85a940e9dee8b09d703de95e7a70a1ca5a7a75c823578",
         "docchunk-3545a572927ebe33a07db8ad9d0fb8fcda5e44467f137dc625bbfb961cc0e36a"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q19",
@@ -1438,7 +1528,12 @@
         "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
         "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q20",
@@ -1512,7 +1607,12 @@
         "docchunk-d09a78b03b1a44724ef9a3de961838eaed41aa47f807336b7ea6ec363a8d23f0",
         "docchunk-20e3afe8685ae3c0fe9c9a5cdcf286714fa0aa54e637f2eaf8e3a56d1b4b1afd",
         "docchunk-13c1c7c40ad90883f86e4327f5cb77cc821e7f9325a53240565edf21c1322e44"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q21",
@@ -1586,7 +1686,12 @@
         "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
         "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc",
         "docchunk-12837d97eaa9a02327f072800d87f6cf0528a54c422bdb27293fc892592e4d88"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q22",
@@ -1660,7 +1765,12 @@
         "docchunk-9c7ee1a7b7412c647d626681a505ae3d247203964479a4d0460dc59ebb4de5f1",
         "docchunk-18c7f5ea913582c59d9d4e763ffb54fb95f14e6e105f223c8aa7addcd1585769",
         "docchunk-d09a78b03b1a44724ef9a3de961838eaed41aa47f807336b7ea6ec363a8d23f0"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q23",
@@ -1734,7 +1844,12 @@
         "docchunk-f2c07ace40e9986431a21c69c4fd2e717b0b2d1310ecce991937f00fc3050544",
         "docchunk-b81d07c3d180bc8ca1303790b48505234f6dce24b990792c11363c9ebc280356",
         "docchunk-d36129d75535ea9e8460c493dd1fa6c9873fa0f945e754f440aa34689d2de131"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q24",
@@ -1808,7 +1923,12 @@
         "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
         "docchunk-8cadb93091cc5f5ff60f416639e1180fe89ebdc1cb7b79b2fea94a7cc849ea3d",
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q25",
@@ -1882,7 +2002,12 @@
         "docchunk-79d36f5564bb1fe92a6f029e92b5207f20964b9c0acc31784fefb78decb99548",
         "docchunk-66c3537dbc619c6deb5310cdaa1ea0076bf465b30abc13127782095f3fddb28a",
         "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q26",
@@ -1956,7 +2081,12 @@
         "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
         "docchunk-7f10c283d4a52da2dead853f2c25af83f5ef09494db074dda0bd14d011d7d83e",
         "docchunk-40ce275fe053b52cb4162d3175aa0fc25f6a0f7f38f4b6eaa8127e258fcda533"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q27",
@@ -2030,7 +2160,12 @@
         "docchunk-eb5615c42e9b38eb477e3a83bbf0fb0e8c1f5f5477009228e99d4ed73af6d35a",
         "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
         "docchunk-a412c0682a94675684654c322a820885493a16c7ad059a0445c386fe64104eef"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q28",
@@ -2104,7 +2239,12 @@
         "docchunk-16b585e37c8758903704738aa469fcbf26a72cb0be2bad538c9be39d4e2dbc03",
         "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
         "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q29",
@@ -2178,7 +2318,12 @@
         "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
         "docchunk-3226ad8248be9bfc802dde4121051995d93948aa8f119c98059a5966b7a1260b",
         "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q30",
@@ -2252,7 +2397,12 @@
         "chunk-97db9179eb4efbbe2441b327ffe32855b0aa0dec8c44a290fe8004a289c27ab8",
         "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
         "chunk-8dd2b93c4aff22cc4eb9103e30de1291e7d87880ce4a447c63e64eb9227d58b7"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q31",
@@ -2326,7 +2476,12 @@
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
         "docchunk-b8cd546469bbf2ca32a2fdcda5ea0d02be4f0b2c866c99d6803a49d47d66753d",
         "docchunk-9f4127a448f3055499260547d5211ac3cec11599eee392a1995793882c569435"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q32",
@@ -2400,7 +2555,12 @@
         "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
         "docchunk-a412c0682a94675684654c322a820885493a16c7ad059a0445c386fe64104eef"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q33",
@@ -2474,7 +2634,12 @@
         "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188",
         "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
         "chunk-b024a7eaae215d7f6532aeed7485bcaa81821c441e5468e7b24d9316ea83f99c"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q34",
@@ -2548,7 +2713,12 @@
         "docchunk-efba5ad44087db14df45c017b1e988a4902acb1d6bd561227e9678ab272b520a",
         "docchunk-6140a4a30712ec6bd122269e8a8405852319722593272a6fcc3eb7c86df58738",
         "docchunk-fe7ebb7b3b24482ce73f8e2469dce699b31557445fc9b010e26e516a384f4e43"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q35",
@@ -2622,7 +2792,12 @@
         "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452",
         "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747",
         "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q36",
@@ -2696,7 +2871,12 @@
         "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc",
         "docchunk-ff0ac1e8087a5d1935f9abb1a80fc898b14cd27ab51b327cad3d1c66b941317c",
         "docchunk-f21a1135d7c09b7a70bb00945e8a385134220399cb25336364fb0f1e6a557a7e"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q37",
@@ -2770,7 +2950,12 @@
         "docchunk-90af3c6130e3b7b22198de01cecfc3d203e70372c42ab1863725522c2abdc46f",
         "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
         "docchunk-eb5615c42e9b38eb477e3a83bbf0fb0e8c1f5f5477009228e99d4ed73af6d35a"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q38",
@@ -2844,7 +3029,12 @@
         "docchunk-fa67fc76647bca64f51e03dbedfcf2aba49a3eb2bd74a2f552403114ac6ca971",
         "docchunk-b95f5d2e8122bac534c1f19f4316f4ad0f10eb8ea9c5f24be94002f338e8d007",
         "docchunk-9f4127a448f3055499260547d5211ac3cec11599eee392a1995793882c569435"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q39",
@@ -2918,7 +3108,12 @@
         "docchunk-79d36f5564bb1fe92a6f029e92b5207f20964b9c0acc31784fefb78decb99548",
         "docchunk-3f557b989553c5f95d26a6ddb76065f0b5f968b5d4dfdd11113d6dc0a648c8d8",
         "docchunk-d21ada7e88ba53057eb56587dfbcbd900aeb7521789903d6e00d120b06d6f780"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q40",
@@ -2992,7 +3187,12 @@
         "docchunk-861118c3272c47057b32fe8b66e118ce4936216facbf387ebf9a203b77779fc1",
         "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875",
         "docchunk-18ce0f43de97cb2bd8058e4e51ed0dc79aae687557c8f65deb0b081c3f124006"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q41",
@@ -3066,7 +3266,12 @@
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
         "chunk-d4bad7b721c464d2fc065c7155fea6568b00def0f89124d19ba535e71419fd65",
         "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q42",
@@ -3140,7 +3345,12 @@
         "docchunk-a8f17b9a627d38f5f07d29f182836544ac2f8ea18ac4ce1b1d32b14d10e26126",
         "docchunk-5737646131b0178e74d9fbe66a76ee71432be553126db3f055846ce8ca9d0c63",
         "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q43",
@@ -3214,7 +3424,12 @@
         "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
         "docchunk-ff0ac1e8087a5d1935f9abb1a80fc898b14cd27ab51b327cad3d1c66b941317c",
         "docchunk-12837d97eaa9a02327f072800d87f6cf0528a54c422bdb27293fc892592e4d88"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q44",
@@ -3288,7 +3503,12 @@
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
         "chunk-cb15baebc71d84b16859f8513fcf7e628675576d648f5e6a566f77b7eebb0747",
         "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q45",
@@ -3362,7 +3582,12 @@
         "docchunk-b107a0e599f7325c58bf98c045f8769b65c658f6915d76e42c94488b9fb81278",
         "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f",
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q46",
@@ -3436,7 +3661,12 @@
         "docchunk-8cadb93091cc5f5ff60f416639e1180fe89ebdc1cb7b79b2fea94a7cc849ea3d",
         "docchunk-b81d07c3d180bc8ca1303790b48505234f6dce24b990792c11363c9ebc280356",
         "chunk-c6dca63d776e4e01e55b762bc3c86302dfb631b0d1d599c2c913b191de7e50da"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q47",
@@ -3510,7 +3740,12 @@
         "docchunk-9c7ee1a7b7412c647d626681a505ae3d247203964479a4d0460dc59ebb4de5f1",
         "docchunk-18c7f5ea913582c59d9d4e763ffb54fb95f14e6e105f223c8aa7addcd1585769",
         "docchunk-5603bc4c29bfe0bffddcc743e0ac8d26e8f23e20708d844d314a91fa194fb875"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "Q48",
@@ -3584,7 +3819,12 @@
         "docchunk-d3d995e954952b399529b2af3f260ae5d3ada5bf9e88a86540a065f0107c2cc7",
         "docchunk-a393377e3f1dd92a32159cdf90cd9e2e72e3d34df3cf44106d28c7f43aea24d4",
         "docchunk-3089becea07ac79103d69d9dda775f090586e2aff216db326a0f00afb2bed0af"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     }
   ],
   "gold": [
@@ -3657,7 +3897,12 @@
         "chunk-b024a7eaae215d7f6532aeed7485bcaa81821c441e5468e7b24d9316ea83f99c",
         "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
         "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "q002",
@@ -3728,7 +3973,12 @@
         "docchunk-7f10c283d4a52da2dead853f2c25af83f5ef09494db074dda0bd14d011d7d83e",
         "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9",
         "docchunk-ddeb1e1d789d25b8b3dbfac264d24e21e46b960fe4e42b9130a9ff8b11c63fcc"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "q003",
@@ -3799,7 +4049,12 @@
         "docchunk-771047a9fda139f19928ac0b318e8d610e8028811b2c2c7524b8ab11021137bb",
         "docchunk-40ce275fe053b52cb4162d3175aa0fc25f6a0f7f38f4b6eaa8127e258fcda533",
         "docchunk-bf448b06cdbe185f1880a9167884f61fb5ef672d9d1b7b9223014547e4ca36f9"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "q004",
@@ -3870,7 +4125,12 @@
         "docchunk-c98c7faa86edf1c4e2429d5f257e5b63a48ceea03dde59a7247d77ce7b4e4a10",
         "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452",
         "docchunk-90a175603f6b63c97d1d523ab9bd94462fc6f1817401b5a9d3b898bc50ac8f85"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "q005",
@@ -3941,7 +4201,12 @@
         "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd",
         "chunk-db6ad7f4e21e8fd43fffa143e667b31e8de547c9a180f73927a40f69a793432f",
         "chunk-a851c1cb355991f1bc588c0f3476e34b9f18e275adf09badb69488310e9aa46f"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "q006",
@@ -4012,7 +4277,12 @@
         "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
         "docchunk-b05bd231c91bf633e9022d809bc194405e256ab91ea8bb26ddea4a3336f2c471",
         "docchunk-3545a572927ebe33a07db8ad9d0fb8fcda5e44467f137dc625bbfb961cc0e36a"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "q007",
@@ -4083,7 +4353,12 @@
         "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452",
         "docchunk-6146bf669a6d5ce24dd08f1134131e4d613809d70164ddaf277ae3e5d30db622",
         "docchunk-3545a572927ebe33a07db8ad9d0fb8fcda5e44467f137dc625bbfb961cc0e36a"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "q008",
@@ -4154,7 +4429,12 @@
         "chunk-bcbce6122a6ffb66e622181bb86cbc27767d94e7deebbd439bc0e2dd1ed4a452",
         "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
         "chunk-594754ffd84e22b02ab3559e17b8155140cc00a266378b81e60a55a0346eee0a"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "q009",
@@ -4225,7 +4505,12 @@
         "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
         "chunk-e4159be3fa93338ca95db30c3e3b7b2df30ef162ef5285797b8245b5a511a5c6",
         "chunk-a73490f7d8aec3adb69806e456b2de81af9c421951faad9db1371abff9486188"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "q010",
@@ -4296,7 +4581,12 @@
         "chunk-98af0dd0cbe54e1f11827ac376dc488c9c7e2466d528b1f5adf4a1e16032daf8",
         "chunk-97db9179eb4efbbe2441b327ffe32855b0aa0dec8c44a290fe8004a289c27ab8",
         "chunk-ef57690e979558866789cf4e2921661e4d15fa2aeada039d7e3c04aab8741ddd"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "q011",
@@ -4367,7 +4657,12 @@
         "chunk-808eb3891543dafe5465c9e6e44a64537b43b3caaad27a09eed8791aa1bf1845",
         "chunk-97db9179eb4efbbe2441b327ffe32855b0aa0dec8c44a290fe8004a289c27ab8",
         "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     },
     {
       "query_id": "q012",
@@ -4438,7 +4733,12 @@
         "chunk-1c201183958882bedb3aba8d5b503051d0a1bbef55ec3081354138eeb1c24954",
         "chunk-22a3165d5f0abf710b577cb499c0e9a6fc3b52cc8f5dad056987dde572062742",
         "chunk-fba1a4f804c2782426a0633d0a0adab374215ec35524dbe23739239cad5dec2b"
-      ]
+      ],
+      "qa_expansion": {
+        "appended_answer_chunk_ids": [],
+        "dropped_orphan_question_chunk_ids": [],
+        "truncated_siblings_by_qa_id": {}
+      }
     }
   ],
   "gold_summary": {
