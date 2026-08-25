@@ -102,3 +102,41 @@ class DecompositionSectionCountsTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class WithoutChunkTextTests(unittest.TestCase):
+    """The committed snapshot must not carry chunk bodies.
+
+    data/eval/results/*_metrics.json is one of the few paths .gitignore lets through,
+    so a `text` field here is published source material. See
+    reports/license_premise_audit_0825.md.
+    """
+
+    def test_text_is_dropped_only_where_a_chunk_id_identifies_the_row(self):
+        payload = {
+            "gold": [{
+                "query_id": "g001",
+                "question": "노즈워크가 뭔가요?",
+                "top_k": [{"rank": 1, "chunk_id": "c1", "score": 0.9,
+                           "where": "문서 · 도입부", "text": "원문 본문"}],
+                "graph_top_k": [{"chunk_id": "c2", "text": "또 다른 원문"}],
+            }],
+        }
+        stripped = module.without_chunk_text(payload)
+        row = stripped["gold"][0]
+        self.assertNotIn("text", row["top_k"][0])
+        self.assertNotIn("text", row["graph_top_k"][0])
+        self.assertEqual(row["top_k"][0]["chunk_id"], "c1")
+        self.assertEqual(row["top_k"][0]["score"], 0.9)
+        self.assertEqual(row["top_k"][0]["where"], "문서 · 도입부")
+        # The question is the project's own text, not the source's.
+        self.assertEqual(row["question"], "노즈워크가 뭔가요?")
+
+    def test_a_text_field_without_a_chunk_id_is_left_alone(self):
+        payload = {"run": {"note": "x", "text": "이건 청크 본문이 아니다"}}
+        self.assertEqual(module.without_chunk_text(payload), payload)
+
+    def test_the_original_payload_is_not_mutated(self):
+        payload = {"top": [{"chunk_id": "c1", "text": "원문"}]}
+        module.without_chunk_text(payload)
+        self.assertEqual(payload["top"][0]["text"], "원문")

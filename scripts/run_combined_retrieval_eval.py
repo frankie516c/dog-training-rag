@@ -280,6 +280,34 @@ def snippet(text: str, limit: int = SNIPPET_CHARS) -> str:
     return flat[:limit] + ("…" if len(flat) > limit else "")
 
 
+def without_chunk_text(payload: Any) -> Any:
+    """The payload minus every chunk body, for writing to *_metrics.json.
+
+    `data/eval/results/*_metrics.json` is one of the few paths .gitignore lets through
+    (the snapshot is worth keeping; a rerun cannot reproduce it once the corpus moves).
+    Whatever this dict holds is therefore published, and this script was putting whole
+    chunk bodies in it — reports/license_premise_audit_0825.md measured 116,681
+    characters of source text inside one snapshot, the single largest exposure in the
+    repository. The identifiers are ours to publish; the article and subtitle bodies
+    are not.
+
+    Nothing needs them. Regression comparison reads chunk_id, rank, score and the gate
+    verdict, all of which stay. `where` already names each hit in human terms
+    ("문서 · 슬개골 탈구 단계별 증상"). The .md report still prints its
+    SNIPPET_CHARS-character excerpt, because it is built from the in-memory payload
+    rather than from the file. And the six other snapshots in data/eval/results/ have
+    never carried `text` at all — `evaluate_youtube_retrieval.py` writes none, and the
+    v1-vs-v3 comparison that settled the chunk size was done on those. This script was
+    the only one that did.
+    """
+    if isinstance(payload, dict):
+        drop = "text" if "chunk_id" in payload else None
+        return {k: without_chunk_text(v) for k, v in payload.items() if k != drop}
+    if isinstance(payload, list):
+        return [without_chunk_text(v) for v in payload]
+    return payload
+
+
 # --------------------------------------------------------------------------- graph
 
 
@@ -974,8 +1002,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             {r["query_id"]: r for r in _rows(args.dryrun)} if args.dryrun.is_file() else {}
         )
         args.metrics.parent.mkdir(parents=True, exist_ok=True)
+        # Stripped on the way to disk, not in `payload` — build_report() below still
+        # reads the bodies to print its snippets.
         args.metrics.write_bytes(
-            json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8"))
+            json.dumps(without_chunk_text(payload), ensure_ascii=False, indent=2)
+            .encode("utf-8"))
         if not args.no_documents:
             args.report.parent.mkdir(parents=True, exist_ok=True)
             args.report.write_bytes(build_report(
