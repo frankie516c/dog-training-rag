@@ -86,6 +86,83 @@ def is_video_chunk(chunk_id: str, by_id: dict[str, dict[str, Any]]) -> bool:
     return bool(chunk and chunk.get("video_id") and chunk.get("start_ms") is not None)
 
 
+def promote_video_chunks(
+    query_id: str,
+    chunk_ids: Sequence[str],
+    by_id: dict[str, dict[str, Any]],
+) -> tuple[str | None, list[dict[str, Any]], list[str]]:
+    """영상 청크 id를 `(video_id, relevant_spans)`로 승격한다.
+
+    평가는 영상 정답을 시간축으로 읽는다 — `relevant_spans`의 구간과 겹치는
+    청크가 gold다. 청크 자신의 `start_ms`/`end_ms`를 그대로 span으로 쓰면
+    정확히 그 청크로 되돌아온다(배치1 4건 실측: 각 span이 같은 영상의 다른
+    청크와 하나도 겹치지 않는다). 여백을 두거나 중점을 잡는 보정이 필요 없다.
+
+    시간축을 쓰는 이유는 앵커가 `doc_id`를 쓰는 이유와 같다 — `chunk_id`는
+    본문 해시라 재청킹·재전사에 못 견딘다. 밀리초는 원본의 좌표라 견딘다.
+
+    돌려주는 것은 `(video_id, spans, problems)`다. 사람이 고른 청크를 조용히
+    버리지 않으려고 문제를 모아서 함께 돌려준다.
+    """
+    problems: list[str] = []
+    spans: list[dict[str, Any]] = []
+    videos: set[str] = set()
+    for index, chunk_id in enumerate(chunk_ids, start=1):
+        chunk = by_id.get(chunk_id)
+        if chunk is None:
+            problems.append(f"{query_id}: gold 영상 청크 {chunk_id[:20]}…를 코퍼스에서 찾지 못했다")
+            continue
+        # 임베딩에서 제외된 청크는 검색 대상이 아니다. gold로 두면 어떤 검색기도
+        # 찾을 수 없는 정답이 되어 지표가 영구히 0이 된다.
+        if not chunk.get("embedding_eligible"):
+            problems.append(
+                f"{query_id}: gold 영상 청크가 embedding_eligible=False다 "
+                f"({chunk.get('exclusion_reason') or '사유 미기재'}) — 검색 대상이 아니라 정답이 될 수 없다"
+            )
+            continue
+        videos.add(chunk["video_id"])
+        spans.append({
+            "span_id": f"{query_id}-s{index}",
+            "start_ms": chunk["start_ms"],
+            "end_ms": chunk["end_ms"],
+            "note": f"영상 청크 #{chunk.get('chunk_index')}에서 승격",
+        })
+    if len(videos) > 1:
+        # 행 단위 video_id가 스칼라라 한 질의가 여러 영상을 가리킬 수 없다.
+        # 조용히 하나만 고르면 나머지 정답이 사라지므로 막는다.
+        problems.append(
+            f"{query_id}: gold 영상 청크가 영상 {len(videos)}개에 걸쳐 있다 "
+            f"({', '.join(sorted(videos))}) — 현재 스키마는 행마다 video_id 하나만 담는다"
+        )
+        return None, [], problems
+    return (videos.pop() if videos else None), spans, problems
+
+
+def revalidate_span(
+    video_id: str,
+    span: dict[str, Any],
+    corpus: Sequence[dict[str, Any]],
+) -> str | None:
+    """span이 지금 코퍼스에서도 정확히 청크 하나로 되돌아오는지 본다.
+
+    `revalidate_anchor()`의 영상판이다. 재청킹이나 재전사로 경계가 움직이면 한
+    span이 여러 청크에 걸치거나 아무 데도 안 걸릴 수 있는데, 전자는 정답 집합이
+    조용히 커져 Hit@1을 쉽게 만들고 후자는 평가를 죽인다.
+    """
+    hits = [
+        c for c in corpus
+        if c.get("video_id") == video_id and c.get("start_ms") is not None
+        and c.get("embedding_eligible")
+        and min(c["end_ms"], span["end_ms"]) - max(c["start_ms"], span["start_ms"]) > 0
+    ]
+    if not hits:
+        return f"{span['span_id']}: 구간과 겹치는 영상 청크가 없다 — 재청킹으로 경계가 움직였다"
+    if len(hits) > 1:
+        return (f"{span['span_id']}: 구간이 청크 {len(hits)}개에 걸친다"
+                f"(#{[c.get('chunk_index') for c in hits]}) — 정답 집합이 의도보다 넓어진다")
+    return None
+
+
 def anchor_collisions(quote: str, doc_id: str, corpus: Sequence[dict[str, Any]]) -> list[str]:
     """인용문이 **다른** 문서에도 나타나는지 본다. 거부하지 않고 보고만 한다.
 
@@ -212,6 +289,19 @@ def main() -> int:
             row["resolved_at"] = got["resolved_at"]
         if got.get("cause_only_chunk_ids"):
             row["cause_only_chunks"] = got["cause_only_chunk_ids"]
+        # 영상 청크는 여기서 시간축으로 승격한다. 문서 청크와 달리 사람의 인용문
+        # 선택이 필요 없다 — 청크 경계가 그대로 구간이다.
+        if promotable_video and corpus:
+            video_id, spans, span_problems = promote_video_chunks(
+                row["query_id"], promotable_video, corpus_by_id)
+            problems.extend(span_problems)
+            for span in spans:
+                issue = revalidate_span(video_id, span, corpus)
+                if issue:
+                    problems.append(f"{row['query_id']} span 재검증: {issue}")
+            if video_id and spans and not span_problems:
+                row["video_id"] = video_id
+                row["relevant_spans"] = spans
         if got.get("anchors"):
             row["anchors"] = [
                 {"anchor_id": f"{row['query_id']}-a{i}", "doc_id": a["doc_id"],
