@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import collections
 import json
 import statistics
 import sys
@@ -825,6 +826,13 @@ def run(
             "mrr@5": serialize_score(
                 sum(r["reciprocal_rank"] for r in scored) / len(scored) if scored else 0.0
             ),
+            # 불변식 A-2 — 이 숫자가 몇 시점의 라벨에서 나왔는지 함께 싣는다.
+            # 부분 재bake 후에는 한 파일에 두 시점의 판정이 공존하는 것이 정상이고
+            # (corpus_fingerprint는 판정 시점의 코퍼스를 가리킨다), 그것이 조용하면
+            # 지표를 한 시점의 것으로 오독하게 된다.
+            "gold_corpus_fingerprints": dict(sorted(collections.Counter(
+                row.get("corpus_fingerprint") or "(없음)" for row in gold
+            ).items())),
         },
     }
 
@@ -1131,7 +1139,7 @@ def _retrieval_gap_section(
 
 def _gold_section(payload: dict[str, Any], base: dict[str, dict[str, Any]]) -> list[str]:
     summary = payload["gold_summary"]
-    lines = ["", "## ④ gold 12 rank · gap 이동 요약", ""]
+    lines = ["", f"## ④ gold rank · gap 이동 요약 (채점 {summary['scored_queries']}문항)", ""]
     lines.append("| id | type | rank 이전 | rank 이후 | RR 이후 | gap 이전 | gap 이후 | 변화 |")
     lines.append("|---|---|---|---|---|---|---|---|")
     moved = []
@@ -1157,7 +1165,7 @@ def _gold_section(payload: dict[str, Any], base: dict[str, dict[str, Any]]) -> l
         lines.append("- 순위가 바뀐 질문: " + ", ".join(
             "{} {}→{}".format(q, o or "미검출", n or "미검출") for q, o, n in moved))
     else:
-        lines.append("- 정답 청크 순위는 12문항 모두 그대로입니다.")
+        lines.append(f"- 정답 청크 순위는 채점 {summary['scored_queries']}문항 모두 그대로입니다.")
     lines.append("- 이 표가 `docs/demo_scenarios.md` 갱신 재료입니다.")
     return lines
 

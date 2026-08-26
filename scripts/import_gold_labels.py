@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import argparse
+import collections
 import json
 import re
 import sys
@@ -323,6 +324,16 @@ def main() -> int:
         "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8"
     )
     print(f"승인 {approved} / 미판정 {skipped} -> {args.gold}")
+
+    # 불변식 A-1 — 지문이 섞이는 것 자체는 정상이다(부분 재bake). 문제는 그것이
+    # 조용한 것이다. corpus_fingerprint는 "이 판정이 내려진 시점의 코퍼스"를
+    # 가리키므로 다시 판정하지 않은 행의 값을 덮어쓰면 거짓이 된다. 대신 분포를
+    # 찍어 사람이 보게 한다.
+    prints = collections.Counter(r.get("corpus_fingerprint") or "(없음)" for r in rows)
+    if len(prints) > 1:
+        print(f"  지문 {len(prints)}종:")
+        for value, count in prints.most_common():
+            print(f"    {value[:26]}… {count}행")
     for note in notes:
         print(f"  참고: {note}")
     if flipped:
