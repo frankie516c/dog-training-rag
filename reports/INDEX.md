@@ -162,7 +162,8 @@
 | 2026-08-25 | [wayopet_custom_parser_0825.md](wayopet_custom_parser_0825.md) | wayopet.com 커스텀 파서 구축, 6건 성공(저자 3명) | 진행중 — 실제 인제스트 대기 |
 | 2026-08-25(자동생성) | [combined_corpus_coverage.md](combined_corpus_coverage.md) | 조달 후 통합 코퍼스(245청크·margin_top5 게이트) 커버리지 리포트 | 진행중 — 사람 coverage 재판정 다수 공란 |
 | 2026-08-25 | [gold_import_and_eval_attempt_0825.md](gold_import_and_eval_attempt_0825.md) | gold 승인 40건 반영, resolved_at 분포, 기준선 평가 시도 | 진행중 — 평가는 gold 청크 미기록으로 중단 |
-| 2026-08-26 | [retrieval_baseline_gold6_0826.md](retrieval_baseline_gold6_0826.md) | P1 이전 검색 기준선. **채점 6문항** Hit@1 0.667 / MRR@5 0.764 | 유효(범위 한정) — situation·refuse_boundary 표본 0 |
+| 2026-08-26 | [retrieval_baseline_gold6_0826.md](retrieval_baseline_gold6_0826.md) | P1 이전 검색 기준선. **채점 6문항** Hit@1 0.667 / MRR@5 0.764 | **추월됨** — 표본이 벡터 성공 사례로 편향. gold13으로 대체 |
+| 2026-08-26 | [retrieval_baseline_gold13_0826.md](retrieval_baseline_gold13_0826.md) | P1 이전 기준선 재측정. **채점 13문항** Hit@1 0.385 / Hit@5 0.692 / MRR@5 0.506 | 유효 — P1 전후 비교의 기준점 |
 | 2026-08-26 | [corpus_gap_map_0826.md](corpus_gap_map_0826.md) | 결손 지도(축×유형), 원인 분류 (a)10·(a′)3·(b)3·(c)0, 수집 대상 16건 | 유효 — 수집 미착수 |
 | 2026-08-26 | [expansion_candidates_0826.md](expansion_candidates_0826.md) | 우선순위 1·2·3 후보 조사(robots 확인), 중복 판정, 앵커·규약·지문 정리안 | 진행중 — 사람 판단 4건 대기 |
 
