@@ -52,23 +52,52 @@ def load_corpus(chunk_dirs: Sequence[Path]) -> list[dict[str, Any]]:
 
 
 def revalidate_anchor(quote: str, doc_id: str, corpus: Sequence[dict[str, Any]]) -> str | None:
-    """앵커 인용문이 지금 코퍼스에서도 단일 매칭인지 다시 본다.
+    """앵커가 지금 코퍼스에서도 그 문서의 청크를 가리키는지 다시 본다.
 
-    굽는 시점의 단일 매칭은 그때의 코퍼스(254청크) 성질이지 영구 보장이 아니다.
-    코퍼스가 커지면 같은 문장이 다른 문서에도 나타날 수 있고, 본문이 편집되면
-    (P1의 clean() 변경처럼) 아예 사라질 수도 있다. 굽는 스크립트를 다시 돌리지
-    않고 gold 파일만 커밋되는 경로가 있으므로, 여기서 독립적으로 확인한다.
+    불변식은 I1이다 — **앵커는 `(doc_id, quote)` 쌍으로 청크 집합을 결정한다.**
+    인용문은 그 문서 안에서만 유일하면 되고, 코퍼스 전역 유일성은 요구하지 않는다.
+
+    전역 유일성을 요구하던 판이 먼저 있었고 그것을 버린 이유는 두 가지다.
+
+    1. 평가 경로가 이미 I1이다. `run_combined_retrieval_eval.gold_relevant_chunks()`는
+       `doc_id`로 먼저 좁힌 뒤 인용문을 찾는다. 전역 검사는 **평가에는 아무 문제가
+       없는데 기록만 거부하는** 비대칭을 만들었다.
+    2. 코퍼스를 키우면 같은 문장이 다른 문서에 나타나는 것이 정상이다. 전역
+       유일성은 확장할 때마다 gold를 흔들어 성립할 수 없다. `doc_id`를 청크가
+       아니라 문서 단위로 올린 결정이 애초에 I1을 전제한다.
+
+    "기록된 doc_id가 실제와 다르다"는 검사는 사라지지 않았다 — 그 문서 안에
+    인용문이 없으면 여기서 걸린다.
     """
-    hits = [c for c in corpus
+    in_doc = [c for c in corpus if c.get("doc_id") == doc_id]
+    if not in_doc:
+        return f"doc_id {doc_id!r}에 해당하는 청크가 코퍼스에 없다"
+    hits = [c for c in in_doc
             if quote in c.get("text", "") and c.get("citation_allowed") is not False]
     if not hits:
-        return "인용문이 코퍼스 어디에도 없다 — 본문이 편집됐거나 앵커를 다시 뽑아야 한다"
-    docs = {c.get("doc_id") for c in hits if c.get("doc_id")}
-    if len(docs) > 1:
-        return f"인용문이 문서 {len(docs)}곳에 매칭된다({', '.join(sorted(docs)[:3])}…) — 앵커를 늘려 좁힐 것"
-    if docs and doc_id not in docs:
-        return f"기록된 doc_id({doc_id})와 실제 매칭 문서({docs.pop()})가 다르다"
+        return (f"{doc_id}의 어느 청크에도 인용문이 없다 — 본문이 편집됐거나 "
+                "청크 경계를 가로지르거나, doc_id가 잘못 기록됐다")
     return None
+
+
+def is_video_chunk(chunk_id: str, by_id: dict[str, dict[str, Any]]) -> bool:
+    """영상 청크인가. 영상만 `video_id`와 시간 경계를 갖는다."""
+    chunk = by_id.get(chunk_id)
+    return bool(chunk and chunk.get("video_id") and chunk.get("start_ms") is not None)
+
+
+def anchor_collisions(quote: str, doc_id: str, corpus: Sequence[dict[str, Any]]) -> list[str]:
+    """인용문이 **다른** 문서에도 나타나는지 본다. 거부하지 않고 보고만 한다.
+
+    I1 아래에서 이것은 오류가 아니다 — 앵커는 `doc_id`로 이미 좁혀져 있다.
+    다만 인용문이 여러 문서에 퍼져 있다는 것은 그 문장이 정형구라는 신호이고,
+    사람이 앵커를 다시 고를 판단 재료가 되므로 버리지 않고 남긴다.
+    """
+    others = {c.get("doc_id") for c in corpus
+              if c.get("doc_id") and c.get("doc_id") != doc_id
+              and quote in c.get("text", "")
+              and c.get("citation_allowed") is not False}
+    return sorted(others)
 
 
 def main() -> int:
@@ -98,8 +127,10 @@ def main() -> int:
         if not corpus:
             print("경고: 코퍼스 청크를 찾지 못해 앵커 재검증을 건너뛴다 "
                   f"({args.doc_chunks}, {args.video_chunks})")
+    corpus_by_id = {c["chunk_id"]: c for c in corpus}
 
     problems: list[str] = []
+    notes: list[str] = []
     approved = skipped = 0
     flipped: list[str] = []
 
@@ -112,15 +143,35 @@ def main() -> int:
         # 데이터 무결성 조건 — 작업대 blockers()와 **독립**으로 검사한다.
         #
         # 작업대는 UI 편의이고 우회 가능하다(gold 파일을 손으로 쓰거나 export를
-        # 직접 만들면 그만이다). coverage=answerable인데 gold 청크도 앵커도 없으면
-        # 평가 시 gold_relevant_chunks()가 EvalError로 죽는다 — 그 상태가
-        # 커밋되면 평가 자체가 안 돌아가므로 여기서 막는다.
+        # 직접 만들면 그만이다). coverage=answerable인데 평가가 읽을 수 있는 근거가
+        # 없으면 gold_relevant_chunks()가 EvalError로 죽는다 — 그 상태가 커밋되면
+        # 평가 자체가 안 돌아가므로 여기서 막는다.
+        #
+        # **청크 id는 그 자체로 근거가 아니다.** 평가는 두 체계만 읽는다 — 영상은
+        # relevant_spans(시간축), 문서는 anchors(인용문 + doc_id). chunk_id는
+        # text_sha256 기반이라 재인제스트에 못 견뎌 어느 쪽도 될 수 없다.
+        #
+        # 이 구분이 없던 판에서는 gold_chunk_ids가 앵커의 대체물로 인정됐고,
+        # 그런데 기록 블록은 그것을 행에 쓰지 않았다. 그래서 "통과"로 판정된 행이
+        # 파일에서는 근거 0이 되어, 검증문이 예고한 바로 그 실패를 검증문 자신이
+        # 통과시켰다(g001·g019·g020이 이 경로로 빠져나갔다). 그래서 승격된 근거만
+        # 센다.
         gold_ids = got.get("gold_chunk_ids") or []
         anchors = got.get("anchors") or []
-        if got["coverage"] == "answerable" and not gold_ids and not anchors:
+        promotable_video = [cid for cid in gold_ids if is_video_chunk(cid, corpus_by_id)]
+        unpromoted_docs = [
+            cid for cid in gold_ids
+            if cid not in promotable_video and not is_video_chunk(cid, corpus_by_id)
+        ]
+        if got["coverage"] == "answerable" and not anchors and not promotable_video:
             problems.append(
-                f"{row['query_id']}: coverage=answerable인데 gold 청크도 앵커도 없다 — "
-                "평가 시 gold_relevant_chunks()가 실패한다"
+                f"{row['query_id']}: coverage=answerable인데 승격된 근거가 없다 — "
+                "문서 청크는 인용문 앵커로, 영상 청크는 relevant_spans로 올려야 한다"
+            )
+        if unpromoted_docs and not anchors:
+            problems.append(
+                f"{row['query_id']}: 문서 청크 {len(unpromoted_docs)}개가 gold로 지정됐으나 "
+                "앵커가 없다 — 청크 id는 승격 전까지 근거가 아니다"
             )
         for cid in gold_ids:
             if cid in (got.get("cause_only_chunk_ids") or []):
@@ -140,6 +191,14 @@ def main() -> int:
                 issue = revalidate_anchor(quote, anchor["doc_id"], corpus)
                 if issue:
                     problems.append(f"{row['query_id']} 앵커 재검증: {issue}")
+                else:
+                    others = anchor_collisions(quote, anchor["doc_id"], corpus)
+                    if others:
+                        notes.append(
+                            f"{row['query_id']}/{anchor.get('anchor_id', '?')}: 인용문이 다른 문서 "
+                            f"{len(others)}곳에도 있다({', '.join(others[:3])}…). I1에서는 오류가 "
+                            "아니지만 정형구일 수 있으니 앵커를 다시 볼 것"
+                        )
             if not anchor.get("name_checked"):
                 problems.append(f"{row['query_id']}: 앵커 호칭 확인 미완료")
 
@@ -174,6 +233,8 @@ def main() -> int:
         "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8"
     )
     print(f"승인 {approved} / 미판정 {skipped} -> {args.gold}")
+    for note in notes:
+        print(f"  참고: {note}")
     if flipped:
         print(f"에이전트 제안과 다른 판정 {len(flipped)}건: {', '.join(flipped)}")
     else:
