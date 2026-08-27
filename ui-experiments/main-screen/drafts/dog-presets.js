@@ -13,6 +13,7 @@
       label,
       labelKo,
       sheet: `../assets/dogs/${id}/walk.png`,
+      portrait: `../assets/dogs/${id}/portrait.png`,
       frameCount: animation.frameCount,
       fps: animation.fps,
       visualWidth,
