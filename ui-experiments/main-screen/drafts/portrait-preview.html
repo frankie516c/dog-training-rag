@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dog Portrait Preview</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; background: #f7f0e8; color: #403a35; }
+    body { margin: 0; padding: 24px; }
+    h1 { margin: 0 0 18px; font-size: 22px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 18px; max-width: 1200px; }
+    .card { background: #fffaf5; border: 1px solid #eaded1; border-radius: 18px; padding: 12px; text-align: center; box-shadow: 0 3px 12px #6b534018; }
+    .portrait { width: 128px; height: 128px; object-fit: cover; border-radius: 50%; display: block; margin: 0 auto 10px; }
+    .label { font-size: 13px; font-weight: 650; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <h1>25 Dog Front Portraits</h1>
+  <div class="grid" id="grid"></div>
+  <script>
+    const ids = [
+      "beagle", "toy-poodle-silver", "toy-poodle-light-brown", "toy-poodle-chocolate", "maltese",
+      "yorkshire-terrier", "chihuahua", "bichon-frise", "labrador-retriever", "jindo",
+      "shiba-inu-black", "shiba-inu-beige", "shiba-inu-orange", "siberian-husky", "pomeranian-black-tan",
+      "pomeranian-beige", "pomeranian-white", "border-collie", "welsh-corgi", "dachshund-short-brown",
+      "dachshund-short-black", "dachshund-long-beige", "french-bulldog", "pug", "schnauzer"
+    ];
+    document.querySelector("#grid").innerHTML = ids.map((id) => `
+      <article class="card">
+        <img class="portrait" src="../assets/dogs/${id}/portrait.png" alt="${id} front portrait">
+        <div class="label">${id}</div>
+      </article>
+    `).join("");
+  </script>
+</body>
+</html>
