@@ -7,18 +7,27 @@ const presets = require("./dog-presets.js");
 
 const expectedIds = [
   "beagle",
-  "toy-poodle",
+  "toy-poodle-silver",
+  "toy-poodle-light-brown",
+  "toy-poodle-chocolate",
   "maltese",
   "yorkshire-terrier",
   "chihuahua",
   "bichon-frise",
   "labrador-retriever",
   "jindo",
-  "shiba-inu",
+  "shiba-inu-black",
+  "shiba-inu-beige",
+  "shiba-inu-orange",
   "siberian-husky",
-  "pomeranian",
+  "pomeranian-black-tan",
+  "pomeranian-beige",
+  "pomeranian-white",
   "border-collie",
   "welsh-corgi",
+  "dachshund-short-brown",
+  "dachshund-short-black",
+  "dachshund-long-beige",
   "french-bulldog",
   "pug",
   "schnauzer"
@@ -45,7 +54,7 @@ presets.catalog.forEach((entry) => {
   assert.equal(png[25], 6, `${entry.id} must use RGBA color`);
 });
 
-assert.equal(presets.get("shiba-inu").label, "Shiba Inu");
+assert.equal(presets.get("shiba-inu-black").label, "Black Shiba Inu");
 assert.equal(presets.get("missing"), presets.catalog[0]);
 
 console.log(`dog-presets: ${presets.catalog.length} presets and sprite sheets verified`);
