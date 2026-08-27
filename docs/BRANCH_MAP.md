@@ -4,82 +4,80 @@
 삭제하거나 정리해야 한다는 계획서가 아닙니다. 팀 저장소로 이관하기 전, 각 브랜치가
 무엇을 담고 있고 다른 브랜치와 어떤 관계인지 파악하기 위해 작성했습니다.
 
-작성 시점(2026-08-21) 기준이며, `git merge-base`, `git merge-base --is-ancestor`,
-`git rev-list --left-right --count`, `git diff --stat`으로 직접 검증한 결과만 담았습니다.
+갱신 시점(2026-08-24) 기준이며, `git merge-base`, `git merge-base --is-ancestor`,
+`git rev-list --left-right --count`, `git rev-parse`로 직접 검증한 결과만 담았습니다.
+2026-08-21 작성된 초판 이후 브랜치 정리가 있었고, 아래는 그 결과를 반영한 갱신판입니다
+— 무엇이 바뀌었는지는 [갱신 이력](#갱신-이력)을 참고하세요.
 
-## 핵심 6개 브랜치
+## main — 유일한 현재 기준 브랜치
 
-| 브랜치 | 역할 | 현재 상태 | 최신 브랜치 포함 여부 | 팀 이관 시 처리 |
-|---|---|---|---|---|
-| `main` | 초기 YouTube 수집 기준 | 과거 기준 | GraphRAG 브랜치에 포함 | 직접 이관하지 않음 |
-| `feature/retrieval-evaluation-baseline` | 벡터 검색 기준선 | 완료 | GraphRAG 브랜치에 포함 | 별도 병합 불필요 |
-| `feature/graphrag-demo-sprint` | 최신 하이브리드 RAG 실험 | 현재 기준 | 해당 없음 | 검색·그래프 기준 |
-| `feature/dog-training-rag` | EvidenceCard·FastAPI 서비스 실험 | 별도 분기 | 미포함 | 계약만 선택 재사용 |
-| `feature/evidence-response-plans` | dog-training-rag와 동일 | 중복 포인터 | 미포함 | 별도 이관 불필요 |
-| `feature/grounded-rag-v1` | dog-training-rag의 조상 | 과거 기준 | dog-training-rag에 포함 | 별도 이관 불필요 |
+이전 버전의 `feature/graphrag-demo-sprint`(최신 하이브리드 RAG 실험)와
+`feature/retrieval-evaluation-baseline`(벡터 검색 기준선)은 둘 다 main으로 병합된 뒤
+원본 브랜치가 삭제됐습니다. 지금은 별도로 추적할 "핵심 실험 브랜치"가 없고, main이
+GraphRAG 폐기·벡터RAG 전환을 포함한 전체 이력을 담은 유일한 브랜치입니다.
 
-### 검증 근거
+## archive/\* — 팀 이관 범위 밖, main에 병합되지 않은 채 보관 중
 
-- `main`과 `feature/graphrag-demo-sprint`: `git rev-list --left-right --count origin/main...origin/feature/graphrag-demo-sprint` → `0  48` (graphrag-demo-sprint가 main의 선형 연장, main 쪽에만 있는 커밋 없음)
-- `feature/retrieval-evaluation-baseline`: `git merge-base --is-ancestor origin/feature/retrieval-evaluation-baseline origin/feature/graphrag-demo-sprint` → 참. `git rev-list --left-right --count origin/main...origin/feature/retrieval-evaluation-baseline` → `0  13` (main의 직계 후손이자 graphrag-demo-sprint의 조상)
-- `feature/evidence-response-plans` = `feature/dog-training-rag`: `git rev-parse` 결과 두 브랜치 모두 동일 커밋(`3fec832`)을 가리킴
-- `feature/grounded-rag-v1`: `git rev-list --left-right --count origin/feature/grounded-rag-v1...origin/feature/dog-training-rag` → `0  2` (dog-training-rag의 직계 조상, 2커밋 차이)
-- `feature/dog-training-rag`와 `feature/graphrag-demo-sprint`: `git rev-list --left-right --count origin/feature/dog-training-rag...origin/feature/graphrag-demo-sprint` → `17  61`, merge-base `9aa2828`("chore: use Python 3.12", main의 조상) — 두 브랜치는 diverged 상태이며 하나가 다른 하나를 포함하지 않음
+GraphRAG 폐기 결정(`docs/decision_graphrag_abandoned_0824.md`) 이전, 아직 GraphRAG
+노선 위에서 나온 실험들입니다. main과 diverged 상태이며 병합할 계획이 없어
+`archive/` 아래로 이름을 옮겨 죽은 브랜치라는 걸 표시해뒀습니다. 커밋 자체는
+삭제하지 않았습니다.
 
-## 이번 이관 범위에서 제외한 브랜치
-
-| 브랜치 | 역할 | 현재 상태 | 최신 브랜치 포함 여부 | 팀 이관 시 처리 |
-|---|---|---|---|---|
-| `feature/chat-ui` | 개인 Chat UI 실험 (Next.js) | 별도 분기 | 미포함 | 이번 범위 제외 |
-
-`feature/chat-ui`는 `feature/dog-training-rag`를 머지한 뒤 그 위에 완전한 Next.js
-프론트엔드(`frontend/app`, `frontend/components/chat.tsx`, `frontend/lib/chat-client.ts` 등)를
-추가한 브랜치입니다. `git diff --stat origin/feature/dog-training-rag origin/feature/chat-ui`로
-확인한 결과 `frontend/` 아래 16개 파일, 약 7,285줄이 추가되어 있습니다. 팀 프론트엔드는
-별도로 개발되므로 이번 AI/RAG 이관 범위에서 제외하고, 존재 여부만 이 문서에 기록합니다.
-
-## 별도 실험·감사 기록 브랜치
-
-아래 브랜치들은 `main`, `feature/graphrag-demo-sprint`, `feature/dog-training-rag`
-세 브랜치 중 어디에도 포함되지 않는, **별도로 보존된 실험·감사 기록**입니다.
-불필요하거나 삭제해도 되는 브랜치라는 뜻이 아니며, 이번 handoff 범위에서 다루지
-않는다는 것만 표시합니다.
-
-| 브랜치 | 성격 (커밋 메시지 기준) |
-|---|---|
-| `data/bodeumtv-feasibility-audit` | 보듬TV 수집 타당성 감사 기록 |
-| `data/evidence-seed-v0` | 검토된 근거 시드 v0 |
-| `data/source-audit` | 잠정 소스 감사 |
-| `data/training-coverage-gap` | 훈련 커버리지 갭 감사 |
-| `experiment/grounded-prompt-v0` | 근거 기반 프롬프트 실험 v0 |
-| `experiment/grounded-prompt-v1-1` | 근거 기반 프롬프트 실험 v1.1 |
-| `experiment/grounded-prompt-v1-2` | 근거 기반 프롬프트 실험 v1.2 (실패 기록) |
+| 브랜치 | 역할 | 비고 |
+|---|---|---|
+| `archive/feature/dog-training-rag` | EvidenceCard·FastAPI `/chat` 서비스 실험 | 팀 이관 시 계약만 선택적으로 재사용 |
+| `archive/feature/evidence-response-plans` | dog-training-rag와 완전히 동일 커밋 | 중복 포인터, 별도 확인 불필요 |
+| `archive/feature/grounded-rag-v1` | dog-training-rag의 직계 조상 (2커밋 차이) | dog-training-rag만 보면 충분 |
+| `archive/feature/chat-ui` | dog-training-rag 위에 얹은 Next.js 프론트엔드 실험 | `frontend/` 아래 16개 파일, 약 7,285줄 추가 (`git diff --stat` 확인) |
+| `archive/experiment/grounded-prompt-v0` | 근거 기반 프롬프트 실험 v0 | main·dog-training-rag 어느 쪽에도 흡수되지 않은 독립 분기 |
+| `archive/experiment/grounded-prompt-v1-1` | 근거 기반 프롬프트 실험 v1.1 | 위와 동일 |
+| `archive/experiment/grounded-prompt-v1-2` | 근거 기반 프롬프트 실험 v1.2 (실패 기록) | 위와 동일 |
+| `archive/data/bodeumtv-feasibility-audit` | 보듬TV 수집 타당성 감사 기록 | 위와 동일 |
+| `archive/data/evidence-seed-v0` | 검토된 근거 시드 v0 | 위와 동일 |
+| `archive/data/source-audit` | 잠정 소스 감사 | 위와 동일 |
+| `archive/data/training-coverage-gap` | 훈련 커버리지 갭 감사 | 위와 동일 |
 
 ### 검증 근거
 
-이전 버전은 `main`의 조상이 아니라는 확인만으로 이 7개 브랜치를 "독립"이라고
-표시했습니다. 하지만 `main`의 조상이 아니라는 사실만으로는 GraphRAG나
-dog-training-rag 계열에 흡수됐을 가능성을 배제하지 못하므로, 세 핵심 브랜치
-(`main`, `feature/graphrag-demo-sprint`, `feature/dog-training-rag`) 각각과
-`git merge-base --is-ancestor`, `git rev-list --left-right --count`로 다시
-확인했습니다.
+- `archive/feature/evidence-response-plans` = `archive/feature/dog-training-rag`: `git rev-parse` 결과 두 브랜치 모두 동일 커밋(`3fec832`)을 가리킴
+- `archive/feature/grounded-rag-v1`: `git rev-list --left-right --count`로 dog-training-rag 계열의 직계 조상임을 확인 (2커밋 차이)
+- `archive/feature/chat-ui`는 dog-training-rag를 머지한 뒤 그 위에 `frontend/app`, `frontend/components/chat.tsx`, `frontend/lib/chat-client.ts` 등 완전한 Next.js 프론트엔드를 추가한 브랜치. 팀 프론트엔드는 별도로 개발되므로 이관 범위에서 제외
+- 나머지 7개(`grounded-prompt-v0/v1-1/v1-2`, `data/*` 4개)는 초판(2026-08-21) 작성 시 `main`, `feature/graphrag-demo-sprint`, `feature/dog-training-rag` 세 브랜치 각각과 `git merge-base --is-ancestor`, `git rev-list --left-right --count`로 확인 — 어느 쪽의 조상도 아니며(`is-ancestor` 전부 거짓), 세 조합 모두 diverged. 즉 GraphRAG 계열에도 dog-training-rag 계열에도 흡수되지 않은, 각자 독립된 시점에서 분기한 별도 보존 기록. main이 이후 진행되긴 했지만 이 결론에 영향을 주는 조상 관계는 아니므로 재검증하지 않았음
 
-7개 브랜치 모두 세 핵심 브랜치 중 어느 쪽의 조상도 아니며(`is-ancestor` 전부
-거짓), 세 조합 모두에서 `rev-list --left-right --count`의 양쪽 값이 모두
-0보다 커서(diverged) 어느 핵심 브랜치에도 포함되지 않습니다. 즉 GraphRAG 계열에
-흡수된 것도, dog-training-rag 계열에 포함된 것도 아닌, 각자 독립된 시점에서
-분기한 별도 보존 기록입니다. 정리 여부는 이 문서의 판단 범위 밖입니다.
+## 완전히 삭제된 브랜치 (main에 흡수 확인 후 정리, 2026-08-24)
 
-## main에 이미 흡수된 브랜치
+아래는 `git merge-base --is-ancestor origin/<branch> origin/main`으로 main의 조상임을
+확인한 뒤 로컬·원격에서 삭제한 브랜치입니다. 커밋은 main 이력 안에 그대로 남아있고,
+브랜치 포인터만 없앴습니다.
 
-아래 브랜치들은 `git merge-base --is-ancestor origin/<branch> origin/main` 확인 결과
-모두 `main`의 조상이며, 이미 `main` → `feature/graphrag-demo-sprint` 계열에 포함돼
-있습니다.
-
+- `chore/team-repo-handoff`
+- `data/breed-conditionality-factcheck`
 - `docs/youtube-caption-troubleshooting`
+- `experiment/growing-pixel-room-v7`
+- `experiment/main-screen-character-mockups`
+- `feature/graphrag-demo-sprint`
+- `feature/retrieval-evaluation-baseline`
 - `feature/youtube-caption-ingestion`
 - `feature/youtube-chapter-chunking`
 - `feature/youtube-metadata-catalog`
+
+## RAG와 무관한 활성 브랜치
+
+이 문서가 다루는 GraphRAG/벡터RAG 계열과 무관한, 메인 화면 UI(픽셀 룸) 실험용
+활성 브랜치입니다. 위 표들의 포함 관계 분석 대상이 아닙니다.
+
+- `experiment/simple-cute-pixel-room-v8`
+- `feature/modular-room-collision-dogs`
+- `worktree-vector-rag-transition`
+
+## 갱신 이력
+
+- **2026-08-24**: `feature/graphrag-demo-sprint`, `feature/retrieval-evaluation-baseline`을
+  main 병합 확인 후 삭제. 나머지 GraphRAG 이전 실험 7개 + `dog-training-rag` 계열
+  4개(`dog-training-rag`, `evidence-response-plans`, `grounded-rag-v1`, `chat-ui`)를
+  `archive/` 네임스페이스로 이동. 완전히 병합된 브랜치 10개(위 목록)를 로컬·원격에서
+  삭제.
+- **2026-08-21**: 초판 작성.
 
 ## 갱신 원칙
 

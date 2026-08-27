@@ -10,10 +10,9 @@
 ## 2026-08-24 — GraphRAG 폐기, 벡터RAG 단독으로 전환
 
 **그래프 검색(엔티티/관계 추출, Neo4j 적재, 벡터+그래프 하이브리드)을 폐기했다.**
-앞으로는 벡터 검색 단독(`--graph-off` 경로)으로 간다. 이 문서의 "검색 구조"·
-"현재 브랜치 기술 구성" 절에 남아 있는 그래프 관련 서술은 **폐기 전 구현 기록**이며
-현재 방향이 아니다. 결정 경위와 실측 근거(하이브리드가 벡터 대비 랭킹 지표 개선
-0건, 코퍼스가 실질 저자 2명뿐이라 절차/연령대 등 대안 축도 재현 불가)는
+앞으로는 벡터 검색 단독(`--graph-off` 경로)으로 간다. 그래프 관련 서술은
+"검색 구조 → 폐기된 경로" 하위 절과 "현재 브랜치 기술 구성" 절에 **폐기 전
+구현 기록**으로 남아 있을 뿐 현재 방향이 아니다. 결정 경위와 실측 근거는
 [`docs/decision_graphrag_abandoned_0824.md`](docs/decision_graphrag_abandoned_0824.md)를,
 그 앞의 축별 개별 조사는
 [`reports/research_graph_viability_0824/`](reports/research_graph_viability_0824/)와
@@ -23,45 +22,57 @@
 
 ## 현재 상태
 
-현재 브랜치(`feature/graphrag-demo-sprint` 계열)에 실제로 구현된 범위는 다음과
-같습니다.
+`feature/graphrag-demo-sprint`는 main에 병합된 뒤 삭제됐습니다. 아래는 이제
+`main`에 실제로 구현된 범위입니다.
 
 - YouTube 메타데이터 후보 수집과 수동 검토 ledger (`scripts/collect_youtube_metadata.py`, `data/reviews/`)
 - 승인된 자막 수집·정규화·챕터 기반 청킹 (`scripts/collect_approved_youtube_captions.py`, `scripts/normalize_youtube_vtt.py`, `scripts/chunk_approved_youtube.py`)
-- 외부 문서 인제스트, 로그인·유료 구간 URL 차단 (`scripts/ingest_documents.py`)
+- 외부 문서·PDF 인제스트, 로그인·유료 구간 URL 차단 (`scripts/ingest_documents.py`, `scripts/ingest_pdf_documents.py`)
 - 벡터 검색 평가 기준선 (`scripts/evaluate_youtube_retrieval.py`)
 - LLM 기반 엔티티·관계 추출 (`scripts/extract_entities.py`)
 - Neo4j 적재 (`scripts/load_graph_neo4j.py`)
 - 벡터+그래프 하이브리드 후보 병합 (`scripts/run_combined_retrieval_eval.py`)
 - 근거 기반 답변 생성 실험 (`scripts/generate_answers.py`)
-- 의료 입력·출력 가드레일 v1/v2 (`scripts/medical_guardrail.py`)
+- 의료 입력·출력 가드레일 v1/v2와 그 평가 (`scripts/medical_guardrail.py`, `scripts/evaluate_medical_guardrail.py`)
+- 합성 질의 생성과 견종·환경·절차·연령대 축별 코퍼스 다양성 표본 추출 (`scripts/build_synthetic_queries.py`, `scripts/sample_breed_sentences.py`, `scripts/sample_env_sentences.py`, `scripts/sample_procedure_sentences.py`, `scripts/sample_agegroup_sentences.py`)
+- 코퍼스 밖(out-of-corpus) 질의 탐지·진단 (`scripts/probe_out_of_corpus.py`, `scripts/check_out_of_corpus_queries.py`, `scripts/diagnose_synthetic_misses.py`)
 - 평가 질문·결과·동결 그래프 스냅샷 (`data/eval/`, `frozen/`)
 
-FastAPI `/chat` 서비스, EvidenceCard 근거 계약, Next.js 채팅 UI는 이 브랜치에
-없습니다. 다른 브랜치에 있는 별도 실험이며, [관련 실험 브랜치](#관련-실험-브랜치)를
+FastAPI `/chat` 서비스, EvidenceCard 근거 계약, Next.js 채팅 UI는 main에
+없습니다. 별도로 보관 중인 archive 브랜치의 실험이며, [관련 실험 브랜치](#관련-실험-브랜치)를
 참고하세요.
 
 ## 검색 구조
 
-**아래는 2026-08-24 폐기 전 구현 기록이다.** 그래프·하이브리드 절은 현재
-사용하지 않는다(위 "GraphRAG 폐기" 절 참고). 벡터 검색만 현재 경로다.
+### 현재 경로
 
-- **벡터 검색**: 질문과 코퍼스 청크(영상+문서)의 임베딩 유사도로 후보를 검색합니다.
-- **그래프 검색**: 질문 문자열에 리터럴로 매칭된 엔티티에서 최대 2-hop까지 후보를
-  확장합니다. Neo4j에 연결하지 않고 `data/graph/` 아래의 추출 결과 파일을 직접
-  읽습니다.
-- **하이브리드**: 벡터 후보 뒤에 그래프 후보를 추가하고 청크 단위로 중복을
-  제거합니다. 게이트 판정(PASS/REFUSE)은 벡터 `score_gap`만으로 내리고, 그래프
-  결과는 판정에 관여하지 않습니다.
-- **답변 생성**: 병합된 근거 후보를 LLM이 읽고 답변을 작성합니다.
+- **벡터 검색**: 질문과 코퍼스 청크(영상+문서)의 임베딩 유사도로 후보를 추립니다.
+- **게이트**: PASS/REFUSE 판정은 벡터 신호 하나로만 내립니다. 기본 신호는
+  2026-08-25부터 `margin_top5`입니다. `score_gap`은 비교용 옵션
+  (`--gate-signal score_gap`)으로 남겨 뒀습니다.
+- **답변 생성**: PASS한 근거 후보를 LLM이 읽고 답변을 작성합니다.
 
 알려진 한계:
 
-- `score_gap` 게이트는 코퍼스가 커지면서 판별력이 흔들린 사례가 있어 운영
-  정책으로 확정하지 않았습니다.
-- GraphRAG는 현재 데모·평가 단계이며 FastAPI `/chat`과 연결되어 있지 않습니다.
-- GraphRAG가 반환하는 raw chunk와 EvidenceCard의 근거 계약은 아직 통합되지
-  않았습니다.
+- 게이트 기본 신호를 `score_gap`에서 `margin_top5`로 바꿨습니다(2026-08-25) —
+  코퍼스가 커지면서 `score_gap`이 판별력을 잃는 사례가 나왔고 held-out 28건
+  기준으로 `margin_top5`가 92.9% 일치해 더 안정적이었습니다. `score_gap`은
+  비교용 옵션으로 남겨 뒀습니다.
+- `scripts/generate_answers.py`의 답변 밴드 분류는 이 전환 범위 밖이라 여전히
+  `score_gap` 단독 기준입니다 — 게이트 신호와 밴드 신호가 서로 다릅니다.
+
+### 폐기된 경로 — 2026-08-24 이전 구현 기록
+
+그래프 검색과 하이브리드 병합은 더 이상 쓰지 않습니다(위 "GraphRAG 폐기" 절
+참고). 코드와 문서는 남아 있습니다. 아래는 살아 있던 시점의 구현을 요약한
+기록입니다.
+
+- **그래프 검색**: 질문 문자열에 리터럴로 매칭된 엔티티에서 최대 2-hop까지
+  후보를 확장합니다. Neo4j에 연결하지 않고 `data/graph/` 아래의 추출 결과
+  파일을 직접 읽습니다.
+- **하이브리드**: 벡터 후보 뒤에 그래프 후보를 붙이고 청크 단위로 중복을
+  제거합니다. PASS로 판정된 질문에만 근거로 들어갈 뿐 게이트 판정에는
+  관여하지 않습니다.
 
 설계 결정과 근거는 [`docs/graph_hybrid_retrieval_design.md`](docs/graph_hybrid_retrieval_design.md),
 이관 시 재사용 판단은 [`docs/TEAM_HANDOFF.md`](docs/TEAM_HANDOFF.md)를 참고하세요.
@@ -88,14 +99,15 @@ Qdrant, FastAPI, Next.js, `bge-m3`, `faster-whisper`는 이 브랜치의 실행 
 ## 저장소 구조
 
 ```
-scripts/      수집·청킹·추출·검색·생성·평가 CLI
-data/         추적 허용된 평가셋·가드레일 어휘·수동 검토 ledger·데모 프로필
-docs/         설계 결정, 소스 지도, 브랜치·handoff 문서
-frozen/       재추출하면 동일하게 재현되지 않는 그래프 동결 스냅샷
-reports/      평가·실패 분석 리포트
-tests/        파이프라인·가드레일 unittest
-prompts/      엔티티 추출 프롬프트 초안
-guardrail/    초기 가드레일 시드 어휘
+scripts/          수집·청킹·추출·검색·생성·평가 CLI
+data/             추적 허용된 평가셋·가드레일 어휘·수동 검토 ledger·데모 프로필
+docs/             설계 결정, 소스 지도, 브랜치·handoff 문서
+frozen/           재추출하면 동일하게 재현되지 않는 그래프 동결 스냅샷
+reports/          평가·실패 분석 리포트
+tests/            파이프라인·가드레일 unittest
+prompts/          엔티티 추출 프롬프트 초안
+guardrail/        초기 가드레일 시드 어휘
+ui-experiments/   RAG와 무관한 메인 화면 UI(픽셀 룸) 디자인 실험. 별도 트랙, 이 문서의 나머지 내용과 관계없음
 ```
 
 `data/`의 나머지(수집된 원본 영상·자막·오디오, 처리된 청크, 그래프 추출 중간
@@ -189,11 +201,12 @@ Git에 올리지 않는 것 (`.gitignore` 기준):
 
 ## 관련 실험 브랜치
 
-- `feature/dog-training-rag`: EvidenceCard·FastAPI `/chat` 서비스 실험
-- `feature/chat-ui`: Next.js 채팅 UI 실험
+- `archive/feature/dog-training-rag`: EvidenceCard·FastAPI `/chat` 서비스 실험
+- `archive/feature/chat-ui`: Next.js 채팅 UI 실험
 
-두 브랜치 모두 이 GraphRAG 기준 브랜치에 병합되지 않았습니다. 팀 이관 시 구현
-전체가 아니라 필요한 계약과 코드만 선택적으로 참고합니다. 전체 브랜치 관계는
+두 브랜치 모두 GraphRAG 폐기·벡터RAG 전환 이전의 실험이라 `archive/` 아래로
+옮겨 보관 중이며, main에는 병합되지 않았습니다. 팀 이관 시 구현 전체가 아니라
+필요한 계약과 코드만 선택적으로 참고합니다. 전체 브랜치 관계는
 [`docs/BRANCH_MAP.md`](docs/BRANCH_MAP.md)를 참고하세요.
 
 ## 팀 이관

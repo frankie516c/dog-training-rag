@@ -38,12 +38,15 @@ from pypdf import PdfReader
 
 sys.path.insert(0, str(Path(__file__).parent))
 from ingest_documents import (  # noqa: E402
+    AUTHORITY_BY_ROLE,
     CHUNK_SCHEMA_VERSION,
     CHUNKING,
+    ROLE_DOCUMENT_BODY,
     check_url_allowed,
     chunk_id_for,
     split_chars,
     split_sections,
+    text_sha256,
 )
 
 if sys.platform == "win32":
@@ -122,9 +125,25 @@ def build_chunks(entry: dict[str, Any], text: str) -> list[dict[str, Any]]:
         pieces = split_chars(body, reserved=len(breadcrumb) + 1)
         for piece in pieces:
             chunk_text = f"{breadcrumb}\n{piece}".strip()
+            # v2: chunk_id는 정체성 payload 기반이다. 이 스크립트는 문서 청커의
+            # 규약을 그대로 따라야 한다 — 한쪽만 v1에 남으면 코퍼스에 스키마가
+            # 섞이고, 실제로 그런 상태가 한 번 만들어졌었다(AVSAB 115청크만 v1).
+            # AVSAB PDF는 Q&A가 아니므로 역할은 항상 DOCUMENT_BODY다.
+            role = ROLE_DOCUMENT_BODY
+            authority = AUTHORITY_BY_ROLE[role]
+            payload = {
+                "schema_version": CHUNK_SCHEMA_VERSION,
+                "doc_id": entry["doc_id"],
+                "chunk_index": index,
+                "qa_id": None,
+                "segment_role": role,
+                "text_sha256": text_sha256(chunk_text),
+                **{k: CHUNKING[k] for k in
+                   ("target_chars", "min_chars", "max_chars", "overlap_segments")},
+            }
             records.append({
                 "schema_version": CHUNK_SCHEMA_VERSION,
-                "chunk_id": chunk_id_for(chunk_text),
+                "chunk_id": chunk_id_for(payload),
                 "doc_id": entry["doc_id"],
                 "chunk_index": index,
                 "source_url": entry["source_url"],
@@ -135,6 +154,9 @@ def build_chunks(entry: dict[str, Any], text: str) -> list[dict[str, Any]]:
                 "char_count": len(chunk_text),
                 "embedding_eligible": True,
                 "chunking": dict(CHUNKING),
+                "qa_id": None,
+                "segment_role": role,
+                **authority,
             })
             index += 1
     return records
