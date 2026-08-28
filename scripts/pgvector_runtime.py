@@ -53,6 +53,24 @@ SAFETY_BOUNDARY_TERMS = (
 
 _BOUNDARY_PATTERN = re.compile("|".join(re.escape(t) for t in SAFETY_BOUNDARY_TERMS))
 
+#: Floor for catastrophically broken retrieval — **not a relevance check.**
+#:
+#: Measured 2026-08-28 on the frozen answerable set (19 rows,
+#: reports/retrieval_gate_signal_0828.md): observed top_score runs 0.8385~0.8832,
+#: so this branch fires 0 times.  It stays because a run whose scores collapse
+#: below it is broken in a way worth catching — the obvious one being a serving
+#: embedding label that does not match the indexed vectors, which produces
+#: garbage silently because the dimensions still line up.
+#:
+#: It cannot be turned into a relevance check by raising it.  hit and miss
+#: overlap completely on top_score, on margin_topk, on top1-top2, on document
+#: diversity and on score spread; the best in-sample threshold buys 2 rows out
+#: of 19 over "always PASS" and the best-looking one points the wrong way.  E5
+#: encodes query and passage separately, and across 65 same-domain chunks the
+#: gold/non-gold difference is 0.003~0.032 — under the model's resolution.
+#: A usable gate needs a different score source, not a different number here.
+RETRIEVAL_FLOOR_SCORE = 0.70
+
 _MEDICAL_LEXICONS: tuple | None = None
 
 
@@ -190,7 +208,10 @@ class RuntimeRetriever:
     def _retrieval_decision(results: list[dict], whitelist: list[str] | None = None):
         extra={"whitelist_matched":whitelist} if whitelist else {}
         if not results: return {"decision":"REFUSE","reason":"no_results",**extra}
-        if results[0]["score"] < 0.70: return {"decision":"UNCERTAIN","reason":"low_top_score","top_score":results[0]["score"],**extra}
+        if results[0]["score"] < RETRIEVAL_FLOOR_SCORE: return {"decision":"UNCERTAIN","reason":"low_top_score","top_score":results[0]["score"],**extra}
+        # 진단용으로 계속 싣는다. **판정에는 쓰지 않는다** — hit/miss 를 못 가른다는 것이
+        # 측정됐다(reports/retrieval_gate_signal_0828.md). "retrieval_confident" 는
+        # 관련성 판정이 아니라 "바닥 위"라는 뜻이다.
         margin=results[0]["score"]-(results[-1]["score"] if len(results)>1 else 0)
         return {"decision":"PASS","reason":"retrieval_confident","top_score":results[0]["score"],"margin_topk":margin,**extra}
 

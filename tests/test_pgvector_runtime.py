@@ -6,6 +6,7 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
 from pgvector_runtime import (  # noqa: E402
     MIN_BOUNDARY_TERM_CHARS,
+    RETRIEVAL_FLOOR_SCORE,
     SAFETY_BOUNDARY_TERMS,
     RuntimeRetriever,
 )
@@ -171,6 +172,36 @@ def test_frozen_answerable_rows_are_never_refused_by_the_boundary():
     answerable = [row for row in rows if row.get("coverage") == "answerable"]
     refused = [row["query_id"] for row in answerable if _gate(row["question"])["decision"] == "REFUSE"]
     assert not refused, f"answerable 행이 경계에 막혔다: {refused}"
+
+
+# --- 죽은 임계값 고정 ----------------------------------------------------------
+
+#: 동결 answerable 19건에서 실측된 `top_score` 범위 (2026-08-28,
+#: reports/retrieval_gate_signal_0828.md).  코퍼스 텍스트가 아니라 측정값이다.
+FROZEN_TOP_SCORE_RANGE = (0.8385, 0.8832)
+
+
+def test_retrieval_floor_never_fires_on_the_frozen_answerable_set():
+    """`RETRIEVAL_FLOOR_SCORE` 는 파국 감지용이지 관련성 검사가 아니다.
+
+    실측 하한 0.8385 에서도 PASS 여야 한다.  이 테스트가 실패한다면 누군가
+    바닥값을 관측 대역 안으로 올린 것이다 — 그러면 hit 9건 중 일부를 같이
+    거절하게 된다.  hit/miss 가 이 값으로 안 갈린다는 측정이 보고서에 있다.
+    """
+    lowest, _ = FROZEN_TOP_SCORE_RANGE
+    assert RETRIEVAL_FLOOR_SCORE < lowest, (
+        f"바닥값 {RETRIEVAL_FLOOR_SCORE} 가 실측 대역({lowest}~) 안으로 들어왔다. "
+        "reports/retrieval_gate_signal_0828.md 를 읽고 바꿀 것"
+    )
+    assert _gate("배변 훈련 질문", [{"score": lowest}] * 4)["decision"] == "PASS"
+
+
+def test_margin_is_reported_but_not_used_in_the_decision():
+    """margin 은 진단값이다. 판정에 쓰이기 시작하면 보고서를 갱신해야 한다."""
+    wide = _gate("배변 훈련 질문", [{"score": .90}, {"score": .80}])
+    narrow = _gate("배변 훈련 질문", [{"score": .90}, {"score": .8999}])
+    assert wide["decision"] == narrow["decision"] == "PASS"
+    assert wide["margin_topk"] > narrow["margin_topk"]
 
 
 # --- 어휘 불변식 (2026-08-20 교훈의 기계화) ------------------------------------

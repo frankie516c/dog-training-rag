@@ -16,28 +16,36 @@
 - [x] A-3. 통과 대조군 4건 · 동결 25건 계약이 그대로인지 재측정
 - [x] A-4. `gate()` docstring의 우선순위 설명을 결과에 맞춘다
 
-## 1. 커밋 · PR
+## 1. 커밋 · PR — **완료 2026-08-28**
 
-- [~] 1-1. `git add -f data/eval/queries/gate_pass_controls_v1.jsonl` (gitignore 예외)
-- [ ] 1-2. dog-training-rag-retrieval 커밋
-- [ ] 1-3. DAENGS_dev `fix/training-rag-safety-decision` 커밋 · push · PR
-- [ ] 1-4. DAENGS backend venv의 `ml` 그룹 상태를 사용자에게 확인받는다
+커밋 `ddce653` / DAENGS PR #45 (`fix/training-rag-safety-decision` -> `dev`).
 
-## 2. 게이트가 거짓말하는 것 닫기
+- [x] 1-1. `git add -f data/eval/queries/gate_pass_controls_v1.jsonl` (gitignore 예외)
+- [x] 1-2. dog-training-rag-retrieval 커밋
+- [x] 1-3. DAENGS_dev `fix/training-rag-safety-decision` 커밋 · push · PR
+- [~] 1-4. DAENGS backend venv의 `ml` 그룹 상태를 사용자에게 확인받는다
+
+## 2. 게이트가 거짓말하는 것 닫기 — **완료 2026-08-28 (판정: 신호 없음)**
+
+`reports/retrieval_gate_signal_0828.md`. top_score·margin·top1-top2·문서 다양성·점수 편차
+**다섯 개 전부 hit/miss 가 겹쳐** 임계값으로 못 가른다. 규칙은 안 바꿨고, 0.70 이 죽은
+분기라는 사실만 상수 이름·문서·테스트로 고정했다. 동결 25건 일치율 88.0% 그대로.
 
 죽은 임계값(`top_score < 0.70`)과 계산만 하고 안 쓰는 `margin_topk`.
 
-- [ ] 2-1. 동결 25건에서 hit/miss별 `top_score`·`margin` 분포를 뽑는다
+- [x] 2-1. 동결 25건에서 hit/miss별 `top_score`·`margin` 분포를 뽑는다
       (`data/scratch/retrieval_reranking_0827_v5/results.json` — DB 불필요)
-- [ ] 2-2. 분리 가능한 신호가 있는지 판정한다. **없으면 없다고 기록하고 2-3을 건너뛴다**
-- [ ] 2-3. 판정 규칙을 고치고 회귀 테스트를 추가한다
-- [ ] 2-4. 동결 25건 decision 일치율이 88.0%에서 어떻게 변하는지 기록
+- [x] 2-2. 분리 가능한 신호가 있는지 판정한다. **없으면 없다고 기록하고 2-3을 건너뛴다**
+- [x] 2-3. 판정 규칙을 고치고 회귀 테스트를 추가한다
+- [x] 2-4. 동결 25건 decision 일치율이 88.0%에서 어떻게 변하는지 기록
 
 ## 3. cross-encoder 리랭커
 
-- [ ] 3-1. Docker · pgvector 기동 (2번과 달리 후보 본문이 필요하다)
+- [~] 3-1. Docker · pgvector 기동 (2번과 달리 후보 본문이 필요하다)
 - [ ] 3-2. `compare_retrieval_reranking.py`에 cross-encoder 갈래를 추가
 - [ ] 3-3. 동결 25건으로 Hit@1 / Hit@4 / MRR 재측정, dense 기준선(47.4%)과 비교
+- [ ] 3-3b. **리랭커 점수가 hit/miss 를 가르는지도 같이 측정** (2번이 넘긴 숙제 —
+      가르면 게이트를 그 점수 위에 세우고, 못 가르면 게이트는 관련성 판단을 포기한다)
 - [ ] 3-4. 기존 dense 정답 9건이 top-4 밖으로 밀리지 않는지 확인 (0827 실험의 탈락 기준)
 - [ ] 3-5. 채택 시 `rag_api.py`의 `top_k: le=4` 상한을 풀고 검색 10 → 리랭크 → 프롬프트 4로 분리
 - [ ] 3-6. 보고서 작성 (`reports/`)
