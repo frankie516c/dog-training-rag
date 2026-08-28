@@ -20,6 +20,7 @@ asserted at startup — a run that cannot reproduce it is not comparable and sto
 from __future__ import annotations
 
 import argparse
+import gc
 import json
 import statistics as st
 import sys
@@ -98,6 +99,10 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="BAAI/bge-reranker-v2-m3")
     parser.add_argument("--candidates", type=int, default=50, help="리랭크할 dense 상위 N (0827 과 같은 50)")
+    # 청크 중앙값이 759자(최대 1001자)라 512 토큰이면 대부분 잘리지 않는다. 이 저장소의
+    # torch 는 CPU 전용이라 시퀀스 길이가 그대로 벽시계 시간이 된다.
+    parser.add_argument("--max-length", type=int, default=512)
+    parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--chunks", type=Path, default=DEFAULT_CHUNKS)
     parser.add_argument("--input", type=Path, default=DEFAULT_EVAL)
     parser.add_argument("--serving", type=Path, default=DEFAULT_SERVING)
@@ -140,9 +145,21 @@ def main() -> None:
             "  코퍼스·청킹·임베딩 모델 중 무엇이 바뀌었는지 먼저 확인할 것."
         )
 
+    # 임베딩 인코더를 놓고 나서 리랭커를 올린다.
+    #
+    # 이 PC 는 RAM 16GB 인데 가용이 4~5GB 뿐이고(qemu VM 이 2GB대를 잡고 있다), E5
+    # (약 1.1GB) 를 든 채로 bge-reranker-v2-m3(2.27GB) 를 얹으면 **트레이스백 없이**
+    # 죽는다. 2026-08-28 에 두 번 그렇게 끊겼다 — 예외가 아니라 OOM kill 이라 로그에
+    # 아무것도 안 남는다. 여기서부터 dense 결과는 이미 숫자로 다 뽑혀 있어 인코더가
+    # 필요 없다.
+    del encoder, passages, queries, sims
+    gc.collect()
+
     started = time.perf_counter()
-    reranker = CrossEncoder(args.model)
+    reranker = CrossEncoder(args.model, max_length=args.max_length)
     load_seconds = time.perf_counter() - started
+    print(f"리랭커 로드 {load_seconds:.1f}초 — {args.model} "
+          f"(max_length={args.max_length}, batch={args.batch_size})", flush=True)
 
     rerank_ranks: list[int | None] = []
     top_scores_hit: list[float] = []
@@ -152,7 +169,7 @@ def main() -> None:
     for i, row in enumerate(rows):
         pool = candidates[i]
         pairs = [(row["question"], chunks[idx]["text"]) for idx in pool]
-        scores = reranker.predict(pairs, batch_size=16, show_progress_bar=False)
+        scores = reranker.predict(pairs, batch_size=args.batch_size, show_progress_bar=False)
         order = [pool[j] for j in np.argsort(-np.asarray(scores))]
         anchors = set(row.get("anchor_chunk_ids") or [])
         rank = next((j + 1 for j, idx in enumerate(order) if chunks[idx]["chunk_id"] in anchors), None)
@@ -163,6 +180,8 @@ def main() -> None:
             "query_id": row["query_id"], "query_type": row["query_type"],
             "dense_rank": dense_ranks[i], "rerank_rank": rank, "rerank_top_score": top_score,
         })
+        print(f"  [{i + 1}/{n}] {row['query_id']} dense={dense_ranks[i]} rerank={rank} "
+              f"({time.perf_counter() - started:.0f}초 경과)", flush=True)
     rerank_seconds = time.perf_counter() - started
     rerank = metrics(rerank_ranks, n)
 
@@ -195,7 +214,7 @@ def main() -> None:
 
     payload = {
         "schema_version": "cross-encoder-rerank-v1", "model": args.model,
-        "candidates": args.candidates, "eligible_rows": len(chunks), "answerable": n,
+        "candidates": args.candidates, "max_length": args.max_length, "eligible_rows": len(chunks), "answerable": n,
         "dense": dense, "rerank": rerank, "gains": gains, "regressions": regressions,
         "gate_signal": gate, "details": details,
         "seconds": {"model_load": load_seconds, "rerank_total": rerank_seconds,
