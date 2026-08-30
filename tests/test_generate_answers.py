@@ -645,11 +645,11 @@ class ProfileCliTests(unittest.TestCase):
 
 
 class LiveModeCliTests(unittest.TestCase):
-    """The default flips to live generation; --dry-run is the opt-out, not the default."""
+    """The project default is the adopted local Ollama provider; --dry-run remains opt-in."""
 
-    def test_mode_defaults_to_openai(self):
+    def test_mode_defaults_to_ollama(self):
         parsed = module.build_parser().parse_args([])
-        self.assertEqual("openai", parsed.mode)
+        self.assertEqual("ollama", parsed.mode)
 
     def test_dry_run_flag_still_overrides_to_dry_run(self):
         parsed = module.build_parser().parse_args(["--dry-run"])
@@ -668,6 +668,10 @@ class LiveModeCliTests(unittest.TestCase):
         message = str(caught.exception)
         self.assertIn("OPENAI_API_KEY", message)
         self.assertNotIn("unknown --mode", message)
+
+    def test_ollama_mode_dispatches_without_openai_key(self):
+        client = module.build_client("ollama", Path(tempfile.mkdtemp()))
+        self.assertEqual("ollama:gemma3:4b", client.info.name)
 
 
 class GenerationMetaTests(unittest.TestCase):

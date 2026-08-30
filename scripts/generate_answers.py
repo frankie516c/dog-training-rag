@@ -34,8 +34,10 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import os
 import sys
 import time
+import urllib.request
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -155,10 +157,14 @@ PROFILE_NOTE = (
 # extract_entities.py's PROMPT_VERSION comment for why: absent from the request,
 # not sent as null). max_output_tokens is generous because a reasoning model's
 # hidden reasoning tokens can eat into the same budget as the visible answer.
-GENERATION_MODEL = "gpt-5.6-terra"
+OPENAI_GENERATION_MODEL = "gpt-5.6-terra"  # rollback/reference provider
+OLLAMA_GENERATION_MODEL = os.getenv("OLLAMA_GENERATION_MODEL", "gemma3:4b")
+GENERATION_MODEL = OPENAI_GENERATION_MODEL
 GENERATION_REASONING_EFFORT = "medium"
 GENERATION_TEMPERATURE = "not_sent"
 GENERATION_MAX_OUTPUT_TOKENS = 4096
+OLLAMA_MAX_OUTPUT_TOKENS = 2000
+DEFAULT_GENERATION_MODE = os.getenv("GENERATION_MODE", "ollama")
 
 
 class GenerationError(RuntimeError):
@@ -399,10 +405,48 @@ def load_openai_answer_client(env_path: Path = Path(".env")) -> AnswerClient:
     return OpenAIAnswerClient()
 
 
+def load_ollama_answer_client(endpoint: str | None = None) -> AnswerClient:
+    """Use the adopted local model through the already-running Ollama service."""
+    model = os.getenv("OLLAMA_GENERATION_MODEL") or OLLAMA_GENERATION_MODEL
+    try:
+        from dotenv import dotenv_values
+        model = (dotenv_values(Path(".env")) or {}).get("OLLAMA_GENERATION_MODEL") or model
+    except ImportError:
+        pass
+    endpoint = endpoint or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+
+    class OllamaAnswerClient:
+        model_id = model
+        reasoning_effort = "disabled"
+
+        @property
+        def info(self) -> ClientInfo:
+            return ClientInfo(name=f"ollama:{model}")
+
+        def complete(self, prompt: str, record: dict[str, Any]) -> str | None:
+            payload = {"model": model, "prompt": prompt, "stream": False, "think": False,
+                       "options": {"temperature": 0, "seed": 42, "num_predict": OLLAMA_MAX_OUTPUT_TOKENS, "num_ctx": 8192}}
+            request = urllib.request.Request(endpoint.rstrip("/") + "/api/generate", data=json.dumps(payload).encode("utf-8"), headers={"Content-Type": "application/json"})
+            try:
+                with urllib.request.urlopen(request, timeout=180) as response:
+                    data = json.loads(response.read().decode("utf-8"))
+            except Exception as exc:
+                raise GenerationError(f"Ollama call failed for {model}: {str(exc)[:400]}") from exc
+            prompt_tokens = data.get("prompt_eval_count", 0) or 0
+            output_tokens = data.get("eval_count", 0) or 0
+            record["usage"] = {"input_tokens": prompt_tokens, "output_tokens": output_tokens,
+                                "prompt_eval_count": prompt_tokens, "eval_count": output_tokens,
+                                "total_duration_ns": data.get("total_duration", 0), "done_reason": data.get("done_reason")}
+            return data.get("response", "") or None
+
+    return OllamaAnswerClient()
+
+
 def build_client(mode: str, prompt_dir: Path, env_path: Path = Path(".env")) -> AnswerClient:
     """Pick the client for a run.
 
-    'openai' (the CLI default) calls GENERATION_MODEL for real; 'dry-run' writes
+    'ollama' (the project default) calls the adopted local model; 'openai' calls
+    the pinned reference model; 'dry-run' writes
     prompts to prompt_dir instead of calling anything, unchanged from before the
     live client existed, so a --dry-run run today stays comparable to every
     dry-run result already on disk.
@@ -411,9 +455,11 @@ def build_client(mode: str, prompt_dir: Path, env_path: Path = Path(".env")) -> 
         return DryRunClient(prompt_dir)
     if mode == "openai":
         return load_openai_answer_client(env_path)
+    if mode == "ollama":
+        return load_ollama_answer_client()
     raise GenerationError(
-        f"unknown --mode {mode!r}. Supported: 'openai' (default, calls {GENERATION_MODEL}) "
-        "or 'dry-run' (prompts only, no API call). See build_client() to add another provider."
+        f"unknown --mode {mode!r}. Supported: 'ollama' (default, calls {OLLAMA_GENERATION_MODEL}), "
+        f"'openai' (calls {OPENAI_GENERATION_MODEL}) or 'dry-run'. Add providers in build_client()."
     )
 
 
@@ -967,9 +1013,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
     parser.add_argument(
         "--mode",
-        default="openai",
-        help=f"'openai' calls the live model (default, pinned to {GENERATION_MODEL}); "
-             "'dry-run' writes prompts instead of calling a model",
+        default=DEFAULT_GENERATION_MODE,
+        help=f"'ollama' calls the adopted local model (default: {OLLAMA_GENERATION_MODEL}); "
+             f"'openai' calls the reference model {OPENAI_GENERATION_MODEL}; 'dry-run' writes prompts",
     )
     parser.add_argument("--dry-run", action="store_true", help="alias for --mode dry-run")
     parser.add_argument(
